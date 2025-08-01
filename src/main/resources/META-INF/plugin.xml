@@ -45,5 +45,9 @@
     <!-- Code formatting -->
     <lang.formatter language="GDB" 
                     implementationClass="org.limepepper.gdb_plugin.formatting.GdbFormattingModelBuilder"/>
+                    
+    <!-- Documentation provider -->
+    <lang.documentationProvider language="GDB"
+                               implementationClass="org.limepepper.gdb_plugin.documentation.GdbDocumentationProvider"/>
   </extensions>
 </idea-plugin>
