@@ -1,0 +1,144 @@
+{
+  parserClass="org.limepepper.gdb_plugin.parser.GdbParser"
+  parserUtilClass="org.limepepper.gdb_plugin.parser.GdbParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Gdb"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.limepepper.gdb_plugin.psi"
+  psiImplPackage="org.limepepper.gdb_plugin.psi.impl"
+
+  elementTypeHolderClass="org.limepepper.gdb_plugin.psi.GdbTypes"
+  elementTypeClass="org.limepepper.gdb_plugin.psi.GdbElementType"
+  tokenTypeClass="org.limepepper.gdb_plugin.psi.GdbTokenType"
+
+  tokens=[
+    // Whitespace and structure
+    WHITESPACE='regexp:\s+'
+    NEWLINE='regexp:\r\n|\r|\n'
+    COMMENT='regexp:#.*'
+    
+    // Commands
+    COMMAND_EXECUTION='regexp:(run|r|start|continue|c|step|s|next|n|finish|until|u|kill|quit|q|detach)'
+    COMMAND_BREAKPOINT='regexp:(break|b|tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)'
+    COMMAND_STACK='regexp:(backtrace|bt|frame|f|up|down|select-frame)'
+    COMMAND_DATA='regexp:(print|p|display|output|printf|call|return|x|examine|info|i|show|list|l|disassemble|disas)'
+    COMMAND_CONFIG='regexp:(set|unset|source|file|exec-file|symbol-file|core-file|target|attach|load)'
+    COMMAND_USER='regexp:(define|document|end|if|else|while|loop_break|loop_continue)'
+    
+    // Literals
+    NUMBER='regexp:\d+'
+    HEX_NUMBER='regexp:0x[0-9a-fA-F]+'
+    STRING='regexp:"([^"\\]|\\.)*"'
+    REGISTER='regexp:\$[a-zA-Z_][a-zA-Z0-9_]*|\$\d+'
+    IDENTIFIER='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
+    
+    // Operators
+    OPERATOR='regexp:(==|!=|<=|>=|<|>|&&|\|\||!|<<|>>|[+\-*/%&|^~])'
+    ASSIGNMENT='regexp:(=|\+=|-=|\*=|/=)'
+    ADDRESS_MARKER='*'
+    
+    // Punctuation
+    LPAREN='('
+    RPAREN=')'
+    LBRACKET='['
+    RBRACKET=']'
+    LBRACE='{'
+    RBRACE='}'
+    COMMA=','
+    SEMICOLON=';'
+    COLON=':'
+    DOT='.'
+    ARROW='->'
+    SCOPE_RESOLUTION='::'
+    
+    // Special
+    CONDITION_IF='if'
+  ]
+}
+
+// Grammar rules
+gdbFile ::= (statement | NEWLINE)*
+
+statement ::= command_statement
+           | user_defined_command
+           | conditional_statement
+
+// Command statements
+command_statement ::= command arguments? condition? comment?
+
+command ::= COMMAND_EXECUTION
+         | COMMAND_BREAKPOINT  
+         | COMMAND_STACK
+         | COMMAND_DATA
+         | COMMAND_CONFIG
+         | COMMAND_USER
+
+arguments ::= argument (WHITESPACE+ argument)*
+
+argument ::= expression
+          | STRING
+          | IDENTIFIER
+          | address
+          | register_ref
+
+// Expressions
+expression ::= logical_or_expr
+
+logical_or_expr ::= logical_and_expr ('||' logical_and_expr)*
+
+logical_and_expr ::= equality_expr ('&&' equality_expr)*
+
+equality_expr ::= relational_expr (('==' | '!=') relational_expr)*
+
+relational_expr ::= additive_expr (('<' | '>' | '<=' | '>=') additive_expr)*
+
+additive_expr ::= multiplicative_expr (('+' | '-') multiplicative_expr)*
+
+multiplicative_expr ::= unary_expr (('*' | '/' | '%') unary_expr)*
+
+unary_expr ::= ('!' | '-' | '+' | ADDRESS_MARKER)? primary_expr
+
+primary_expr ::= NUMBER
+              | HEX_NUMBER
+              | STRING
+              | register_ref
+              | function_call
+              | member_access
+              | array_access
+              | IDENTIFIER
+              | LPAREN expression RPAREN
+
+// Specific constructs
+address ::= ADDRESS_MARKER (HEX_NUMBER | IDENTIFIER | LPAREN expression RPAREN)
+
+register_ref ::= REGISTER
+
+function_call ::= IDENTIFIER LPAREN (expression (COMMA expression)*)? RPAREN
+
+member_access ::= (IDENTIFIER | register_ref) (DOT | ARROW) IDENTIFIER
+
+array_access ::= (IDENTIFIER | register_ref) LBRACKET expression RBRACKET
+
+// Conditional constructs
+condition ::= CONDITION_IF expression
+
+conditional_statement ::= CONDITION_IF expression NEWLINE
+                         statement*
+                         (else_clause)?
+                         end_clause
+
+else_clause ::= 'else' NEWLINE statement*
+
+end_clause ::= 'end'
+
+// User-defined commands
+user_defined_command ::= define_statement NEWLINE
+                        statement*
+                        end_clause
+
+define_statement ::= 'define' IDENTIFIER
+
+// Comments
+comment ::= COMMENT
