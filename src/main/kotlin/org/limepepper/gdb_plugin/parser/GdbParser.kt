@@ -5,6 +5,7 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
 import com.intellij.psi.tree.IElementType
 import org.limepepper.gdb_plugin.GdbTokenTypes
+import org.limepepper.gdb_plugin.psi.GdbElementType
 
 /**
  * Simple parser for GDB language
@@ -118,6 +119,3 @@ class GdbParser : PsiParser {
         )
     }
 }
-
-// Import the element type
-import org.limepepper.gdb_plugin.psi.GdbElementType

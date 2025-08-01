@@ -7,6 +7,7 @@ import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.formatter.common.AbstractBlock
+import org.limepepper.gdb_plugin.GdbLanguage
 import org.limepepper.gdb_plugin.GdbTokenTypes
 import org.limepepper.gdb_plugin.parser.GdbParser
 
@@ -41,17 +42,14 @@ class GdbBlock(
                 val childAlignment = getChildAlignment(child)
                 val childIndent = getChildIndent(child)
                 
-                blocks.add(
-                    GdbBlock(
-                        child,
-                        childWrap,
-                        childAlignment,
-                        spacingBuilder,
-                        codeStyleSettings
-                    ).apply {
-                        indent = childIndent
-                    }
+                val childBlock = GdbBlock(
+                    child,
+                    childWrap,
+                    childAlignment,
+                    spacingBuilder,
+                    codeStyleSettings
                 )
+                blocks.add(childBlock)
             }
             child = child.treeNext
         }
@@ -149,6 +147,3 @@ class GdbBlock(
         }
     }
 }
-
-// Import required for SpacingBuilder
-import org.limepepper.gdb_plugin.GdbLanguage
