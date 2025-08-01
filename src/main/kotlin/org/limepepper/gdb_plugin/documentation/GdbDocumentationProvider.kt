@@ -1,8 +1,7 @@
 package org.limepepper.gdb_plugin.documentation
 
-import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.documentation.DocumentationTarget
-import com.intellij.platform.backend.documentation.DocumentationTargetProvider
+import com.intellij.platform.backend.documentation.PsiDocumentationTargetProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import org.limepepper.gdb_plugin.GdbTokenTypes
@@ -10,9 +9,9 @@ import org.limepepper.gdb_plugin.GdbTokenTypes
 /**
  * Modern documentation target provider for GDB language elements
  */
-class GdbDocumentationProvider : DocumentationTargetProvider {
+class GdbDocumentationProvider : PsiDocumentationTargetProvider {
 
-    override fun documentationTarget(project: Project, element: PsiElement): DocumentationTarget? {
+    override fun documentationTarget(element: PsiElement, originalElement: PsiElement?): DocumentationTarget? {
         return if (isDocumentableElement(element)) {
             GdbDocumentationTarget(element)
         } else {
@@ -34,14 +33,6 @@ class GdbDocumentationProvider : DocumentationTargetProvider {
         }
     }
 
-    private fun escapeHtml(text: String): String {
-        return text
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace("\"", "&quot;")
-            .replace("'", "&#x27;")
-    }
 }
 
 /**
