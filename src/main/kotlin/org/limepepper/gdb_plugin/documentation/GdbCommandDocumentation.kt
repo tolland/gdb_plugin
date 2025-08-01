@@ -292,8 +292,8 @@ object GdbCommandDocumentation {
             Size: b(byte), h(halfword), w(word), g(giant, 8 bytes)
             
             Examples:
-            - x/10i $pc (10 instructions at PC)
-            - x/8x $sp (8 hex words at stack pointer)
+            - x/10i ${'$'}pc (10 instructions at PC)
+            - x/8x ${'$'}sp (8 hex words at stack pointer)
             - x/s 0x400000 (string at address)
             """.trimIndent()
         ),
