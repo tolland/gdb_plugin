@@ -1,5 +1,6 @@
 package org.limepepper.gdb_plugin.parser
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.lang.PsiParser
@@ -53,9 +54,8 @@ class GdbParserDefinition : ParserDefinition {
     override fun getWhitespaceTokens(): TokenSet = WHITESPACE_TOKENS
 
     override fun createElement(node: ASTNode): PsiElement {
-        // For now, return a generic PSI element
-        // In a full implementation, this would create specific PSI element types
-        return node.psi
+        // Create a generic PSI wrapper element to avoid infinite recursion
+        return ASTWrapperPsiElement(node)
     }
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile {

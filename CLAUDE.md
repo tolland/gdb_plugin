@@ -88,7 +88,6 @@ The plugin follows IntelliJ Platform's language support architecture with these 
 - Target IntelliJ Platform 2025.1+ for latest APIs
 - Use Kotlin coroutines for async operations where applicable
 - Implement proper PSI structure for advanced features
-- Follow IntelliJ Platform coding conventions
 - Use `@Service` annotation for services instead of deprecated component system
 - Prefer extension points over direct registration where possible
 
