@@ -13,7 +13,12 @@ import org.limepepper.gdb_plugin.GdbTokenTypes
  * Documentation target for GDB language elements using the modern API
  */
 class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTarget {
-    
+
+    override fun createPointer(): Pointer<out DocumentationTarget> {
+        // A Pointer allows the IDE to restore this target later if needed.
+        return Pointer.hardPointer(this)
+    }
+
     private val elementPointer: Pointer<PsiElement> = element.createSmartPointer()
 
     override fun computePresentation(): TargetPresentation {
@@ -27,22 +32,22 @@ class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTar
             GdbTokenTypes.COMMAND_USER -> {
                 val doc = GdbCommandDocumentation.getDocumentation(elementText)
                 TargetPresentation.builder("GDB Command: $elementText")
-                    .presentation(doc?.summary ?: "GDB command")
+                    .presentation()
             }
             
             GdbTokenTypes.REGISTER -> {
                 TargetPresentation.builder("Register: $elementText")
-                    .presentation("CPU register")
+                    .presentation()
             }
             
             GdbTokenTypes.HEX_NUMBER -> {
                 TargetPresentation.builder("Hex: $elementText")
-                    .presentation("Hexadecimal value")
+                    .presentation()
             }
             
             else -> {
                 TargetPresentation.builder(elementText)
-                    .presentation("GDB element")
+                    .presentation()
             }
         }
     }

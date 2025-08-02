@@ -25,29 +25,45 @@
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
   <extensions defaultExtensionNs="com.intellij">
     <!-- File type registration -->
-    <fileType name="GDB Script" 
+    <fileType name="GDB Script"
               implementationClass="org.limepepper.gdb_plugin.GdbFileType"
               fieldName="INSTANCE"
               language="GDB"
               extensions="gdb"/>
-              
+
     <!-- Syntax highlighting -->
-    <lang.syntaxHighlighterFactory language="GDB" 
+    <lang.syntaxHighlighterFactory language="GDB"
                                    implementationClass="org.limepepper.gdb_plugin.highlighting.GdbSyntaxHighlighterFactory"/>
-                                   
+
     <!-- Color settings page -->
     <colorSettingsPage implementation="org.limepepper.gdb_plugin.highlighting.GdbColorSettingsPage"/>
-    
+
     <!-- Parser definition -->
-    <lang.parserDefinition language="GDB" 
-                          implementationClass="org.limepepper.gdb_plugin.parser.GdbParserDefinition"/>
-                          
+    <lang.parserDefinition language="GDB"
+                           implementationClass="org.limepepper.gdb_plugin.parser.GdbParserDefinition"/>
+
     <!-- Code formatting -->
-    <lang.formatter language="GDB" 
+    <lang.formatter language="GDB"
                     implementationClass="org.limepepper.gdb_plugin.formatting.GdbFormattingModelBuilder"/>
-                    
+
     <!-- Documentation target provider (modern API) -->
     <platform.backend.documentation.psiTargetProvider
-                               implementationClass="org.limepepper.gdb_plugin.documentation.GdbDocumentationProvider"/>
+            order="first"
+            implementation="org.limepepper.gdb_plugin.documentation.GdbDocumentationProvider"/>
   </extensions>
+
+  <!-- Actions -->
+  <actions>
+    <action id="org.limepepper.gdb_plugin.debug.DebugDocumentationAction"
+            class="org.limepepper.gdb_plugin.debug.DebugDocumentationAction"
+            text="Debug Documentation Providers"
+            description="List all loaded PsiDocumentationTargetProviders in the log">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+    <action id="org.limepepper.gdb_plugin.actions.ActionDebugDocProv"
+            class="org.limepepper.gdb_plugin.actions.ActionDebugDocProv" text="ActionDebugDocProvToLog"
+            description="Print List of providers to idea.log">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+  </actions>
 </idea-plugin>
