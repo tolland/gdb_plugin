@@ -1,15 +1,16 @@
-package org.limepepper.gdb_plugin
+package org.limepepper.gdb_plugin.parser
 
 import com.intellij.psi.tree.IElementType
+import org.limepepper.gdb_plugin.GdbLanguage
 
 /**
  * Token types for GDB script lexical analysis
  */
 object GdbTokenTypes {
-    
+
     // Comments
     @JvmField val COMMENT = GdbTokenType("COMMENT")
-    
+
     // Commands - categorized for different highlighting
     @JvmField val COMMAND_EXECUTION = GdbTokenType("COMMAND_EXECUTION")     // run, continue, step, etc.
     @JvmField val COMMAND_BREAKPOINT = GdbTokenType("COMMAND_BREAKPOINT")   // break, watch, catch, etc.
@@ -18,21 +19,21 @@ object GdbTokenTypes {
     @JvmField val COMMAND_CONFIG = GdbTokenType("COMMAND_CONFIG")           // set, show, source, file
     @JvmField val COMMAND_USER = GdbTokenType("COMMAND_USER")               // define, document, end, if
     @JvmField val COMMAND_GENERAL = GdbTokenType("COMMAND_GENERAL")         // other commands
-    
+
     // Literals
     @JvmField val NUMBER = GdbTokenType("NUMBER")
     @JvmField val HEX_NUMBER = GdbTokenType("HEX_NUMBER")
     @JvmField val STRING = GdbTokenType("STRING")
     @JvmField val REGISTER = GdbTokenType("REGISTER")
-    
+
     // Identifiers and symbols
     @JvmField val IDENTIFIER = GdbTokenType("IDENTIFIER")
     @JvmField val FUNCTION_NAME = GdbTokenType("FUNCTION_NAME")
-    
+
     // Operators
     @JvmField val OPERATOR = GdbTokenType("OPERATOR")
     @JvmField val ASSIGNMENT = GdbTokenType("ASSIGNMENT")
-    
+
     // Punctuation
     @JvmField val LPAREN = GdbTokenType("LPAREN")
     @JvmField val RPAREN = GdbTokenType("RPAREN")
@@ -46,11 +47,11 @@ object GdbTokenTypes {
     @JvmField val DOT = GdbTokenType("DOT")
     @JvmField val ARROW = GdbTokenType("ARROW")
     @JvmField val SCOPE_RESOLUTION = GdbTokenType("SCOPE_RESOLUTION")
-    
+
     // Special symbols
     @JvmField val ADDRESS_MARKER = GdbTokenType("ADDRESS_MARKER")            // * for addresses
     @JvmField val CONDITION_IF = GdbTokenType("CONDITION_IF")                // if in breakpoint conditions
-    
+
     // Whitespace and structure
     @JvmField val WHITESPACE = GdbTokenType("WHITESPACE")
     @JvmField val NEWLINE = GdbTokenType("NEWLINE")
@@ -60,6 +61,6 @@ object GdbTokenTypes {
 /**
  * Custom token type for GDB language
  */
-class GdbTokenType(debugName: String) : IElementType(debugName, GdbLanguage.INSTANCE) {
+class GdbTokenType(debugName: String) : IElementType(debugName, GdbLanguage.Companion.INSTANCE) {
     override fun toString(): String = "GdbTokenType.${super.toString()}"
 }

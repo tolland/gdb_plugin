@@ -2,7 +2,7 @@ package org.limepepper.gdb_plugin.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import org.limepepper.gdb_plugin.GdbTokenTypes;
+import org.limepepper.gdb_plugin.psi.GdbTokenTypes;
 
 %%
 

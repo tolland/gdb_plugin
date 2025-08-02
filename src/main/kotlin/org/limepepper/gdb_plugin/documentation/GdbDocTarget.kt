@@ -7,7 +7,7 @@ import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.createSmartPointer
 import com.intellij.psi.util.elementType
-import org.limepepper.gdb_plugin.GdbTokenTypes
+import org.limepepper.gdb_plugin.parser.GdbTokenTypes
 
 /**
  * Documentation target for GDB language elements using the modern API

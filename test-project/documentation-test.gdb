@@ -22,7 +22,7 @@ disable
 # Data examination commands - detailed help available  
 print variable_name
 print $rax
-print /x 0x12345678
+print/x 0x12345678
 x/10i $pc
 x/8x $sp
 info registers

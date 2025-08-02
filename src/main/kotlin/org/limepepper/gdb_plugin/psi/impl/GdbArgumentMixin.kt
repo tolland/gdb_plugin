@@ -1,13 +1,11 @@
-package org.limepepper.gdb_plugin.psi
+// src/main/kotlin/org/limepepper/gdb_plugin/psi/impl/GdbArgumentMixin.kt
+package org.limepepper.gdb_plugin.psi.impl
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 
-/**
- * PSI element for GDB command arguments
- */
-class GdbArgument(node: ASTNode) : GdbPsiElement(node) {
+abstract class GdbArgumentMixin(node: ASTNode) : ASTWrapperPsiElement(node) {
 
     /**
      * Get the argument value (the token inside this argument)
@@ -22,6 +20,4 @@ class GdbArgument(node: ASTNode) : GdbPsiElement(node) {
     fun getArgumentText(): String {
         return text.trim()
     }
-
-    override fun toString(): String = "GdbArgument"
 }

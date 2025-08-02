@@ -5,9 +5,9 @@ import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.platform.backend.documentation.PsiDocumentationTargetProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
-import org.limepepper.gdb_plugin.GdbTokenTypes
-import org.limepepper.gdb_plugin.psi.GdbArgument
+import org.limepepper.gdb_plugin.parser.GdbTokenTypes
 import org.limepepper.gdb_plugin.psi.GdbStatement
+import org.limepepper.gdb_plugin.psi.GdbArgument
 
 /**
  * Modern documentation target provider for GDB language elements
@@ -27,24 +27,35 @@ class GdbPsiDocProvider : PsiDocumentationTargetProvider {
         }
         
         // Handle GDB-specific PSI elements
-        when (element) {
-            is GdbStatement -> {
-                logger.info("Found GdbStatement, checking command")
-                val command = element.getCommand()
-                if (command != null && isDocumentableElement(command)) {
-                    logger.info("Creating documentation target for GdbStatement command: ${command.text}")
-                    return GdbDocTarget(command)
-                }
-            }
-            is GdbArgument -> {
-                logger.info("Found GdbArgument: ${element.text}")
-                val value = element.getValue()
-                if (value != null && isDocumentableElement(value)) {
-                    logger.info("Creating documentation target for GdbArgument value: ${value.text}")
-                    return GdbDocTarget(value)
-                }
-            }
-        }
+//        when (element) {
+//            is GdbStatement -> {
+//                logger.info("Found GdbStatement, checking command")
+//                // Get the command from the statement - it should be the first child that's a command
+//                val command = element.getCommand()
+//                if (command != null && isDocumentableElement(command)) {
+//                    logger.info("Creating documentation target for GdbStatement command: ${command.text}")
+//                    return GdbDocTarget(command)
+//                } else {
+//                    // Fallback: check all children for command tokens
+//                    for (child in element.children) {
+//                        if (isDocumentableElement(child)) {
+//                            logger.info("Creating documentation target for GdbStatement child: ${child.text}")
+//                            return GdbDocTarget(child)
+//                        }
+//                    }
+//                }
+//            }
+//            is GdbArgument -> {
+//                logger.info("Found GdbArgument: ${element.text}")
+//                // Check if the argument itself is documentable (e.g., register, hex number)
+//                for (child in element.children) {
+//                    if (isDocumentableElement(child)) {
+//                        logger.info("Creating documentation target for GdbArgument child: ${child.text}")
+//                        return GdbDocTarget(child)
+//                    }
+//                }
+//            }
+//        }
 
         // Try the element itself first
         if (isDocumentableElement(element)) {
@@ -53,7 +64,7 @@ class GdbPsiDocProvider : PsiDocumentationTargetProvider {
         }
 
         // If the element itself isn't documentable, check its children
-        // This handles cases where commands are wrapped in ASTWrapperPsiElement
+        // This handles cases where commands are wrapped in other elements
         for (child in element.children) {
             if (isDocumentableElement(child)) {
                 logger.info("Creating documentation target for child element: ${child.text}")
@@ -61,41 +72,6 @@ class GdbPsiDocProvider : PsiDocumentationTargetProvider {
             }
         }
 
-        // Also check the parent element in case we're hovering over a nested element
-        element.parent?.let { parent ->
-            // Handle parent GDB elements
-            when (parent) {
-                is GdbStatement -> {
-                    logger.info("Parent is GdbStatement, checking command")
-                    val command = parent.getCommand()
-                    if (command != null && isDocumentableElement(command)) {
-                        logger.info("Creating documentation target for parent GdbStatement command: ${command.text}")
-                        return GdbDocTarget(command)
-                    }
-        }
-                is GdbArgument -> {
-                    logger.info("Parent is GdbArgument: ${parent.text}")
-                    val value = parent.getValue()
-                    if (value != null && isDocumentableElement(value)) {
-                        logger.info("Creating documentation target for parent GdbArgument value: ${value.text}")
-                        return GdbDocTarget(value)
-                    }
-                }
-            }
-
-            if (isDocumentableElement(parent)) {
-                logger.info("Creating documentation target for parent element: ${parent.text}")
-                return GdbDocTarget(parent)
-            }
-
-            // Check parent's children too
-            for (child in parent.children) {
-                if (isDocumentableElement(child)) {
-                    logger.info("Creating documentation target for parent's child element: ${child.text}")
-                    return GdbDocTarget(child)
-                }
-            }
-        }
 
         logger.info("No documentable element found for: ${element.text} (elementType: ${element.elementType})")
         return null

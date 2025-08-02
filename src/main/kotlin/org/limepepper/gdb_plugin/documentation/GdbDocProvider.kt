@@ -5,7 +5,7 @@ import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.platform.backend.documentation.DocumentationTargetProvider
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.elementType
-import org.limepepper.gdb_plugin.GdbTokenTypes
+import org.limepepper.gdb_plugin.parser.GdbTokenTypes
 
 /**
  * Documentation target provider that works with file offsets

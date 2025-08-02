@@ -1,3 +1,5 @@
+// src/main/kotlin/org/limepepper/gdb_plugin/psi/GdbTokenType.kt
+
 package org.limepepper.gdb_plugin.psi
 
 import com.intellij.psi.tree.IElementType

@@ -1,12 +1,22 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
-import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
-    id("org.jetbrains.intellij.platform") version "2.5.0"
+    id("org.jetbrains.intellij.platform") version "2.7.0"
     id("org.jetbrains.grammarkit") version "2022.3.2.2"
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+// Configure Grammar-Kit
+grammarKit {
+    // Optional: specify JFlex version if needed
+    // jflexRelease.set("1.7.0-2")
 }
 
 group = "org.limepepper"
@@ -74,6 +84,24 @@ intellijPlatform {
 }
 
 tasks {
+    generateParser {
+        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb_plugin/parser/Gdb.bnf"))
+        targetRootOutputDir.set(file("src/main/gen"))
+        pathToParser.set("org/limepepper/gdb_plugin/parser/GdbParser.java")
+        pathToPsiRoot.set("org/limepepper/gdb_plugin/psi")
+        purgeOldFiles.set(true)
+    }
+
+
+    // Make sure generation happens before compilation
+//    compileKotlin {
+//        dependsOn("generateGdbParser", "generateGdbLexer")
+//    }
+//
+//    compileJava {
+//        dependsOn("generateGdbParser", "generateGdbLexer")
+//    }
+
     // Set the JVM compatibility versions
     withType<JavaCompile> {
         sourceCompatibility = "21"

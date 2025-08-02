@@ -6,8 +6,10 @@ import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
-import org.limepepper.gdb_plugin.GdbTokenTypes
+import org.limepepper.gdb_plugin.parser.GdbTokenTypes
 import org.limepepper.gdb_plugin.lexer.GdbLexerAdapter
+import org.limepepper.gdb_plugin.psi.GdbTypes
+import org.limepepper.gdb_plugin.psi.GdbTokenSets
 
 /**
  * Syntax highlighter for GDB script files
@@ -105,45 +107,23 @@ class GdbSyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer(): Lexer = GdbLexerAdapter()
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        return when (tokenType) {
-            GdbTokenTypes.COMMENT -> arrayOf(COMMENT)
+        return when {
+            // Use TokenSets for cleaner code - reference the correct attributes
+            tokenType in GdbTokenSets.EXECUTION_COMMANDS -> arrayOf(COMMAND_EXECUTION)
+            tokenType in GdbTokenSets.BREAKPOINT_COMMANDS -> arrayOf(COMMAND_BREAKPOINT)
+            tokenType in GdbTokenSets.DATA_COMMANDS -> arrayOf(COMMAND_DATA)
+            tokenType in GdbTokenSets.COMMENTS -> arrayOf(COMMENT)
+            tokenType in GdbTokenSets.STRINGS -> arrayOf(STRING)
+            tokenType in GdbTokenSets.LITERALS -> arrayOf(NUMBER)
+            tokenType in GdbTokenSets.OPERATORS -> arrayOf(OPERATOR)
             
-            // Command categories
-            GdbTokenTypes.COMMAND_EXECUTION -> arrayOf(COMMAND_EXECUTION)
-            GdbTokenTypes.COMMAND_BREAKPOINT -> arrayOf(COMMAND_BREAKPOINT)
-            GdbTokenTypes.COMMAND_STACK -> arrayOf(COMMAND_STACK)
-            GdbTokenTypes.COMMAND_DATA -> arrayOf(COMMAND_DATA)
-            GdbTokenTypes.COMMAND_CONFIG -> arrayOf(COMMAND_CONFIG)
-            GdbTokenTypes.COMMAND_USER -> arrayOf(COMMAND_USER)
-            GdbTokenTypes.COMMAND_GENERAL -> arrayOf(COMMAND_GENERAL)
-            
-            // Literals
-            GdbTokenTypes.NUMBER -> arrayOf(NUMBER)
-            GdbTokenTypes.HEX_NUMBER -> arrayOf(HEX_NUMBER)
-            GdbTokenTypes.STRING -> arrayOf(STRING)
-            GdbTokenTypes.REGISTER -> arrayOf(REGISTER)
-            
-            // Identifiers
-            GdbTokenTypes.IDENTIFIER -> arrayOf(IDENTIFIER)
-            GdbTokenTypes.FUNCTION_NAME -> arrayOf(IDENTIFIER)
-            
-            // Operators and punctuation
-            GdbTokenTypes.OPERATOR -> arrayOf(OPERATOR)
-            GdbTokenTypes.ASSIGNMENT -> arrayOf(OPERATOR)
-            GdbTokenTypes.ADDRESS_MARKER -> arrayOf(OPERATOR)
-            
-            GdbTokenTypes.LPAREN, GdbTokenTypes.RPAREN,
-            GdbTokenTypes.LBRACKET, GdbTokenTypes.RBRACKET,
-            GdbTokenTypes.LBRACE, GdbTokenTypes.RBRACE,
-            GdbTokenTypes.COMMA, GdbTokenTypes.SEMICOLON,
-            GdbTokenTypes.COLON, GdbTokenTypes.DOT,
-            GdbTokenTypes.ARROW, GdbTokenTypes.SCOPE_RESOLUTION -> arrayOf(PUNCTUATION)
-            
-            // Special keywords
-            GdbTokenTypes.CONDITION_IF -> arrayOf(CONDITION_IF)
-            
-            // Error handling
-            GdbTokenTypes.BAD_CHARACTER -> arrayOf(BAD_CHARACTER)
+            // Specific token highlighting
+            tokenType == GdbTypes.COMMAND_STACK -> arrayOf(COMMAND_STACK)
+            tokenType == GdbTypes.COMMAND_CONFIG -> arrayOf(COMMAND_CONFIG)
+            tokenType == GdbTypes.COMMAND_USER -> arrayOf(COMMAND_USER)
+            tokenType == GdbTypes.FORMAT_SPEC -> arrayOf(COMMAND_GENERAL) // or create a FORMAT_SPEC attribute
+            tokenType == GdbTypes.REGISTER -> arrayOf(REGISTER)
+            tokenType == GdbTypes.HEX_NUMBER -> arrayOf(HEX_NUMBER)
             
             else -> emptyArray()
         }
