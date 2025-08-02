@@ -81,17 +81,18 @@ tasks {
         )
 
         doLast {
-
-            Files.copy(
-                file("sandbox-config/ide.general.xml").toPath(),
-                sandboxConfigDirectory.file("options/ide.general.xml").get().asFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING
+            // Use Gradle's built-in copy operations instead of Files.copy for configuration cache compatibility
+            val optionsDir = sandboxConfigDirectory.file("options").get().asFile
+            optionsDir.mkdirs()
+            
+            file("sandbox-config/ide.general.xml").copyTo(
+                optionsDir.resolve("ide.general.xml"),
+                overwrite = true
             )
-
-            Files.copy(
-                file("sandbox-config/ui.lnf.xml").toPath(),
-                sandboxConfigDirectory.file("options/ui.lnf.xml").get().asFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING
+            
+            file("sandbox-config/ui.lnf.xml").copyTo(
+                optionsDir.resolve("ui.lnf.xml"),
+                overwrite = true
             )
         }
     }
