@@ -1,6 +1,6 @@
-import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 plugins {
     id("java")
@@ -37,7 +37,7 @@ dependencies {
 
         // Add necessary plugin dependencies for compilation here, example:
         // bundledPlugin("com.intellij.java")
-        
+
         // Development plugins for runIde
 //        plugin("PsiViewer", "2025.1")
 //        plugin("LivePlugin")
@@ -55,7 +55,7 @@ intellijPlatform {
       Initial version
     """.trimIndent()
     }
-    
+
     // Disable buildSearchableOptions for development
     buildSearchableOptions = false
 }
@@ -82,48 +82,20 @@ tasks {
 
         doLast {
 
-
-            val ideGeneralFile =
-                sandboxConfigDirectory.file("options/ide.general.xml").get().asFile
-
-            ideGeneralFile.writeText(
-                """
-                <application>
-                  <component name="GeneralSettings">
-                    <option name="showTipsOnStartup" value="false" />
-                    <option name="confirmExit" value="false" />
-                  </component>
-                  <component name="StatusBar">
-                    <option name="widgets">
-                      <map>
-                        <entry key="AIAssistant" value="false" />
-                        <entry key="webDeployment.default.server.widget" value="false" />
-                      </map>
-                    </option>
-                  </component>
-                </application>
-            """.trimIndent()
+            Files.copy(
+                file("sandbox-config/ide.general.xml").toPath(),
+                sandboxConfigDirectory.file("options/ide.general.xml").get().asFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING
             )
 
-            val uiInfFile = sandboxConfigDirectory.file("options/ui.lnf.xml").get().asFile
-
-            uiInfFile.writeText(
-                """
-            <application>
-              <component name="UISettings">
-                <option name="SHOW_MAIN_MENU_MODE" value="SEPARATE_TOOLBAR" />
-                <option name="MAX_LOOKUP_WIDTH2" value="1000" />
-                <option name="SCROLL_TAB_LAYOUT_IN_EDITOR" value="false" />
-                <option name="SHOW_PREVIEW_IN_SEARCH_EVERYWHERE" value="true" />
-                <option name="UI_DENSITY" value="COMPACT" />
-                <option name="CONTRAST_SCROLLBARS" value="true" />
-              </component>
-            </application>
-            """.trimIndent()
+            Files.copy(
+                file("sandbox-config/ui.lnf.xml").toPath(),
+                sandboxConfigDirectory.file("options/ui.lnf.xml").get().asFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING
             )
         }
     }
-    
+
     runIde {
         // Configure IDE launch options for better development experience
         jvmArgs = listOf(
@@ -139,13 +111,15 @@ tasks {
         )
         args(listOf("nosplash"))
         argumentProviders += CommandLineArgumentProvider {
-            listOf("${System.getProperty("user.home")}/Sync/projects/java/gdb_plugin/test-project")
+            listOf(
+                file("test-project").toString()
+            )
         }
 
         // Open test project automatically
         systemProperty("idea.auto.reload.plugins", "true")
     }
-    
+
     // Configure JFlex lexer generation
     generateLexer {
         sourceFile.set(file("src/main/kotlin/org/limepepper/gdb_plugin/lexer/Gdb.flex"))
