@@ -1,6 +1,6 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 
 plugins {
     id("java")
@@ -42,6 +42,7 @@ dependencies {
 //        plugin("PsiViewer", "2025.1")
 //        plugin("LivePlugin")
         // plugin("org.jetbrains.plugins.gradle", "251.3")
+        pluginVerifier()
     }
 }
 
@@ -58,6 +59,18 @@ intellijPlatform {
 
     // Disable buildSearchableOptions for development
     buildSearchableOptions = false
+
+    pluginVerification {
+        ides {
+            recommended()
+            select {
+                types = listOf(IntelliJPlatformType.CLion)
+                channels = listOf(ProductRelease.Channel.RELEASE)
+                sinceBuild = "251"
+                untilBuild = "251"
+            }
+        }
+    }
 }
 
 tasks {
@@ -75,22 +88,26 @@ tasks {
     withType<PrepareSandboxTask> {
         sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
         sandboxSuffix = ""
-        val pluginZips = listOf(
-            File("${System.getProperty("user.home")}/Sync/projects/java/CLion-2025.1.2/plugins_ext/LivePlugin.zip"),
-            File("${System.getProperty("user.home")}/Sync/projects/java/CLion-2025.1.2/plugins_ext/psiviewer-2025.1.zip")
-        )
+
+        // Declare sandbox config files as inputs for configuration cache compatibility
+        inputs.files("sandbox-config/ide.general.xml", "sandbox-config/ui.lnf.xml")
+            .withPropertyName("sandboxConfigFiles")
 
         doLast {
             // Use Gradle's built-in copy operations instead of Files.copy for configuration cache compatibility
             val optionsDir = sandboxConfigDirectory.file("options").get().asFile
             optionsDir.mkdirs()
-            
-            file("sandbox-config/ide.general.xml").copyTo(
+
+            // Access files through the declared inputs
+            val ideGeneralFile = inputs.files.find { it.name == "ide.general.xml" }
+            val uiLnfFile = inputs.files.find { it.name == "ui.lnf.xml" }
+
+            ideGeneralFile?.copyTo(
                 optionsDir.resolve("ide.general.xml"),
                 overwrite = true
             )
-            
-            file("sandbox-config/ui.lnf.xml").copyTo(
+
+            uiLnfFile?.copyTo(
                 optionsDir.resolve("ui.lnf.xml"),
                 overwrite = true
             )

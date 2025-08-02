@@ -13,7 +13,7 @@ import org.limepepper.gdb_plugin.GdbTokenTypes
  * Documentation target for GDB language elements using the modern API
  */
 @Suppress("UnstableApiUsage")
-class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTarget {
+class GdbDocTarget(private val element: PsiElement) : DocumentationTarget {
 
     override fun createPointer(): Pointer<out DocumentationTarget> {
         // A Pointer allows the IDE to restore this target later if needed.
@@ -31,7 +31,7 @@ class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTar
             GdbTokenTypes.COMMAND_DATA,
             GdbTokenTypes.COMMAND_CONFIG,
             GdbTokenTypes.COMMAND_USER -> {
-                val doc = GdbCommandDocumentation.getDocumentation(elementText)
+                val doc = GdbCommandDoc.getDocumentation(elementText)
                 TargetPresentation.builder("GDB Command: $elementText")
                     .presentation()
             }
@@ -82,7 +82,7 @@ class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTar
     }
 
     private fun generateCommandDocumentation(commandText: String): String? {
-        val doc = GdbCommandDocumentation.getDocumentation(commandText) ?: return null
+        val doc = GdbCommandDoc.getDocumentation(commandText) ?: return null
         
         return buildString {
             append("<html><body>")
@@ -248,7 +248,7 @@ class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTar
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is GdbDocumentationTarget) return false
+        if (other !is GdbDocTarget) return false
         
         val thisElement = elementPointer.dereference()
         val otherElement = other.elementPointer.dereference()

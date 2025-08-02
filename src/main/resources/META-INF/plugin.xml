@@ -49,7 +49,12 @@
     <!-- Documentation target provider (modern API) -->
     <platform.backend.documentation.psiTargetProvider
             order="first"
-            implementation="org.limepepper.gdb_plugin.documentation.GdbDocumentationProvider"/>
+            implementation="org.limepepper.gdb_plugin.documentation.GdbPsiDocProvider"/>
+
+    <!-- Documentation target provider (modern API) -->
+    <platform.backend.documentation.targetProvider
+            order="first"
+            implementation="org.limepepper.gdb_plugin.documentation.GdbDocProvider"/>
   </extensions>
 
   <!-- Actions -->
@@ -58,11 +63,6 @@
             class="org.limepepper.gdb_plugin.debug.DebugDocumentationAction"
             text="Debug Documentation Providers"
             description="List all loaded PsiDocumentationTargetProviders in the log">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
-    <action id="org.limepepper.gdb_plugin.actions.ActionDebugDocProv"
-            class="org.limepepper.gdb_plugin.actions.ActionDebugDocProv" text="ActionDebugDocProvToLog"
-            description="Print List of providers to idea.log">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
   </actions>

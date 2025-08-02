@@ -15,6 +15,8 @@ import org.limepepper.gdb_plugin.GdbLanguage
 import org.limepepper.gdb_plugin.GdbTokenTypes
 import org.limepepper.gdb_plugin.lexer.GdbLexerAdapter
 import org.limepepper.gdb_plugin.psi.GdbFile
+import org.limepepper.gdb_plugin.psi.GdbStatement
+import org.limepepper.gdb_plugin.psi.GdbArgument
 
 /**
  * Parser definition for GDB language
@@ -54,8 +56,12 @@ class GdbParserDefinition : ParserDefinition {
     override fun getWhitespaceTokens(): TokenSet = WHITESPACE_TOKENS
 
     override fun createElement(node: ASTNode): PsiElement {
-        // Create a generic PSI wrapper element to avoid infinite recursion
-        return ASTWrapperPsiElement(node)
+        // Create specific PSI elements based on the element type
+        return when (node.elementType) {
+            GdbParser.STATEMENT -> GdbStatement(node)
+            GdbParser.ARGUMENT -> GdbArgument(node)
+            else -> ASTWrapperPsiElement(node)
+        }
     }
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile {

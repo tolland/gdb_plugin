@@ -3,7 +3,7 @@ package org.limepepper.gdb_plugin.documentation
 /**
  * Documentation data for GDB commands
  */
-object GdbCommandDocumentation {
+object GdbCommandDoc {
     
     /**
      * Documentation for execution control commands

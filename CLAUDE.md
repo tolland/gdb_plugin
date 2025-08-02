@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 validate code changes at the end of each change.
 
 ```bash
-./gradlew verifyPlugin
+./gradlew buildPlugin
 ```
 
 ## Commit each task change
