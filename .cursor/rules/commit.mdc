@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+- before making changes, working directory must be clean
+- commit files from each change at end
+- commit messages should be "checkpoint: <description>"
