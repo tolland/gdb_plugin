@@ -12,6 +12,7 @@ import org.limepepper.gdb_plugin.GdbTokenTypes
 /**
  * Documentation target for GDB language elements using the modern API
  */
+@Suppress("UnstableApiUsage")
 class GdbDocumentationTarget(private val element: PsiElement) : DocumentationTarget {
 
     override fun createPointer(): Pointer<out DocumentationTarget> {
