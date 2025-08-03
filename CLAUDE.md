@@ -14,7 +14,7 @@ validate code changes at the end of each change.
 
 Commit changes to current branch as "checkpoint" commit. Prefix commit with "checkpoint: some description"
 
-if committing files, to clean working directory, commit message "checkpoint" is sufficient. The purpose is to achieve a commit per change.
+To clean working directory at the start of a change, a commit with message "checkpoint" is sufficient. The purpose is to achieve a commit per change.
 
 ## Project Overview
 
