@@ -8,33 +8,29 @@ import org.limepepper.gdb.psi.impl.*;
 
 public interface GdbTypes {
 
-  IElementType ADDITIVE_EXPR = new GdbElementType("ADDITIVE_EXPR");
-  IElementType ADDRESS = new GdbElementType("ADDRESS");
-  IElementType ARGUMENT = new GdbElementType("ARGUMENT");
-  IElementType ARRAY_ACCESS = new GdbElementType("ARRAY_ACCESS");
-  IElementType COMMAND_WITH_FORMAT = new GdbElementType("COMMAND_WITH_FORMAT");
-  IElementType COMMENT_LINE = new GdbElementType("COMMENT_LINE");
+  IElementType ARGUMENTS = new GdbElementType("ARGUMENTS");
+  IElementType ASSIGNMENT = new GdbElementType("ASSIGNMENT");
+  IElementType ASSIGNMENT_TARGET = new GdbElementType("ASSIGNMENT_TARGET");
+  IElementType ASSIGNMENT_VALUE = new GdbElementType("ASSIGNMENT_VALUE");
+  IElementType BLANK = new GdbElementType("BLANK");
+  IElementType BREAKPOINT = new GdbElementType("BREAKPOINT");
+  IElementType COMMAND_BLOCK = new GdbElementType("COMMAND_BLOCK");
+  IElementType COMMAND_LINE = new GdbElementType("COMMAND_LINE");
+  IElementType COMMAND_NAME = new GdbElementType("COMMAND_NAME");
   IElementType CONDITION = new GdbElementType("CONDITION");
-  IElementType EQUALITY_EXPR = new GdbElementType("EQUALITY_EXPR");
   IElementType EXPRESSION = new GdbElementType("EXPRESSION");
-  IElementType FORMATTED_COMMAND = new GdbElementType("FORMATTED_COMMAND");
-  IElementType FUNCTION_CALL = new GdbElementType("FUNCTION_CALL");
-  IElementType LOGICAL_AND_EXPR = new GdbElementType("LOGICAL_AND_EXPR");
-  IElementType LOGICAL_OR_EXPR = new GdbElementType("LOGICAL_OR_EXPR");
-  IElementType MEMBER_ACCESS = new GdbElementType("MEMBER_ACCESS");
-  IElementType MULTIPLICATIVE_EXPR = new GdbElementType("MULTIPLICATIVE_EXPR");
-  IElementType PRIMARY_EXPR = new GdbElementType("PRIMARY_EXPR");
-  IElementType REGISTER_REF = new GdbElementType("REGISTER_REF");
-  IElementType RELATIONAL_EXPR = new GdbElementType("RELATIONAL_EXPR");
-  IElementType SIMPLE_COMMAND = new GdbElementType("SIMPLE_COMMAND");
+  IElementType MEMORY_ASSIGNMENT_TARGET = new GdbElementType("MEMORY_ASSIGNMENT_TARGET");
+  IElementType SIMPLE_ASSIGNMENT_TARGET = new GdbElementType("SIMPLE_ASSIGNMENT_TARGET");
   IElementType STATEMENT = new GdbElementType("STATEMENT");
-  IElementType UNARY_EXPR = new GdbElementType("UNARY_EXPR");
+  IElementType SUBCOMMAND_ASSIGNMENT_TARGET = new GdbElementType("SUBCOMMAND_ASSIGNMENT_TARGET");
+  IElementType VALUE = new GdbElementType("VALUE");
+  IElementType VARIABLE_ASSIGNMENT_TARGET = new GdbElementType("VARIABLE_ASSIGNMENT_TARGET");
 
-  IElementType ADDRESS_MARKER = new GdbTokenType("*");
+  IElementType ADDRESS_MARKER = new GdbTokenType("\\*");
   IElementType ARROW = new GdbTokenType("->");
-  IElementType ASSIGNMENT = new GdbTokenType("ASSIGNMENT");
-  IElementType BREAK_CMD = new GdbTokenType("break");
-  IElementType B_CMD = new GdbTokenType("b");
+  IElementType ASSIGNMENT_OP = new GdbTokenType("ASSIGNMENT_OP");
+  IElementType ASTERISK = new GdbTokenType("ASTERISK");
+  IElementType BAD_CHARACTER = new GdbTokenType("BAD_CHARACTER");
   IElementType COLON = new GdbTokenType(":");
   IElementType COMMA = new GdbTokenType(",");
   IElementType COMMAND_BREAKPOINT = new GdbTokenType("COMMAND_BREAKPOINT");
@@ -45,92 +41,82 @@ public interface GdbTypes {
   IElementType COMMAND_USER = new GdbTokenType("COMMAND_USER");
   IElementType COMMENT = new GdbTokenType("COMMENT");
   IElementType CONDITION_IF = new GdbTokenType("if");
-  IElementType DOT = new GdbTokenType(".");
+  IElementType DOT = new GdbTokenType("\\.");
+  IElementType EQUALS = new GdbTokenType("=");
   IElementType FORMAT_SPEC = new GdbTokenType("FORMAT_SPEC");
+  IElementType GREATER = new GdbTokenType(">");
   IElementType HEX_NUMBER = new GdbTokenType("HEX_NUMBER");
   IElementType IDENTIFIER = new GdbTokenType("IDENTIFIER");
-  IElementType LBRACE = new GdbTokenType("{");
-  IElementType LBRACKET = new GdbTokenType("[");
-  IElementType LPAREN = new GdbTokenType("(");
+  IElementType LBRACE = new GdbTokenType("\\{");
+  IElementType LBRACKET = new GdbTokenType("\\[");
+  IElementType LESS = new GdbTokenType("<");
+  IElementType LPAREN = new GdbTokenType("\\(");
   IElementType NEWLINE = new GdbTokenType("NEWLINE");
   IElementType NUMBER = new GdbTokenType("NUMBER");
   IElementType OPERATOR = new GdbTokenType("OPERATOR");
-  IElementType PRINT_CMD = new GdbTokenType("print");
-  IElementType P_CMD = new GdbTokenType("p");
-  IElementType RBRACE = new GdbTokenType("}");
-  IElementType RBRACKET = new GdbTokenType("]");
+  IElementType RBRACE = new GdbTokenType("\\}");
+  IElementType RBRACKET = new GdbTokenType("\\]");
   IElementType REGISTER = new GdbTokenType("REGISTER");
-  IElementType RPAREN = new GdbTokenType(")");
+  IElementType RPAREN = new GdbTokenType("\\)");
   IElementType SCOPE_RESOLUTION = new GdbTokenType("::");
   IElementType SEMICOLON = new GdbTokenType(";");
   IElementType STRING = new GdbTokenType("STRING");
-  IElementType X_CMD = new GdbTokenType("x");
+  IElementType VARIABLE = new GdbTokenType("VARIABLE");
+  IElementType WHITESPACE = new GdbTokenType("WHITESPACE");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == ADDITIVE_EXPR) {
-        return new GdbAdditiveExprImpl(node);
+      if (type == ARGUMENTS) {
+        return new GdbArgumentsImpl(node);
       }
-      else if (type == ADDRESS) {
-        return new GdbAddressImpl(node);
+      else if (type == ASSIGNMENT) {
+        return new GdbAssignmentImpl(node);
       }
-      else if (type == ARGUMENT) {
-        return new GdbArgumentImpl(node);
+      else if (type == ASSIGNMENT_TARGET) {
+        return new GdbAssignmentTargetImpl(node);
       }
-      else if (type == ARRAY_ACCESS) {
-        return new GdbArrayAccessImpl(node);
+      else if (type == ASSIGNMENT_VALUE) {
+        return new GdbAssignmentValueImpl(node);
       }
-      else if (type == COMMAND_WITH_FORMAT) {
-        return new GdbCommandWithFormatImpl(node);
+      else if (type == BLANK) {
+        return new GdbBlankImpl(node);
       }
-      else if (type == COMMENT_LINE) {
-        return new GdbCommentLineImpl(node);
+      else if (type == BREAKPOINT) {
+        return new GdbBreakpointImpl(node);
+      }
+      else if (type == COMMAND_BLOCK) {
+        return new GdbCommandBlockImpl(node);
+      }
+      else if (type == COMMAND_LINE) {
+        return new GdbCommandLineImpl(node);
+      }
+      else if (type == COMMAND_NAME) {
+        return new GdbCommandNameImpl(node);
       }
       else if (type == CONDITION) {
         return new GdbConditionImpl(node);
       }
-      else if (type == EQUALITY_EXPR) {
-        return new GdbEqualityExprImpl(node);
-      }
       else if (type == EXPRESSION) {
         return new GdbExpressionImpl(node);
       }
-      else if (type == FORMATTED_COMMAND) {
-        return new GdbFormattedCommandImpl(node);
+      else if (type == MEMORY_ASSIGNMENT_TARGET) {
+        return new GdbMemoryAssignmentTargetImpl(node);
       }
-      else if (type == FUNCTION_CALL) {
-        return new GdbFunctionCallImpl(node);
-      }
-      else if (type == LOGICAL_AND_EXPR) {
-        return new GdbLogicalAndExprImpl(node);
-      }
-      else if (type == LOGICAL_OR_EXPR) {
-        return new GdbLogicalOrExprImpl(node);
-      }
-      else if (type == MEMBER_ACCESS) {
-        return new GdbMemberAccessImpl(node);
-      }
-      else if (type == MULTIPLICATIVE_EXPR) {
-        return new GdbMultiplicativeExprImpl(node);
-      }
-      else if (type == PRIMARY_EXPR) {
-        return new GdbPrimaryExprImpl(node);
-      }
-      else if (type == REGISTER_REF) {
-        return new GdbRegisterRefImpl(node);
-      }
-      else if (type == RELATIONAL_EXPR) {
-        return new GdbRelationalExprImpl(node);
-      }
-      else if (type == SIMPLE_COMMAND) {
-        return new GdbSimpleCommandImpl(node);
+      else if (type == SIMPLE_ASSIGNMENT_TARGET) {
+        return new GdbSimpleAssignmentTargetImpl(node);
       }
       else if (type == STATEMENT) {
         return new GdbStatementImpl(node);
       }
-      else if (type == UNARY_EXPR) {
-        return new GdbUnaryExprImpl(node);
+      else if (type == SUBCOMMAND_ASSIGNMENT_TARGET) {
+        return new GdbSubcommandAssignmentTargetImpl(node);
+      }
+      else if (type == VALUE) {
+        return new GdbValueImpl(node);
+      }
+      else if (type == VARIABLE_ASSIGNMENT_TARGET) {
+        return new GdbVariableAssignmentTargetImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

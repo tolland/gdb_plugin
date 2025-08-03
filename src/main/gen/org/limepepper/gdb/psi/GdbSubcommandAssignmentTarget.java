@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface GdbExpression extends PsiElement {
-
-  @NotNull
-  GdbValue getValue();
-
-  @NotNull
-  PsiElement getIdentifier();
+public interface GdbSubcommandAssignmentTarget extends PsiElement {
 
 }

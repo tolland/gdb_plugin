@@ -39,26 +39,26 @@
     <lang.parserDefinition language="GDBScript"
                            implementationClass="org.limepepper.gdb.parser.GdbParserDefinition"/>
 
-    <!-- Syntax highlighting -->
-    <lang.syntaxHighlighterFactory language="GDBScript"
-                                   implementationClass="org.limepepper.gdb.highlighting.GdbSyntaxHighlighterFactory"/>
+<!--    &lt;!&ndash; Syntax highlighting &ndash;&gt;-->
+<!--    <lang.syntaxHighlighterFactory language="GDBScript"-->
+<!--                                   implementationClass="org.limepepper.gdb.highlighting.GdbSyntaxHighlighterFactory"/>-->
 
-    <!-- Color settings page -->
-    <colorSettingsPage implementation="org.limepepper.gdb.highlighting.GdbColorSettingsPage"/>
+<!--    &lt;!&ndash; Color settings page &ndash;&gt;-->
+<!--    <colorSettingsPage implementation="org.limepepper.gdb.highlighting.GdbColorSettingsPage"/>-->
 
-    <!-- Code formatting -->
-    <lang.formatter language="GDBScript"
-                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>
+<!--    &lt;!&ndash; Code formatting &ndash;&gt;-->
+<!--    <lang.formatter language="GDBScript"-->
+<!--                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>-->
 
-    <!-- Documentation target provider (modern API) -->
-    <platform.backend.documentation.psiTargetProvider
-            order="first"
-            implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>
+<!--    &lt;!&ndash; Documentation target provider (modern API) &ndash;&gt;-->
+<!--    <platform.backend.documentation.psiTargetProvider-->
+<!--            order="first"-->
+<!--            implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>-->
 
-    <!-- Documentation target provider (modern API) -->
-    <platform.backend.documentation.targetProvider
-            order="first"
-            implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>
+<!--    &lt;!&ndash; Documentation target provider (modern API) &ndash;&gt;-->
+<!--    <platform.backend.documentation.targetProvider-->
+<!--            order="first"-->
+<!--            implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>-->
   </extensions>
 
   <!-- Actions -->

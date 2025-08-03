@@ -11,14 +11,14 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.limepepper.gdb.psi.*;
 
-public class GdbStatementImpl extends ASTWrapperPsiElement implements GdbStatement {
+public class GdbAssignmentTargetImpl extends ASTWrapperPsiElement implements GdbAssignmentTarget {
 
-  public GdbStatementImpl(@NotNull ASTNode node) {
+  public GdbAssignmentTargetImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull GdbVisitor visitor) {
-    visitor.visitStatement(this);
+    visitor.visitAssignmentTarget(this);
   }
 
   @Override
@@ -29,26 +29,26 @@ public class GdbStatementImpl extends ASTWrapperPsiElement implements GdbStateme
 
   @Override
   @Nullable
-  public GdbAssignment getAssignment() {
-    return findChildByClass(GdbAssignment.class);
+  public GdbMemoryAssignmentTarget getMemoryAssignmentTarget() {
+    return findChildByClass(GdbMemoryAssignmentTarget.class);
   }
 
   @Override
   @Nullable
-  public GdbBreakpoint getBreakpoint() {
-    return findChildByClass(GdbBreakpoint.class);
+  public GdbSimpleAssignmentTarget getSimpleAssignmentTarget() {
+    return findChildByClass(GdbSimpleAssignmentTarget.class);
   }
 
   @Override
   @Nullable
-  public GdbCommandBlock getCommandBlock() {
-    return findChildByClass(GdbCommandBlock.class);
+  public GdbSubcommandAssignmentTarget getSubcommandAssignmentTarget() {
+    return findChildByClass(GdbSubcommandAssignmentTarget.class);
   }
 
   @Override
   @Nullable
-  public GdbCommandLine getCommandLine() {
-    return findChildByClass(GdbCommandLine.class);
+  public GdbVariableAssignmentTarget getVariableAssignmentTarget() {
+    return findChildByClass(GdbVariableAssignmentTarget.class);
   }
 
 }

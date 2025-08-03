@@ -5,18 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface GdbStatement extends PsiElement {
+public interface GdbVariableAssignmentTarget extends PsiElement {
 
   @Nullable
-  GdbAssignment getAssignment();
+  PsiElement getIdentifier();
 
   @Nullable
-  GdbBreakpoint getBreakpoint();
-
-  @Nullable
-  GdbCommandBlock getCommandBlock();
-
-  @Nullable
-  GdbCommandLine getCommandLine();
+  PsiElement getVariable();
 
 }

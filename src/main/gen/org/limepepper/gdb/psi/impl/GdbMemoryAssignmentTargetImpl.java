@@ -11,14 +11,14 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.limepepper.gdb.psi.*;
 
-public class GdbStatementImpl extends ASTWrapperPsiElement implements GdbStatement {
+public class GdbMemoryAssignmentTargetImpl extends ASTWrapperPsiElement implements GdbMemoryAssignmentTarget {
 
-  public GdbStatementImpl(@NotNull ASTNode node) {
+  public GdbMemoryAssignmentTargetImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull GdbVisitor visitor) {
-    visitor.visitStatement(this);
+    visitor.visitMemoryAssignmentTarget(this);
   }
 
   @Override
@@ -29,26 +29,20 @@ public class GdbStatementImpl extends ASTWrapperPsiElement implements GdbStateme
 
   @Override
   @Nullable
-  public GdbAssignment getAssignment() {
-    return findChildByClass(GdbAssignment.class);
+  public PsiElement getHexNumber() {
+    return findChildByType(HEX_NUMBER);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getIdentifier() {
+    return findNotNullChildByType(IDENTIFIER);
   }
 
   @Override
   @Nullable
-  public GdbBreakpoint getBreakpoint() {
-    return findChildByClass(GdbBreakpoint.class);
-  }
-
-  @Override
-  @Nullable
-  public GdbCommandBlock getCommandBlock() {
-    return findChildByClass(GdbCommandBlock.class);
-  }
-
-  @Override
-  @Nullable
-  public GdbCommandLine getCommandLine() {
-    return findChildByClass(GdbCommandLine.class);
+  public PsiElement getNumber() {
+    return findChildByType(NUMBER);
   }
 
 }

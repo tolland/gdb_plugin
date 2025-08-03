@@ -27,12 +27,7 @@ object GdbTokenSets {
         GdbTypes.COMMAND_STACK,
         GdbTypes.COMMAND_DATA,
         GdbTypes.COMMAND_CONFIG,
-        GdbTypes.COMMAND_USER,
-        GdbTypes.X_CMD,
-        GdbTypes.PRINT_CMD,
-        GdbTypes.P_CMD,
-        GdbTypes.BREAK_CMD,
-        GdbTypes.B_CMD
+        GdbTypes.COMMAND_USER
     )
 
     // Execution control commands
@@ -44,18 +39,13 @@ object GdbTokenSets {
     // Breakpoint-related commands
     @JvmField
     val BREAKPOINT_COMMANDS = TokenSet.create(
-        GdbTypes.COMMAND_BREAKPOINT,
-        GdbTypes.BREAK_CMD,
-        GdbTypes.B_CMD
+        GdbTypes.COMMAND_BREAKPOINT
     )
 
     // Data examination commands
     @JvmField
     val DATA_COMMANDS = TokenSet.create(
-        GdbTypes.COMMAND_DATA,
-        GdbTypes.X_CMD,
-        GdbTypes.PRINT_CMD,
-        GdbTypes.P_CMD
+        GdbTypes.COMMAND_DATA
     )
 
     // Literals - mix of original and generated

@@ -5,10 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface GdbExpression extends PsiElement {
-
-  @NotNull
-  GdbValue getValue();
+public interface GdbCommandName extends PsiElement {
 
   @NotNull
   PsiElement getIdentifier();

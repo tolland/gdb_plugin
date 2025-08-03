@@ -9,8 +9,8 @@ import org.limepepper.gdb.psi.GdbNamedElement
 abstract class GdbStatementMixin(node: ASTNode) : ASTWrapperPsiElement(node), GdbNamedElement {
 
     override fun getName(): String? {
-        // Use the generated getCommandName() method
-        return (this as? org.limepepper.gdb.psi.GdbStatement)?.commandName
+        // For GDB statements, return the text content
+        return text
     }
 
     override fun setName(name: String): PsiElement {

@@ -7,27 +7,39 @@ import com.intellij.psi.PsiElement;
 
 public class GdbVisitor extends PsiElementVisitor {
 
-  public void visitAdditiveExpr(@NotNull GdbAdditiveExpr o) {
+  public void visitArguments(@NotNull GdbArguments o) {
     visitPsiElement(o);
   }
 
-  public void visitAddress(@NotNull GdbAddress o) {
+  public void visitAssignment(@NotNull GdbAssignment o) {
     visitPsiElement(o);
   }
 
-  public void visitArgument(@NotNull GdbArgument o) {
+  public void visitAssignmentTarget(@NotNull GdbAssignmentTarget o) {
     visitPsiElement(o);
   }
 
-  public void visitArrayAccess(@NotNull GdbArrayAccess o) {
+  public void visitAssignmentValue(@NotNull GdbAssignmentValue o) {
     visitPsiElement(o);
   }
 
-  public void visitCommandWithFormat(@NotNull GdbCommandWithFormat o) {
+  public void visitBlank(@NotNull GdbBlank o) {
     visitPsiElement(o);
   }
 
-  public void visitCommentLine(@NotNull GdbCommentLine o) {
+  public void visitBreakpoint(@NotNull GdbBreakpoint o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommandBlock(@NotNull GdbCommandBlock o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommandLine(@NotNull GdbCommandLine o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommandName(@NotNull GdbCommandName o) {
     visitPsiElement(o);
   }
 
@@ -35,63 +47,31 @@ public class GdbVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitEqualityExpr(@NotNull GdbEqualityExpr o) {
-    visitPsiElement(o);
-  }
-
   public void visitExpression(@NotNull GdbExpression o) {
     visitPsiElement(o);
   }
 
-  public void visitFormattedCommand(@NotNull GdbFormattedCommand o) {
+  public void visitMemoryAssignmentTarget(@NotNull GdbMemoryAssignmentTarget o) {
     visitPsiElement(o);
   }
 
-  public void visitFunctionCall(@NotNull GdbFunctionCall o) {
-    visitPsiElement(o);
-  }
-
-  public void visitLogicalAndExpr(@NotNull GdbLogicalAndExpr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitLogicalOrExpr(@NotNull GdbLogicalOrExpr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMemberAccess(@NotNull GdbMemberAccess o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMultiplicativeExpr(@NotNull GdbMultiplicativeExpr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPrimaryExpr(@NotNull GdbPrimaryExpr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitRegisterRef(@NotNull GdbRegisterRef o) {
-    visitPsiElement(o);
-  }
-
-  public void visitRelationalExpr(@NotNull GdbRelationalExpr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitSimpleCommand(@NotNull GdbSimpleCommand o) {
+  public void visitSimpleAssignmentTarget(@NotNull GdbSimpleAssignmentTarget o) {
     visitPsiElement(o);
   }
 
   public void visitStatement(@NotNull GdbStatement o) {
-    visitNamedElement(o);
-  }
-
-  public void visitUnaryExpr(@NotNull GdbUnaryExpr o) {
     visitPsiElement(o);
   }
 
-  public void visitNamedElement(@NotNull GdbNamedElement o) {
+  public void visitSubcommandAssignmentTarget(@NotNull GdbSubcommandAssignmentTarget o) {
+    visitPsiElement(o);
+  }
+
+  public void visitValue(@NotNull GdbValue o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVariableAssignmentTarget(@NotNull GdbVariableAssignmentTarget o) {
     visitPsiElement(o);
   }
 

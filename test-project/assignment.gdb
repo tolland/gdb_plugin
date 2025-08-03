@@ -1,12 +1,13 @@
 
+
+set var $myVar = "some string value"
+set variable $myVar = "some string value"
+
 # split over lines
 set var \
 $myvar2 \
 = \
 7
-
-set var $myVar = "some string value"
-set variable $myVar = "some string value"
 
 # set some variable in a program
 set variable width = 50

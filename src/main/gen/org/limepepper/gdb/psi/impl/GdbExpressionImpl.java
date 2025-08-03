@@ -29,8 +29,14 @@ public class GdbExpressionImpl extends ASTWrapperPsiElement implements GdbExpres
 
   @Override
   @NotNull
-  public GdbLogicalOrExpr getLogicalOrExpr() {
-    return findNotNullChildByClass(GdbLogicalOrExpr.class);
+  public GdbValue getValue() {
+    return findNotNullChildByClass(GdbValue.class);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getIdentifier() {
+    return findNotNullChildByType(IDENTIFIER);
   }
 
 }

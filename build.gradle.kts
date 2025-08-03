@@ -6,7 +6,7 @@ plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
     id("org.jetbrains.intellij.platform") version "2.7.0"
-//    id("org.jetbrains.grammarkit") version "2022.3.2.2"
+    id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
 kotlin {
@@ -83,6 +83,15 @@ intellijPlatform {
 }
 
 tasks {
+    generateParser {
+        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/parser/Gdb_Revised.bnf"))
+        targetRootOutputDir.set(file("src/main/gen"))
+        pathToParser.set("org/limepepper/gdb/parser/GdbParser.java")
+        pathToPsiRoot.set("org/limepepper/gdb/psi")
+        purgeOldFiles.set(true)
+    }
+
+
     // Make sure generation happens before compilation
 //    compileKotlin {
 //        dependsOn("generateParser", "generateLexer")

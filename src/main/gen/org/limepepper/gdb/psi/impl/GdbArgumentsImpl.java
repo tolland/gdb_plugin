@@ -11,14 +11,14 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.limepepper.gdb.psi.*;
 
-public class GdbStatementImpl extends ASTWrapperPsiElement implements GdbStatement {
+public class GdbArgumentsImpl extends ASTWrapperPsiElement implements GdbArguments {
 
-  public GdbStatementImpl(@NotNull ASTNode node) {
+  public GdbArgumentsImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull GdbVisitor visitor) {
-    visitor.visitStatement(this);
+    visitor.visitArguments(this);
   }
 
   @Override
@@ -28,27 +28,15 @@ public class GdbStatementImpl extends ASTWrapperPsiElement implements GdbStateme
   }
 
   @Override
-  @Nullable
-  public GdbAssignment getAssignment() {
-    return findChildByClass(GdbAssignment.class);
+  @NotNull
+  public List<GdbExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, GdbExpression.class);
   }
 
   @Override
-  @Nullable
-  public GdbBreakpoint getBreakpoint() {
-    return findChildByClass(GdbBreakpoint.class);
-  }
-
-  @Override
-  @Nullable
-  public GdbCommandBlock getCommandBlock() {
-    return findChildByClass(GdbCommandBlock.class);
-  }
-
-  @Override
-  @Nullable
-  public GdbCommandLine getCommandLine() {
-    return findChildByClass(GdbCommandLine.class);
+  @NotNull
+  public List<GdbValue> getValueList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, GdbValue.class);
   }
 
 }
