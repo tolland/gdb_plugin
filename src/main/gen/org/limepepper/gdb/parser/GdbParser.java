@@ -62,15 +62,16 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'set' assignment_target assignment_value
+  // SET_CMD assignment_target assignment_value
   public static boolean assignment(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "assignment")) return false;
+    if (!nextTokenIs(builder_, SET_CMD)) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, ASSIGNMENT, "<assignment>");
-    result_ = consumeToken(builder_, "set");
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, SET_CMD);
     result_ = result_ && assignment_target(builder_, level_ + 1);
     result_ = result_ && assignment_value(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
+    exit_section_(builder_, marker_, ASSIGNMENT, result_);
     return result_;
   }
 
@@ -373,15 +374,23 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER IDENTIFIER
+  // IDENTIFIER IDENTIFIER?
   public static boolean subcommand_assignment_target(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "subcommand_assignment_target")) return false;
     if (!nextTokenIs(builder_, IDENTIFIER)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, IDENTIFIER, IDENTIFIER);
+    result_ = consumeToken(builder_, IDENTIFIER);
+    result_ = result_ && subcommand_assignment_target_1(builder_, level_ + 1);
     exit_section_(builder_, marker_, SUBCOMMAND_ASSIGNMENT_TARGET, result_);
     return result_;
+  }
+
+  // IDENTIFIER?
+  private static boolean subcommand_assignment_target_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "subcommand_assignment_target_1")) return false;
+    consumeToken(builder_, IDENTIFIER);
+    return true;
   }
 
   /* ********************************************************** */

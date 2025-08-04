@@ -116,8 +116,15 @@ tasks {
         sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
         sandboxSuffix = ""
 
+
+//        val trustedPathsFile =
+//            sandboxConfigDirectory.file("options/trusted-paths.xml").get().asFile
+//
+//        trustedPathsFile.writeText(
+//            """
+
         // Declare sandbox config files as inputs for configuration cache compatibility
-        inputs.files("sandbox-config/ide.general.xml", "sandbox-config/ui.lnf.xml")
+        inputs.files("sandbox-config/ide.general.xml", "sandbox-config/ui.lnf.xml", "sandbox-config/trusted-paths.xml")
             .withPropertyName("sandboxConfigFiles")
 
         doLast {
@@ -128,6 +135,7 @@ tasks {
             // Access files through the declared inputs
             val ideGeneralFile = inputs.files.find { it.name == "ide.general.xml" }
             val uiLnfFile = inputs.files.find { it.name == "ui.lnf.xml" }
+            val trustedPaths = inputs.files.find { it.name == "trusted-paths.xml" }
 
             ideGeneralFile?.copyTo(
                 optionsDir.resolve("ide.general.xml"),
@@ -136,6 +144,11 @@ tasks {
 
             uiLnfFile?.copyTo(
                 optionsDir.resolve("ui.lnf.xml"),
+                overwrite = true
+            )
+
+            trustedPaths?.copyTo(
+                optionsDir.resolve("trusted-paths.xml"),
                 overwrite = true
             )
         }

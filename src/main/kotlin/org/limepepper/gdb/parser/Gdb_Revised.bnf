@@ -59,6 +59,7 @@
       CONDITION_IF = 'if'
       FORMAT_SPEC = 'regexp:([a-zA-Z])'
       BAD_CHARACTER = 'regexp:(.)'
+      SET_CMD = 'set'
     ]
 
 }
@@ -76,10 +77,10 @@ private newlines ::= '\n'*
 statement ::= assignment | breakpoint | command_block | command_line
 
 // Assignment: various set command patterns
-assignment ::= 'set' assignment_target assignment_value
+assignment ::= SET_CMD assignment_target assignment_value
 
 // Different types of assignment targets
-assignment_target ::= 
+assignment_target ::=
     variable_assignment_target |
     simple_assignment_target |
     subcommand_assignment_target |
@@ -92,10 +93,10 @@ variable_assignment_target ::= ('var' | 'variable') (VARIABLE | IDENTIFIER) EQUA
 simple_assignment_target ::= IDENTIFIER EQUALS
 
 // Subcommand assignments: set logging file value
-subcommand_assignment_target ::= IDENTIFIER IDENTIFIER
+subcommand_assignment_target ::= IDENTIFIER IDENTIFIER?
 
 // Memory assignments: set *(type*)address = value OR set {type}address = value
-memory_assignment_target ::= 
+memory_assignment_target ::=
     ASTERISK LPAREN IDENTIFIER ASTERISK RPAREN (NUMBER | HEX_NUMBER) EQUALS |
     LBRACE IDENTIFIER RBRACE (NUMBER | HEX_NUMBER) EQUALS
 

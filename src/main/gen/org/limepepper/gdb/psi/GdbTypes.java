@@ -60,6 +60,7 @@ public interface GdbTypes {
   IElementType RPAREN = new GdbTokenType("\\)");
   IElementType SCOPE_RESOLUTION = new GdbTokenType("::");
   IElementType SEMICOLON = new GdbTokenType(";");
+  IElementType SET_CMD = new GdbTokenType("set");
   IElementType STRING = new GdbTokenType("STRING");
   IElementType VARIABLE = new GdbTokenType("VARIABLE");
   IElementType WHITESPACE = new GdbTokenType("WHITESPACE");

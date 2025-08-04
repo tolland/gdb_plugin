@@ -1,4 +1,11 @@
+# assignment to simple value
+set pagination off
 
+# this also works, if it doesn't conflict with gdb set subcommand
+set someVar = 50
+
+# set some variable in a program
+set variable width = 50
 
 set var $myVar = "some string value"
 set variable $myVar = "some string value"
