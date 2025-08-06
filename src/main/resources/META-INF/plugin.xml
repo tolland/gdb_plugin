@@ -59,6 +59,11 @@
         <!--    <lang.formatter language="GDBScript"-->
         <!--                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>-->
 
+        <!-- Traditional DocumentationProvider for GDB language -->
+        <lang.documentationProvider
+            language="GDBScript"
+            implementationClass="org.limepepper.gdb.documentation.GdbDocumentationProvider"/>
+
         <!-- Documentation target provider (modern API) -->
         <platform.backend.documentation.psiTargetProvider
             order="first"
