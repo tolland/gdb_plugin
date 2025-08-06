@@ -1,5 +1,7 @@
 package org.limepepper.gdb.psi
 
+import com.intellij.psi.TokenType
+import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.limepepper.gdb.parser.GdbTokenTypes
 
@@ -9,12 +11,16 @@ import org.limepepper.gdb.parser.GdbTokenTypes
  */
 object GdbTokenSets {
 
+    // common types
+    val WHITESPACE: IElementType = TokenType.WHITE_SPACE
+    val LINE_CONTINUATION: IElementType = GdbTokenType("LINE_CONTINUATION")
+
     // Basic lexer tokens - use original GdbTokenTypes
     @JvmField
-    val WHITESPACE = TokenSet.create(GdbTokenTypes.WHITESPACE)
+    val whitespaceTokens = TokenSet.create(WHITESPACE, LINE_CONTINUATION)
 
     @JvmField
-    val COMMENTS = TokenSet.create(GdbTokenTypes.COMMENT)
+    val COMMENTS = TokenSet.create(GdbTypes.COMMENT)
 
     @JvmField
     val STRINGS = TokenSet.create(GdbTokenTypes.STRING)

@@ -1,7 +1,7 @@
 package org.limepepper.gdb.parser
 
 import com.intellij.psi.tree.IElementType
-import org.limepepper.gdb.GdbLanguage
+import org.limepepper.gdb.lang.GdbLanguage
 
 /**
  * Token types for GDB script lexical analysis
@@ -103,6 +103,6 @@ object GdbTokenTypes {
 /**
  * Custom token type for GDB language
  */
-class GdbTokenType(debugName: String) : IElementType(debugName, GdbLanguage.Companion.INSTANCE) {
+class GdbTokenType(debugName: String) : IElementType(debugName, GdbLanguage) {
     override fun toString(): String = "GdbTokenType.${super.toString()}"
 }

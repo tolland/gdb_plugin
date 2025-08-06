@@ -4,7 +4,7 @@ package org.limepepper.gdb.parser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import static org.limepepper.gdb.psi.GdbTypes.*;
-import static org.limepepper.gdb.parser.GdbParserUtil.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
@@ -36,406 +36,465 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (value | expression | IDENTIFIER)+
-  public static boolean arguments(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "arguments")) return false;
+  // set_print_command | normal_command
+  public static boolean command(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "command")) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, ARGUMENTS, "<arguments>");
-    result_ = arguments_0(builder_, level_ + 1);
-    while (result_) {
-      int pos_ = current_position_(builder_);
-      if (!arguments_0(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "arguments", pos_)) break;
-    }
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, COMMAND, "<command>");
+    result_ = set_print_command(builder_, level_ + 1);
+    if (!result_) result_ = normal_command(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
-  // value | expression | IDENTIFIER
-  private static boolean arguments_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "arguments_0")) return false;
+  /* ********************************************************** */
+  // define_block | command
+  public static boolean command_statement(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "command_statement")) return false;
     boolean result_;
-    result_ = value(builder_, level_ + 1);
-    if (!result_) result_ = expression(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, IDENTIFIER);
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, COMMAND_STATEMENT, "<command statement>");
+    result_ = define_block(builder_, level_ + 1);
+    if (!result_) result_ = command(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
   /* ********************************************************** */
-  // SET_CMD assignment_target assignment_value
-  public static boolean assignment(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "assignment")) return false;
-    if (!nextTokenIs(builder_, SET_CMD)) return false;
+  // COMMANDS CRLF statement* END CRLF?
+  static boolean commands_block(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "commands_block")) return false;
+    if (!nextTokenIs(builder_, COMMANDS)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, SET_CMD);
-    result_ = result_ && assignment_target(builder_, level_ + 1);
-    result_ = result_ && assignment_value(builder_, level_ + 1);
-    exit_section_(builder_, marker_, ASSIGNMENT, result_);
+    result_ = consumeTokens(builder_, 0, COMMANDS, CRLF);
+    result_ = result_ && commands_block_2(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, END);
+    result_ = result_ && commands_block_4(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  /* ********************************************************** */
-  // variable_assignment_target |
-  //     simple_assignment_target |
-  //     subcommand_assignment_target |
-  //     memory_assignment_target
-  public static boolean assignment_target(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "assignment_target")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, ASSIGNMENT_TARGET, "<assignment target>");
-    result_ = variable_assignment_target(builder_, level_ + 1);
-    if (!result_) result_ = simple_assignment_target(builder_, level_ + 1);
-    if (!result_) result_ = subcommand_assignment_target(builder_, level_ + 1);
-    if (!result_) result_ = memory_assignment_target(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // value | expression
-  public static boolean assignment_value(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "assignment_value")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, ASSIGNMENT_VALUE, "<assignment value>");
-    result_ = value(builder_, level_ + 1);
-    if (!result_) result_ = expression(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // WHITESPACE | NEWLINE
-  public static boolean blank(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "blank")) return false;
-    if (!nextTokenIs(builder_, "<blank>", NEWLINE, WHITESPACE)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, BLANK, "<blank>");
-    result_ = consumeToken(builder_, WHITESPACE);
-    if (!result_) result_ = consumeToken(builder_, NEWLINE);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // ('break' | 'b') IDENTIFIER ( 'if' condition )?
-  public static boolean breakpoint(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "breakpoint")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, BREAKPOINT, "<breakpoint>");
-    result_ = breakpoint_0(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, IDENTIFIER);
-    result_ = result_ && breakpoint_2(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
-  }
-
-  // 'break' | 'b'
-  private static boolean breakpoint_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "breakpoint_0")) return false;
-    boolean result_;
-    result_ = consumeToken(builder_, "break");
-    if (!result_) result_ = consumeToken(builder_, "b");
-    return result_;
-  }
-
-  // ( 'if' condition )?
-  private static boolean breakpoint_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "breakpoint_2")) return false;
-    breakpoint_2_0(builder_, level_ + 1);
+  // statement*
+  private static boolean commands_block_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "commands_block_2")) return false;
+    while (true) {
+      int pos_ = current_position_(builder_);
+      if (!statement(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "commands_block_2", pos_)) break;
+    }
     return true;
   }
 
-  // 'if' condition
-  private static boolean breakpoint_2_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "breakpoint_2_0")) return false;
+  // CRLF?
+  private static boolean commands_block_4(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "commands_block_4")) return false;
+    consumeToken(builder_, CRLF);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // documented_command | floating_comment | doc_comment_block
+  static boolean comment_driven_statement(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "comment_driven_statement")) return false;
+    if (!nextTokenIs(builder_, COMMENT)) return false;
+    boolean result_;
+    result_ = documented_command(builder_, level_ + 1);
+    if (!result_) result_ = floating_comment(builder_, level_ + 1);
+    if (!result_) result_ = doc_comment_block(builder_, level_ + 1);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // DEFINE WORD+ CRLF statement* END CRLF?
+  public static boolean define_block(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "define_block")) return false;
+    if (!nextTokenIs(builder_, DEFINE)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, CONDITION_IF);
-    result_ = result_ && condition(builder_, level_ + 1);
+    result_ = consumeToken(builder_, DEFINE);
+    result_ = result_ && define_block_1(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, CRLF);
+    result_ = result_ && define_block_3(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, END);
+    result_ = result_ && define_block_5(builder_, level_ + 1);
+    exit_section_(builder_, marker_, DEFINE_BLOCK, result_);
+    return result_;
+  }
+
+  // WORD+
+  private static boolean define_block_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "define_block_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, WORD);
+    while (result_) {
+      int pos_ = current_position_(builder_);
+      if (!consumeToken(builder_, WORD)) break;
+      if (!empty_element_parsed_guard_(builder_, "define_block_1", pos_)) break;
+    }
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // statement*
+  private static boolean define_block_3(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "define_block_3")) return false;
+    while (true) {
+      int pos_ = current_position_(builder_);
+      if (!statement(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "define_block_3", pos_)) break;
+    }
+    return true;
+  }
+
+  // CRLF?
+  private static boolean define_block_5(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "define_block_5")) return false;
+    consumeToken(builder_, CRLF);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // (COMMENT CRLF)+
+  public static boolean doc_comment_block(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_comment_block")) return false;
+    if (!nextTokenIs(builder_, COMMENT)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = doc_comment_block_0(builder_, level_ + 1);
+    while (result_) {
+      int pos_ = current_position_(builder_);
+      if (!doc_comment_block_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "doc_comment_block", pos_)) break;
+    }
+    exit_section_(builder_, marker_, DOC_COMMENT_BLOCK, result_);
+    return result_;
+  }
+
+  // COMMENT CRLF
+  private static boolean doc_comment_block_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_comment_block_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, COMMENT, CRLF);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
   /* ********************************************************** */
-  // 'commands' NEWLINE command_line* 'end'
-  public static boolean command_block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "command_block")) return false;
+  // doc_comment_block &(!CRLF) command_statement
+  public static boolean documented_command(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "documented_command")) return false;
+    if (!nextTokenIs(builder_, COMMENT)) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, COMMAND_BLOCK, "<command block>");
-    result_ = consumeToken(builder_, "commands");
-    result_ = result_ && consumeToken(builder_, NEWLINE);
-    result_ = result_ && command_block_2(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, "end");
+    Marker marker_ = enter_section_(builder_);
+    result_ = doc_comment_block(builder_, level_ + 1);
+    result_ = result_ && documented_command_1(builder_, level_ + 1);
+    result_ = result_ && command_statement(builder_, level_ + 1);
+    exit_section_(builder_, marker_, DOCUMENTED_COMMAND, result_);
+    return result_;
+  }
+
+  // &(!CRLF)
+  private static boolean documented_command_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "documented_command_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _AND_);
+    result_ = documented_command_1_0(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
-  // command_line*
-  private static boolean command_block_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "command_block_2")) return false;
-    while (true) {
-      int pos_ = current_position_(builder_);
-      if (!command_line(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "command_block_2", pos_)) break;
-    }
-    return true;
+  // !CRLF
+  private static boolean documented_command_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "documented_command_1_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NOT_);
+    result_ = !consumeToken(builder_, CRLF);
+    exit_section_(builder_, level_, marker_, result_, false, null);
+    return result_;
   }
 
   /* ********************************************************** */
-  // command_name arguments?
-  public static boolean command_line(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "command_line")) return false;
-    if (!nextTokenIs(builder_, IDENTIFIER)) return false;
+  // doc_comment_block CRLF
+  public static boolean floating_comment(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "floating_comment")) return false;
+    if (!nextTokenIs(builder_, COMMENT)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = command_name(builder_, level_ + 1);
-    result_ = result_ && command_line_1(builder_, level_ + 1);
-    exit_section_(builder_, marker_, COMMAND_LINE, result_);
-    return result_;
-  }
-
-  // arguments?
-  private static boolean command_line_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "command_line_1")) return false;
-    arguments(builder_, level_ + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // IDENTIFIER
-  public static boolean command_name(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "command_name")) return false;
-    if (!nextTokenIs(builder_, IDENTIFIER)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, IDENTIFIER);
-    exit_section_(builder_, marker_, COMMAND_NAME, result_);
+    result_ = doc_comment_block(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, CRLF);
+    exit_section_(builder_, marker_, FLOATING_COMMENT, result_);
     return result_;
   }
 
   /* ********************************************************** */
-  // COMMENT
-  static boolean comment(PsiBuilder builder_, int level_) {
-    return consumeToken(builder_, COMMENT);
-  }
-
-  /* ********************************************************** */
-  // expression
-  public static boolean condition(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "condition")) return false;
-    if (!nextTokenIs(builder_, IDENTIFIER)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = expression(builder_, level_ + 1);
-    exit_section_(builder_, marker_, CONDITION, result_);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // IDENTIFIER (GREATER | LESS | EQUALS) value
-  public static boolean expression(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "expression")) return false;
-    if (!nextTokenIs(builder_, IDENTIFIER)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, IDENTIFIER);
-    result_ = result_ && expression_1(builder_, level_ + 1);
-    result_ = result_ && value(builder_, level_ + 1);
-    exit_section_(builder_, marker_, EXPRESSION, result_);
-    return result_;
-  }
-
-  // GREATER | LESS | EQUALS
-  private static boolean expression_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "expression_1")) return false;
-    boolean result_;
-    result_ = consumeToken(builder_, GREATER);
-    if (!result_) result_ = consumeToken(builder_, LESS);
-    if (!result_) result_ = consumeToken(builder_, EQUALS);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // item*
+  // statement*
   static boolean gdbFile(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "gdbFile")) return false;
     while (true) {
       int pos_ = current_position_(builder_);
-      if (!item(builder_, level_ + 1)) break;
+      if (!statement(builder_, level_ + 1)) break;
       if (!empty_element_parsed_guard_(builder_, "gdbFile", pos_)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
-  // statement | comment | blank
-  static boolean item(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "item")) return false;
-    boolean result_;
-    result_ = statement(builder_, level_ + 1);
-    if (!result_) result_ = comment(builder_, level_ + 1);
-    if (!result_) result_ = blank(builder_, level_ + 1);
-    return result_;
+  // normal_command_line commands_block?
+  static boolean normal_command(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command")) return false;
+    boolean result_, pinned_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_);
+    result_ = normal_command_line(builder_, level_ + 1);
+    pinned_ = result_; // pin = 1
+    result_ = result_ && normal_command_1(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, result_, pinned_, null);
+    return result_ || pinned_;
+  }
+
+  // commands_block?
+  private static boolean normal_command_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_1")) return false;
+    commands_block(builder_, level_ + 1);
+    return true;
   }
 
   /* ********************************************************** */
-  // ASTERISK LPAREN IDENTIFIER ASTERISK RPAREN (NUMBER | HEX_NUMBER) EQUALS |
-  //     LBRACE IDENTIFIER RBRACE (NUMBER | HEX_NUMBER) EQUALS
-  public static boolean memory_assignment_target(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "memory_assignment_target")) return false;
-    if (!nextTokenIs(builder_, "<memory assignment target>", ASTERISK, LBRACE)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, MEMORY_ASSIGNMENT_TARGET, "<memory assignment target>");
-    result_ = memory_assignment_target_0(builder_, level_ + 1);
-    if (!result_) result_ = memory_assignment_target_1(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, result_, false, null);
-    return result_;
-  }
-
-  // ASTERISK LPAREN IDENTIFIER ASTERISK RPAREN (NUMBER | HEX_NUMBER) EQUALS
-  private static boolean memory_assignment_target_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "memory_assignment_target_0")) return false;
+  // simple_command+
+  //                                 ((IDENTIFIER | WORD) &(!CRLF))*
+  //                                 (COMMENT)? CRLF
+  static boolean normal_command_line(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, ASTERISK, LPAREN, IDENTIFIER, ASTERISK, RPAREN);
-    result_ = result_ && memory_assignment_target_0_5(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, EQUALS);
+    result_ = normal_command_line_0(builder_, level_ + 1);
+    result_ = result_ && normal_command_line_1(builder_, level_ + 1);
+    result_ = result_ && normal_command_line_2(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, CRLF);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  // NUMBER | HEX_NUMBER
-  private static boolean memory_assignment_target_0_5(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "memory_assignment_target_0_5")) return false;
-    boolean result_;
-    result_ = consumeToken(builder_, NUMBER);
-    if (!result_) result_ = consumeToken(builder_, HEX_NUMBER);
-    return result_;
-  }
-
-  // LBRACE IDENTIFIER RBRACE (NUMBER | HEX_NUMBER) EQUALS
-  private static boolean memory_assignment_target_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "memory_assignment_target_1")) return false;
+  // simple_command+
+  private static boolean normal_command_line_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, LBRACE, IDENTIFIER, RBRACE);
-    result_ = result_ && memory_assignment_target_1_3(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, EQUALS);
+    result_ = simple_command(builder_, level_ + 1);
+    while (result_) {
+      int pos_ = current_position_(builder_);
+      if (!simple_command(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "normal_command_line_0", pos_)) break;
+    }
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  // NUMBER | HEX_NUMBER
-  private static boolean memory_assignment_target_1_3(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "memory_assignment_target_1_3")) return false;
-    boolean result_;
-    result_ = consumeToken(builder_, NUMBER);
-    if (!result_) result_ = consumeToken(builder_, HEX_NUMBER);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // '\n'*
-  static boolean newlines(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "newlines")) return false;
+  // ((IDENTIFIER | WORD) &(!CRLF))*
+  private static boolean normal_command_line_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_1")) return false;
     while (true) {
       int pos_ = current_position_(builder_);
-      if (!consumeToken(builder_, "\\n")) break;
-      if (!empty_element_parsed_guard_(builder_, "newlines", pos_)) break;
+      if (!normal_command_line_1_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "normal_command_line_1", pos_)) break;
     }
     return true;
   }
 
-  /* ********************************************************** */
-  // IDENTIFIER EQUALS
-  public static boolean simple_assignment_target(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "simple_assignment_target")) return false;
-    if (!nextTokenIs(builder_, IDENTIFIER)) return false;
+  // (IDENTIFIER | WORD) &(!CRLF)
+  private static boolean normal_command_line_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_1_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, IDENTIFIER, EQUALS);
-    exit_section_(builder_, marker_, SIMPLE_ASSIGNMENT_TARGET, result_);
+    result_ = normal_command_line_1_0_0(builder_, level_ + 1);
+    result_ = result_ && normal_command_line_1_0_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  /* ********************************************************** */
-  // assignment | breakpoint | command_block | command_line
-  public static boolean statement(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "statement")) return false;
+  // IDENTIFIER | WORD
+  private static boolean normal_command_line_1_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_1_0_0")) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, STATEMENT, "<statement>");
-    result_ = assignment(builder_, level_ + 1);
-    if (!result_) result_ = breakpoint(builder_, level_ + 1);
-    if (!result_) result_ = command_block(builder_, level_ + 1);
-    if (!result_) result_ = command_line(builder_, level_ + 1);
+    result_ = consumeToken(builder_, IDENTIFIER);
+    if (!result_) result_ = consumeToken(builder_, WORD);
+    return result_;
+  }
+
+  // &(!CRLF)
+  private static boolean normal_command_line_1_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_1_0_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _AND_);
+    result_ = normal_command_line_1_0_1_0(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
-  /* ********************************************************** */
-  // IDENTIFIER IDENTIFIER?
-  public static boolean subcommand_assignment_target(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "subcommand_assignment_target")) return false;
-    if (!nextTokenIs(builder_, IDENTIFIER)) return false;
+  // !CRLF
+  private static boolean normal_command_line_1_0_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_1_0_1_0")) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, IDENTIFIER);
-    result_ = result_ && subcommand_assignment_target_1(builder_, level_ + 1);
-    exit_section_(builder_, marker_, SUBCOMMAND_ASSIGNMENT_TARGET, result_);
+    Marker marker_ = enter_section_(builder_, level_, _NOT_);
+    result_ = !consumeToken(builder_, CRLF);
+    exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
-  // IDENTIFIER?
-  private static boolean subcommand_assignment_target_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "subcommand_assignment_target_1")) return false;
-    consumeToken(builder_, IDENTIFIER);
+  // (COMMENT)?
+  private static boolean normal_command_line_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "normal_command_line_2")) return false;
+    consumeToken(builder_, COMMENT);
     return true;
   }
 
   /* ********************************************************** */
-  // VARIABLE | NUMBER | HEX_NUMBER | STRING | IDENTIFIER
-  public static boolean value(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "value")) return false;
+  // set_print_command_line commands_block?
+  static boolean set_print_command(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command")) return false;
+    if (!nextTokenIs(builder_, "", PRINT_KW, SET_KW)) return false;
+    boolean result_, pinned_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_);
+    result_ = set_print_command_line(builder_, level_ + 1);
+    pinned_ = result_; // pin = 1
+    result_ = result_ && set_print_command_1(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, result_, pinned_, null);
+    return result_ || pinned_;
+  }
+
+  // commands_block?
+  private static boolean set_print_command_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_1")) return false;
+    commands_block(builder_, level_ + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // (SET_KW | PRINT_KW)
+  //                                    ((IDENTIFIER | REGISTER | EQUALS | COMMENT) &(!CRLF))*
+  //                                     value_statement
+  //                                    CRLF
+  static boolean set_print_command_line(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line")) return false;
+    if (!nextTokenIs(builder_, "", PRINT_KW, SET_KW)) return false;
+    boolean result_, pinned_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_);
+    result_ = set_print_command_line_0(builder_, level_ + 1);
+    pinned_ = result_; // pin = 1
+    result_ = result_ && report_error_(builder_, set_print_command_line_1(builder_, level_ + 1));
+    result_ = pinned_ && report_error_(builder_, value_statement(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && consumeToken(builder_, CRLF) && result_;
+    exit_section_(builder_, level_, marker_, result_, pinned_, null);
+    return result_ || pinned_;
+  }
+
+  // SET_KW | PRINT_KW
+  private static boolean set_print_command_line_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line_0")) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, VALUE, "<value>");
-    result_ = consumeToken(builder_, VARIABLE);
-    if (!result_) result_ = consumeToken(builder_, NUMBER);
-    if (!result_) result_ = consumeToken(builder_, HEX_NUMBER);
-    if (!result_) result_ = consumeToken(builder_, STRING);
-    if (!result_) result_ = consumeToken(builder_, IDENTIFIER);
+    result_ = consumeToken(builder_, SET_KW);
+    if (!result_) result_ = consumeToken(builder_, PRINT_KW);
+    return result_;
+  }
+
+  // ((IDENTIFIER | REGISTER | EQUALS | COMMENT) &(!CRLF))*
+  private static boolean set_print_command_line_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line_1")) return false;
+    while (true) {
+      int pos_ = current_position_(builder_);
+      if (!set_print_command_line_1_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "set_print_command_line_1", pos_)) break;
+    }
+    return true;
+  }
+
+  // (IDENTIFIER | REGISTER | EQUALS | COMMENT) &(!CRLF)
+  private static boolean set_print_command_line_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line_1_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = set_print_command_line_1_0_0(builder_, level_ + 1);
+    result_ = result_ && set_print_command_line_1_0_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // IDENTIFIER | REGISTER | EQUALS | COMMENT
+  private static boolean set_print_command_line_1_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line_1_0_0")) return false;
+    boolean result_;
+    result_ = consumeToken(builder_, IDENTIFIER);
+    if (!result_) result_ = consumeToken(builder_, REGISTER);
+    if (!result_) result_ = consumeToken(builder_, EQUALS);
+    if (!result_) result_ = consumeToken(builder_, COMMENT);
+    return result_;
+  }
+
+  // &(!CRLF)
+  private static boolean set_print_command_line_1_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line_1_0_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _AND_);
+    result_ = set_print_command_line_1_0_1_0(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, result_, false, null);
+    return result_;
+  }
+
+  // !CRLF
+  private static boolean set_print_command_line_1_0_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "set_print_command_line_1_0_1_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NOT_);
+    result_ = !consumeToken(builder_, CRLF);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
   /* ********************************************************** */
-  // ('var' | 'variable') (VARIABLE | IDENTIFIER) EQUALS
-  public static boolean variable_assignment_target(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "variable_assignment_target")) return false;
+  // COMMAND_EXECUTION
+  //          | COMMAND_BREAKPOINT
+  //          | COMMAND_STACK
+  //          | COMMAND_DATA
+  //          | COMMAND_CONFIG
+  //          | COMMAND_USER
+  public static boolean simple_command(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "simple_command")) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, VARIABLE_ASSIGNMENT_TARGET, "<variable assignment target>");
-    result_ = variable_assignment_target_0(builder_, level_ + 1);
-    result_ = result_ && variable_assignment_target_1(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, EQUALS);
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, SIMPLE_COMMAND, "<simple command>");
+    result_ = consumeToken(builder_, COMMAND_EXECUTION);
+    if (!result_) result_ = consumeToken(builder_, COMMAND_BREAKPOINT);
+    if (!result_) result_ = consumeToken(builder_, COMMAND_STACK);
+    if (!result_) result_ = consumeToken(builder_, COMMAND_DATA);
+    if (!result_) result_ = consumeToken(builder_, COMMAND_CONFIG);
+    if (!result_) result_ = consumeToken(builder_, COMMAND_USER);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 
-  // 'var' | 'variable'
-  private static boolean variable_assignment_target_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "variable_assignment_target_0")) return false;
+  /* ********************************************************** */
+  // comment_driven_statement | command_statement | CRLF
+  static boolean statement(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "statement")) return false;
     boolean result_;
-    result_ = consumeToken(builder_, "var");
-    if (!result_) result_ = consumeToken(builder_, "variable");
+    result_ = comment_driven_statement(builder_, level_ + 1);
+    if (!result_) result_ = command_statement(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, CRLF);
     return result_;
   }
 
-  // VARIABLE | IDENTIFIER
-  private static boolean variable_assignment_target_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "variable_assignment_target_1")) return false;
+  /* ********************************************************** */
+  // HEX_NUMBER | NUMBER | STRING | IDENTIFIER | WORD
+  public static boolean value_statement(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "value_statement")) return false;
     boolean result_;
-    result_ = consumeToken(builder_, VARIABLE);
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, VALUE_STATEMENT, "<value statement>");
+    result_ = consumeToken(builder_, HEX_NUMBER);
+    if (!result_) result_ = consumeToken(builder_, NUMBER);
+    if (!result_) result_ = consumeToken(builder_, STRING);
     if (!result_) result_ = consumeToken(builder_, IDENTIFIER);
+    if (!result_) result_ = consumeToken(builder_, WORD);
+    exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
 

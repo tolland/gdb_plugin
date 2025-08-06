@@ -7,71 +7,35 @@ import com.intellij.psi.PsiElement;
 
 public class GdbVisitor extends PsiElementVisitor {
 
-  public void visitArguments(@NotNull GdbArguments o) {
+  public void visitCommand(@NotNull GdbCommand o) {
     visitPsiElement(o);
   }
 
-  public void visitAssignment(@NotNull GdbAssignment o) {
+  public void visitCommandStatement(@NotNull GdbCommandStatement o) {
     visitPsiElement(o);
   }
 
-  public void visitAssignmentTarget(@NotNull GdbAssignmentTarget o) {
+  public void visitDefineBlock(@NotNull GdbDefineBlock o) {
     visitPsiElement(o);
   }
 
-  public void visitAssignmentValue(@NotNull GdbAssignmentValue o) {
+  public void visitDocCommentBlock(@NotNull GdbDocCommentBlock o) {
     visitPsiElement(o);
   }
 
-  public void visitBlank(@NotNull GdbBlank o) {
+  public void visitDocumentedCommand(@NotNull GdbDocumentedCommand o) {
     visitPsiElement(o);
   }
 
-  public void visitBreakpoint(@NotNull GdbBreakpoint o) {
+  public void visitFloatingComment(@NotNull GdbFloatingComment o) {
     visitPsiElement(o);
   }
 
-  public void visitCommandBlock(@NotNull GdbCommandBlock o) {
+  public void visitSimpleCommand(@NotNull GdbSimpleCommand o) {
     visitPsiElement(o);
   }
 
-  public void visitCommandLine(@NotNull GdbCommandLine o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCommandName(@NotNull GdbCommandName o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCondition(@NotNull GdbCondition o) {
-    visitPsiElement(o);
-  }
-
-  public void visitExpression(@NotNull GdbExpression o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMemoryAssignmentTarget(@NotNull GdbMemoryAssignmentTarget o) {
-    visitPsiElement(o);
-  }
-
-  public void visitSimpleAssignmentTarget(@NotNull GdbSimpleAssignmentTarget o) {
-    visitPsiElement(o);
-  }
-
-  public void visitStatement(@NotNull GdbStatement o) {
-    visitPsiElement(o);
-  }
-
-  public void visitSubcommandAssignmentTarget(@NotNull GdbSubcommandAssignmentTarget o) {
-    visitPsiElement(o);
-  }
-
-  public void visitValue(@NotNull GdbValue o) {
-    visitPsiElement(o);
-  }
-
-  public void visitVariableAssignmentTarget(@NotNull GdbVariableAssignmentTarget o) {
+  public void visitValueStatement(@NotNull GdbValueStatement o) {
     visitPsiElement(o);
   }
 

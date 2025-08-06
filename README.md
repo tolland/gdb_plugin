@@ -6,6 +6,26 @@ gdb supports providing lists of commands as a file as an option:
 gdb --command=file.gdb
 ```
 
+
+```shell
+(gdb) help
+List of classes of commands:
+
+aliases -- User-defined aliases of other commands.
+breakpoints -- Making program stop at certain points.
+data -- Examining data.
+files -- Specifying and examining files.
+internals -- Maintenance commands.
+obscure -- Obscure features.
+running -- Running the program.
+stack -- Examining the stack.
+status -- Status inquiries.
+support -- Support facilities.
+text-user-interface -- TUI is the GDB text based interface.
+tracepoints -- Tracing of program execution without stopping the program.
+user-defined -- User-defined commands.
+```
+
 These files can be simple, but support increasingly complicated nested structures and edge cases which make it hard to model in a syntax highlighter.
 
 <https://sourceware.org/gdb/current/onlinedocs/gdb#Command-Syntax>

@@ -1,9 +1,7 @@
 // src/main/kotlin/org/limepepper/gdb/psi/GdbNamedElement.kt
 package org.limepepper.gdb.psi
 
-import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.PsiNamedElement
 
-interface GdbNamedElement : PsiElement {
-    fun getName(): String?
-    fun setName(name: String): PsiElement
-}
+interface GdbNamedElement : PsiNamedElement, PsiNameIdentifierOwner

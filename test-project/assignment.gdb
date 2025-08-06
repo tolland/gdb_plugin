@@ -6,7 +6,6 @@ set someVar = 50
 
 # set some variable in a program
 set variable width = 50
-
 set var $myVar = "some string value"
 set variable $myVar = "some string value"
 
@@ -15,6 +14,10 @@ set var \
 $myvar2 \
 = \
 7
+
+# gdb supports non-ambiguous sub-keywords
+set lo ov of
+set loggging overwrite off
 
 # set some variable in a program
 set variable width = 50
@@ -30,5 +33,5 @@ set logging file gdb.output
 # assignment of other type, e.g. integer
 set var counter = 42
 # set memory location to value
-set *(int*)0x400000 = 0xdeadbeef
-set {int}0x83040 = 4
+# set *(int*)0x400000 = 0xdeadbeef
+# set {int}0x83040 = 4

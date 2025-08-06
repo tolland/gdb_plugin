@@ -1,0 +1,74 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="en-US" data-preset="contrast" data-primary-color="#307FFF" data-resizable-sidebar="true"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="built-on" content="2025-08-04T11:04:03.424802886"><meta name="build-number" content="1487"><!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5P98');</script>
+<!-- End Google Tag Manager -->
+<title>3. Grammar and Parser | IntelliJ Platform Plugin SDK</title><script type="application/json" id="virtual-toc-data">[{"id":"define-a-token-type","level":0,"title":"Define a Token Type","anchor":"#define-a-token-type"},{"id":"define-an-element-type","level":0,"title":"Define an Element Type","anchor":"#define-an-element-type"},{"id":"define-the-grammar","level":0,"title":"Define the Grammar","anchor":"#define-the-grammar"},{"id":"generate-a-parser","level":0,"title":"Generate a Parser","anchor":"#generate-a-parser"},{"id":"add-generated-sources-root","level":0,"title":"Add Generated Sources Root","anchor":"#add-generated-sources-root"}]</script><script type="application/json" id="topic-shortcuts"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.23/app.css" rel="stylesheet"><link rel="manifest" href="https://www.jetbrains.com/site.webmanifest"><meta name="msapplication-TileColor" content="#000000"><link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"><meta name="image" content="https://resources.jetbrains.com/storage/products/jetbrains/img/meta/preview.png"><!-- Open Graph --><meta property="og:title" content="3. Grammar and Parser | IntelliJ Platform Plugin SDK"><meta property="og:description" content=""><meta property="og:image" content="https://resources.jetbrains.com/storage/products/jetbrains/img/meta/preview.png"><meta property="og:site_name" content="IntelliJ Platform Plugin SDK Help"><meta property="og:type" content="website"><meta property="og:locale" content="en_US"><meta property="og:url" content="https://plugins.jetbrains.com/docs/intellij/grammar-and-parser.html"><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@JBPlatform"><meta name="twitter:title" content="3. Grammar and Parser | IntelliJ Platform Plugin SDK"><meta name="twitter:description" content=""><meta name="twitter:creator" content="@JBPlatform"><meta name="twitter:image:src" content="https://resources.jetbrains.com/storage/products/jetbrains/img/meta/preview.png"><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json">{
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "@id": "https://plugins.jetbrains.com/docs/intellij/grammar-and-parser.html#webpage",
+    "url": "https://plugins.jetbrains.com/docs/intellij/grammar-and-parser.html",
+    "name": "3. Grammar and Parser | IntelliJ Platform Plugin SDK",
+    "description": "",
+    "image": "https://resources.jetbrains.com/storage/products/jetbrains/img/meta/preview.png",
+    "inLanguage":"en-US"
+}</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json">{
+    "@type": "WebSite",
+    "@id": "https://plugins.jetbrains.com/docs/intellij/#website",
+    "url": "https://plugins.jetbrains.com/docs/intellij/",
+    "name": "IntelliJ Platform Plugin SDK Help"
+}</script><!-- End Schema.org --></head><body data-id="grammar_and_parser" data-main-title="3. Grammar and Parser" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}" data-template="article" data-breadcrumbs="Custom Languages///custom_language_support_tutorial.md|Custom Language Support Tutorial" data-edit-url="https://github.com/JetBrains/intellij-sdk-docs/edit/main/topics/tutorials/custom_language_support/grammar_and_parser.md"><!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5P98" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>IntelliJ Platform Plugin SDK  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="grammar_and_parser" id="grammar_and_parser.md">3. Grammar and Parser</h1><div class="micro-format" data-content="{&quot;microFormat&quot;:[&quot;<p id=\&quot;n915za_14\&quot;><span class=\&quot;control\&quot; id=\&quot;n915za_16\&quot;>Reference</span>: <a href=\&quot;implementing-lexer.html\&quot; id=\&quot;n915za_17\&quot; data-tooltip=\&quot;A Lexer defines how a file's contents are broken into tokens.\&quot;>Implementing Lexer</a>, <a href=\&quot;implementing-parser-and-psi.html\&quot; id=\&quot;n915za_18\&quot; data-tooltip=\&quot;Introduction to parsing custom language files code and representing it with AST and PSI trees.\&quot;>Implementing Parser and PSI</a></p>&quot;,&quot;<p id=\&quot;n915za_15\&quot;><span class=\&quot;control\&quot; id=\&quot;n915za_19\&quot;>Code</span>: <a href=\&quot;https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin/src/main/java/org/intellij/sdk/language/psi/SimpleTokenType.java\&quot; id=\&quot;n915za_20\&quot; data-external=\&quot;true\&quot; rel=\&quot;noopener noreferrer\&quot; target=\&quot;_blank\&quot;><code class=\&quot;code\&quot; id=\&quot;n915za_22\&quot;>SimpleTokenType</code></a>, <a href=\&quot;https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin/src/main/java/org/intellij/sdk/language/psi/SimpleElementType.java\&quot; id=\&quot;n915za_21\&quot; data-external=\&quot;true\&quot; rel=\&quot;noopener noreferrer\&quot; target=\&quot;_blank\&quot;><code class=\&quot;code\&quot; id=\&quot;n915za_23\&quot;>SimpleElementType</code></a></p>&quot;]}"></div><aside class="prompt" data-type="tip" data-title="" id="n915za_13"><p id="n915za_24">This page is part of multi-step <a href="custom-language-support-tutorial.html" id="n915za_25" data-tooltip="Tutorial for creating a .properties-like custom language.">Custom Language Support Tutorial</a>. All previous steps must be executed in sequence for the code to work.</p></aside><p id="n915za_6">In order for the IntelliJ Platform to parse a Simple Language file, tokens and elements must be defined based on <a href="https://github.com/JetBrains/intellij-community/tree/idea/251.26094.121/platform/core-api/src/com/intellij/psi/tree/IElementType.java" id="n915za_26" data-external="true" rel="noopener noreferrer" target="_blank"><code class="code" id="n915za_27">IElementType</code></a>. The Simple Language grammar must also be defined to generate a parser.</p><section class="chapter"><h2 id="define-a-token-type" data-toc="define-a-token-type">Define a Token Type</h2><p id="n915za_28">Create <a href="https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin/src/main/java/org/intellij/sdk/language/psi/SimpleTokenType.java" id="n915za_30" data-external="true" rel="noopener noreferrer" target="_blank"><code class="code" id="n915za_33">SimpleTokenType</code></a> in the <code class="code" id="n915za_31">org.intellij.sdk.language.psi</code> package by subclassing <code class="code" id="n915za_32">IElementType</code>.</p><div class="code-block" data-lang="java" data-disable-link-processing="true">public class SimpleTokenType extends IElementType {
+
+  public SimpleTokenType(@NotNull @NonNls String debugName) {
+    super(debugName, SimpleLanguage.INSTANCE);
+  }
+
+  @Override
+  public String toString() {
+    return "SimpleTokenType." + super.toString();
+  }
+
+}
+</div></section><section class="chapter"><h2 id="define-an-element-type" data-toc="define-an-element-type">Define an Element Type</h2><p id="n915za_34">Create the <a href="https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin/src/main/java/org/intellij/sdk/language/psi/SimpleElementType.java" id="n915za_36" data-external="true" rel="noopener noreferrer" target="_blank"><code class="code" id="n915za_39">SimpleElementType</code></a> in the <code class="code" id="n915za_37">org.intellij.sdk.language.psi</code> package by subclassing <code class="code" id="n915za_38">IElementType</code>.</p><div class="code-block" data-lang="java" data-disable-link-processing="true">public class SimpleElementType extends IElementType {
+
+  public SimpleElementType(@NotNull @NonNls String debugName) {
+    super(debugName, SimpleLanguage.INSTANCE);
+  }
+
+}
+</div></section><section class="chapter"><h2 id="define-the-grammar" data-toc="define-the-grammar">Define the Grammar</h2><p id="n915za_40">Define a grammar for the Simple Language in the <span class="filepath" id="n915za_45">org/intellij/sdk/language/Simple.bnf</span> file.</p><div class="code-block" data-lang="rbnf">
+{
+  parserClass="org.intellij.sdk.language.parser.SimpleParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Simple"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.intellij.sdk.language.psi"
+  psiImplPackage="org.intellij.sdk.language.psi.impl"
+
+  elementTypeHolderClass="org.intellij.sdk.language.psi.SimpleTypes"
+  elementTypeClass="org.intellij.sdk.language.psi.SimpleElementType"
+  tokenTypeClass="org.intellij.sdk.language.psi.SimpleTokenType"
+}
+
+simpleFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY
+</div><p id="n915za_42">Please see <a href="https://github.com/JetBrains/Grammar-Kit" id="n915za_46" data-external="true" rel="noopener noreferrer" target="_blank">Grammar-Kit</a> documentation for more details on BNF syntax.</p><p id="n915za_43">The grammar defines the flexibility of the support for a language. The above grammar specifies that a property may have or may not have a key and value. This flexibility allows the IntelliJ Platform to recognize incorrectly defined properties and provide corresponding code analysis and quick fixes.</p><p id="n915za_44">Note that the <code class="code" id="n915za_47">SimpleTypes</code> class in the <code class="code" id="n915za_48">elementTypeHolderClass</code> attribute above specifies the name of a class that gets generated from the grammar in the scope of the <span class="control" id="n915za_49">Generate Parser Code</span> action (see <a href="#generate-a-parser" id="n915za_50">Generate a Parser</a>); it doesn't exist at this point.</p></section><section class="chapter"><h2 id="generate-a-parser" data-toc="generate-a-parser">Generate a Parser</h2><p id="n915za_51">Now that the grammar is defined, generate a parser with PSI classes via <span class="control" id="n915za_54">Generate Parser Code</span> from the context menu on the <span class="filepath" id="n915za_55">Simple.bnf</span> file. This step generates a parser and PSI elements in the <span class="filepath" id="n915za_56">/src/main/gen</span> folder of the project.</p><aside class="prompt" data-type="tip" data-title="" id="n915za_52"><p id="n915za_57"><a href="tools-gradle-grammar-kit-plugin.html" id="n915za_58" data-tooltip="Gradle Grammar-Kit Plugin automates generating custom language lexers and parsers when using Grammar-Kit.">Gradle Grammar-Kit Plugin</a> can be used alternatively.</p></aside><figure id="n915za_53"><img alt="Parser" src="images/generated_parser.png" title="Parser" width="800" height="700"></figure></section><section class="chapter"><h2 id="add-generated-sources-root" data-toc="add-generated-sources-root">Add Generated Sources Root</h2><p id="n915za_59">To include the sources generated into <span class="filepath" id="n915za_63">/src/main/gen</span>, the project's <code class="code" id="n915za_64">sourceSets</code> must be expanded by inserting the following in the Gradle build script:</p><div class="code-block" data-lang="kotlin">
+sourceSets {
+  main {
+    java {
+      srcDirs("src/main/gen")
+    }
+  }
+}
+</div><p id="n915za_61">See <span class="filepath" id="n915za_65"><a href="https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin/build.gradle.kts" id="n915za_66" data-external="true" rel="noopener noreferrer" target="_blank">build.gradle.kts</a></span> for the reference.</p><p id="n915za_62">Reload the Gradle project for changes to take effect and build the project.</p></section><div class="last-modified">29 April 2025</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom"><a href="language-and-filetype.html" class="navigation-links__prev">2. Language and File Type</a><a href="lexer-and-parser-definition.html" class="navigation-links__next">4. Lexer and Parser Definition</a></div></article><div id="disqus_thread"></div></div></section></main></div><script src="https://resources.jetbrains.com/writerside/apidoc/6.23/app.js"></script></body></html>

@@ -1,73 +1,82 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-  <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-  <id>org.limepepper.gdb</id>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>org.limepepper.gdb</id>
 
-  <!-- Public plugin name should be written in Title Case.
-       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-  <name>GDB Script Support</name>
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>GDB Script Support</name>
 
-  <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-  <vendor url="https://github.com/limepepper">limepepper</vendor>
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://github.com/limepepper">limepepper</vendor>
 
-  <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-  <description><![CDATA[
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
     Provides support for GDB debugger script files including syntax highlighting, formatting, and documentation.<br>
     <em>Supports .gdb file extension with comprehensive language features</em>
   ]]></description>
 
-  <!-- Product and plugin compatibility requirements.
-       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-  <depends>com.intellij.modules.platform</depends>
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- File type registration -->
+        <fileType name="GDB Script"
+                  implementationClass="org.limepepper.gdb.lang.GdbFileType"
+                  fieldName="INSTANCE"
+                  language="GDBScript"
+                  extensions="gdb"
+        />
+
+        <!-- Parser definition -->
+        <lang.parserDefinition language="GDBScript"
+                               implementationClass="org.limepepper.gdb.parser.GdbParserDefinition"/>
+
+        <!-- Syntax highlighting -->
+        <lang.syntaxHighlighterFactory language="GDBScript"
+                                       implementationClass="org.limepepper.gdb.highlighting.GdbSyntaxHighlighterFactory"/>
+
+        <!-- Color settings page -->
+        <colorSettingsPage implementation="org.limepepper.gdb.highlighting.GdbColorSettingsPage"/>
 
 
+        <lang.commenter
+            language="GDBScript"
+            implementationClass="org.limepepper.gdb.commenter.GdbCommenter"/>
 
 
-  <!-- Extension points defined by the plugin.
-       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- File type registration -->
-    <fileType name="GDB Script"
-              implementationClass="org.limepepper.gdb.GdbFileType"
-              fieldName="INSTANCE"
-              language="GDBScript"
-              extensions="gdb"
-    />
+        <lang.psiStructureViewFactory
+            language="GDBScript"
+            implementationClass="org.limepepper.gdb.structure.GdbStructureViewFactory"/>
 
-    <!-- Parser definition -->
-    <lang.parserDefinition language="GDBScript"
-                           implementationClass="org.limepepper.gdb.parser.GdbParserDefinition"/>
 
-<!--    &lt;!&ndash; Syntax highlighting &ndash;&gt;-->
-<!--    <lang.syntaxHighlighterFactory language="GDBScript"-->
-<!--                                   implementationClass="org.limepepper.gdb.highlighting.GdbSyntaxHighlighterFactory"/>-->
+        <!--    &lt;!&ndash; Code formatting &ndash;&gt;-->
+        <!--    <lang.formatter language="GDBScript"-->
+        <!--                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>-->
 
-<!--    &lt;!&ndash; Color settings page &ndash;&gt;-->
-<!--    <colorSettingsPage implementation="org.limepepper.gdb.highlighting.GdbColorSettingsPage"/>-->
+        <!-- Documentation target provider (modern API) -->
+        <platform.backend.documentation.psiTargetProvider
+            order="first"
+            implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>
 
-<!--    &lt;!&ndash; Code formatting &ndash;&gt;-->
-<!--    <lang.formatter language="GDBScript"-->
-<!--                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>-->
-
-<!--    &lt;!&ndash; Documentation target provider (modern API) &ndash;&gt;-->
-<!--    <platform.backend.documentation.psiTargetProvider-->
-<!--            order="first"-->
-<!--            implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>-->
-
-<!--    &lt;!&ndash; Documentation target provider (modern API) &ndash;&gt;-->
-<!--    <platform.backend.documentation.targetProvider-->
+        <!-- Documentation target provider (modern API) -->
+<!--        <platform.backend.documentation.targetProvider-->
 <!--            order="first"-->
 <!--            implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>-->
-  </extensions>
+    </extensions>
 
-  <!-- Actions -->
-  <actions>
-    <action id="org.limepepper.gdb.debug.DebugDocumentationAction"
-            class="org.limepepper.gdb.debug.DebugDocumentationAction"
-            text="Debug Documentation Providers"
-            description="List all loaded PsiDocumentationTargetProviders in the log">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
-  </actions>
+    <!-- Actions -->
+    <actions>
+        <action id="org.limepepper.gdb.debug.DebugDocumentationAction"
+                class="org.limepepper.gdb.debug.DebugDocumentationAction"
+                text="Debug Documentation Providers"
+                description="List all loaded PsiDocumentationTargetProviders in the log">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>

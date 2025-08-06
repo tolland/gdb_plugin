@@ -1,9 +1,6 @@
 package org.limepepper.gdb.psi.impl
 
 
-import org.limepepper.gdb.psi.GdbStatement
-import org.limepepper.gdb.psi.GdbTypes
-
 /**
  * Utility methods for generated PSI elements
  */

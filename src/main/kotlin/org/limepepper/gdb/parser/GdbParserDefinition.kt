@@ -10,7 +10,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
-import org.limepepper.gdb.GdbLanguage
+import org.limepepper.gdb.lang.GdbLanguage
 import org.limepepper.gdb.psi.GdbTypes
 import org.limepepper.gdb.psi.GdbTokenSets
 import org.limepepper.gdb.lexer.GdbLexerAdapter
@@ -20,9 +20,9 @@ import org.limepepper.gdb.psi.GdbFile
  * Parser definition for GDB language
  */
 class GdbParserDefinition : ParserDefinition {
-    
+
     companion object {
-        val FILE = IFileElementType(GdbLanguage.INSTANCE)
+        val FILE = IFileElementType(GdbLanguage)
     }
 
     override fun createLexer(project: Project?): Lexer = GdbLexerAdapter()
@@ -37,7 +37,7 @@ class GdbParserDefinition : ParserDefinition {
 
     override fun getStringLiteralElements(): TokenSet = GdbTokenSets.STRINGS
 
-    override fun getWhitespaceTokens(): TokenSet = GdbTokenSets.WHITESPACE
+    override fun getWhitespaceTokens(): TokenSet = GdbTokenSets.whitespaceTokens
 
     override fun createElement(node: ASTNode): PsiElement {
         // Use the generated factory method

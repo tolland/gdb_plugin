@@ -1,6 +1,7 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
     id("java")
@@ -14,10 +15,10 @@ kotlin {
 }
 
 // Configure Grammar-Kit
-//grammarKit {
+grammarKit {
 //    // Optional: specify JFlex version if needed
 //    // jflexRelease.set("1.7.0-2")
-//}
+}
 
 group = "org.limepepper"
 version = "1.0-SNAPSHOT"
@@ -27,6 +28,7 @@ repositories {
     intellijPlatform {
         defaultRepositories()
     }
+    maven { url = uri("https://jitpack.io") }
 }
 
 // Add generated sources to compilation
@@ -45,15 +47,17 @@ dependencies {
         create("IC", "2025.1")
         // clion("2025.1.4")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
-
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testFramework(TestFrameworkType.Platform)
         // Add necessary plugin dependencies for compilation here, example:
-        // bundledPlugin("com.intellij.java")
+        bundledPlugin("com.jetbrains.sh")
 
         // Development plugins for runIde
-//        plugin("PsiViewer", "2025.1")
+//        plugin("PsiViewer", "252.23892.248")
 //        plugin("LivePlugin")
         // plugin("org.jetbrains.plugins.gradle", "251.3")
         pluginVerifier()
+        testFramework(TestFrameworkType.Plugin.Java)
     }
 }
 
@@ -84,11 +88,17 @@ intellijPlatform {
 
 tasks {
     generateParser {
-        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/parser/Gdb_Revised.bnf"))
+        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/parser/Gdb.bnf"))
         targetRootOutputDir.set(file("src/main/gen"))
         pathToParser.set("org/limepepper/gdb/parser/GdbParser.java")
         pathToPsiRoot.set("org/limepepper/gdb/psi")
         purgeOldFiles.set(true)
+    }
+
+//     Configure JFlex lexer generation
+    generateLexer {
+        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/lexer/GdbLexer.flex"))
+        targetOutputDir.set(file("src/main/gen/org/limepepper/gdb/lexer"))
     }
 
 
@@ -124,7 +134,11 @@ tasks {
 //            """
 
         // Declare sandbox config files as inputs for configuration cache compatibility
-        inputs.files("sandbox-config/ide.general.xml", "sandbox-config/ui.lnf.xml", "sandbox-config/trusted-paths.xml")
+        inputs.files(
+            "sandbox-config/ide.general.xml",
+            "sandbox-config/ui.lnf.xml",
+            "sandbox-config/trusted-paths.xml"
+        )
             .withPropertyName("sandboxConfigFiles")
 
         doLast {
@@ -165,7 +179,8 @@ tasks {
             "-Dide.main.menu.separate=true",
             "-Didea.auto.reload.plugins=true",
             "-XX:+UnlockDiagnosticVMOptions",
-            "-Dide.log.level=DEBUG"
+            "-Dide.log.level=DEBUG",
+//            "-Dkotlinx.coroutines.debug=off"
         )
         args(listOf("nosplash"))
         argumentProviders += CommandLineArgumentProvider {
@@ -177,10 +192,4 @@ tasks {
         // Open test project automatically
         systemProperty("idea.auto.reload.plugins", "true")
     }
-
-    // Configure JFlex lexer generation
-//    generateLexer {
-//        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/lexer/Gdb.flex"))
-//        targetOutputDir.set(file("src/main/gen/org/limepepper/gdb/lexer"))
-//    }
 }

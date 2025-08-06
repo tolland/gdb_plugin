@@ -1,13 +1,10 @@
 {
   parserClass="org.limepepper.gdb.parser.GdbParser"
-
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-
   psiClassPrefix="Gdb"
   psiImplClassSuffix="Impl"
   psiPackage="org.limepepper.gdb.psi"
   psiImplPackage="org.limepepper.gdb.psi.impl"
-
   elementTypeHolderClass="org.limepepper.gdb.psi.GdbTypes"
   elementTypeClass="org.limepepper.gdb.psi.GdbElementType"
   tokenTypeClass="org.limepepper.gdb.psi.GdbTokenType"
@@ -15,41 +12,36 @@
   psiImplUtilClass="org.limepepper.gdb.psi.impl.GdbPsiUtil"
 
   tokens=[
-    // Whitespace and structure
-    WHITESPACE='regexp:\s+'
-    NEWLINE='regexp:\r\n|\r|\n'
-    COMMENT='regexp:#.*'
-    
+
+    // Special-case command keywords ---
+    SET_KW           = 'set'
+    PRINT_KW         = 'print'
+    DEFINE           = 'define'
+    END              = 'end'
+    COMMANDS         = 'commands'
+
     // Basic commands (without x, print, p, break, b)
     COMMAND_EXECUTION='regexp:(run|r|start|continue|c|step|s|next|n|finish|until|u|kill|quit|q|detach)'
-    COMMAND_BREAKPOINT='regexp:(tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)'
+    COMMAND_BREAKPOINT='regexp:(b|br|bre|brea|break|tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)'
     COMMAND_STACK='regexp:(backtrace|bt|frame|f|up|down|select-frame)'
     COMMAND_DATA='regexp:(display|output|printf|call|return|examine|info|i|show|list|l|disassemble|disas)'
-    COMMAND_CONFIG='regexp:(set|unset|source|file|exec-file|symbol-file|core-file|target|attach|load)'
-    COMMAND_USER='regexp:(define|document|end|if|else|while|loop_break|loop_continue)'
-    
-    // Special command keywords
-    X_CMD='x'
-    PRINT_CMD='print'
-    P_CMD='p'
-    BREAK_CMD='break'
-    B_CMD='b'
+    COMMAND_CONFIG='regexp:(set|unset|source|exec-file|symbol-file|core-file|target|attach|load)'
+    // COMMAND_USER='regexp:(d|if|else|while|loop_break|loop_continue)'
 
-    // Format specifiers (as tokens so they can have their own highlighting)
-    FORMAT_SPEC='regexp:/[0-9]*[xotducsiaf]?[bhwg]?'
+    // Structural tokens
+    WHITE_SPACE       = 'regexp:[ \t]'
+    COMMENT          = 'regexp:#[^\r\n]*'
+    LINE_CONTINUATION = 'regexp:\\\\(\r\n|\n|\r)'
+    CRLF             = 'regexp:(\r\n|\n|\r)'
 
     // Literals
-    NUMBER='regexp:\d+'
     HEX_NUMBER='regexp:0x[0-9a-fA-F]+'
-    STRING='regexp:"([^"\\]|\\.)*"'
+//    VARIABLE = 'regexp:\$[a-zA-Z_][a-zA-Z0-9_]*'
     REGISTER='regexp:\$[a-zA-Z_][a-zA-Z0-9_]*|\$\d+'
+    NUMBER='regexp:\d+'
     IDENTIFIER='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
-    
-    // Operators
-    OPERATOR='regexp:(==|!=|<=|>=|<|>|&&|\|\|!|<<|>>|[+\-*/%&|^~])'
-    ASSIGNMENT='regexp:(=|\+=|-=|\*=|/=)'
-    ADDRESS_MARKER='*'
-    
+    STRING='regexp:"([^"\\]|\\.)*"'
+
     // Punctuation
     LPAREN='('
     RPAREN=')'
@@ -57,94 +49,82 @@
     RBRACKET=']'
     LBRACE='{'
     RBRACE='}'
+    EQUALS = '='
     COMMA=','
     SEMICOLON=';'
     COLON=':'
     DOT='.'
     ARROW='->'
     SCOPE_RESOLUTION='::'
-    
-    // Special
-    CONDITION_IF='if'
+    WORD             = 'regexp:[^#\s\\]+'
   ]
 }
 
-// Grammar rules
-gdbFile ::= item*
+gdbFile ::= statement*
 
-private item ::= statement | comment_line | NEWLINE
+// --- THE NEW, UNAMBIGUOUS DISPATCHER ---
+// A statement is now one of three things, based on what it starts with.
+private statement ::= (comment_driven_statement | command_statement | CRLF)
 
-// Single statement type with command + arguments
-statement ::= command_with_format argument* condition? {
-  mixin="org.limepepper.gdb.psi.impl.GdbStatementMixin"
-  implements="org.limepepper.gdb.psi.GdbNamedElement"
-  methods=[getCommandName getFormatSpec]
-}
 
-// Command with optional format specification
-command_with_format ::= simple_command
-                     | formatted_command
+// --- 1. A STATEMENT THAT STARTS WITH A COMMENT ---
+// We figure out what KIND of comment block it is here.
+private comment_driven_statement ::= (documented_command | floating_comment | doc_comment_block)
 
-// Simple commands without format specs
+// An ATTACHED command: a doc block, a predicate ensuring NO blank line, and the command itself.
+// This is now a top-level structure.
+documented_command ::= doc_comment_block &(!CRLF) command_statement
+
+// A FLOATING comment: a doc block FOLLOWED by a blank line.
+floating_comment ::= doc_comment_block CRLF
+
+// A TRAILING comment (or standalone): just a doc block.
+// The parser will only choose this if the rules above fail.
+doc_comment_block ::= (COMMENT CRLF)+
+
+// ================== Structural Rules ==================
+
+// --- 2. A STATEMENT THAT STARTS WITH A COMMAND WORD ---
+// This rule now ONLY matches commands that are NOT preceded by a comment.
+// All doc-comment logic has been removed from here.
+command_statement ::= (define_block | command)
+// {mixin="org.limepepper.gdb.psi.impl.GdbNamedElementImpl" implements=["org.limepepper.gdb.psi.GdbNamedElement" "com.intellij.navigation.NavigationItem"]}
+
+
+// ================== CORE COMMAND RULES (NOW SIMPLIFIED) ==================
+// These rules are now simple because they don't worry about doc comments.
+
+define_block ::= DEFINE WORD+ CRLF statement* END CRLF?
+
+command ::= (set_print_command | normal_command)
+
+private set_print_command ::= set_print_command_line commands_block? {pin=1}
+private normal_command ::= normal_command_line commands_block? {pin=1}
+
+// A command line for 'set' or 'print'.
+// The key is `(WORD | COMMENT)*`: it consumes the entire rest of the line,
+// treating COMMENT tokens as just another part of the arguments.
+private set_print_command_line ::= (SET_KW | PRINT_KW)
+                                   ((IDENTIFIER | REGISTER | EQUALS | COMMENT) &(!CRLF))*
+                                    value_statement
+                                   CRLF {pin=1}
+
+value_statement ::= HEX_NUMBER | NUMBER | STRING | IDENTIFIER | WORD
+//value ::= VARIABLE | NUMBER | STRING | IDENTIFIER
+
 simple_command ::= COMMAND_EXECUTION
-         | COMMAND_BREAKPOINT  
+         | COMMAND_BREAKPOINT
          | COMMAND_STACK
          | COMMAND_DATA
          | COMMAND_CONFIG
          | COMMAND_USER
 
-// Commands with format specs: x/format, print/format, break *addr
-formatted_command ::= (X_CMD | PRINT_CMD | P_CMD) FORMAT_SPEC?
-                   | (BREAK_CMD | B_CMD) ADDRESS_MARKER?
+// A command line for any other command.
+// The key is `(COMMENT)?`: it allows an OPTIONAL
+// separate COMMENT at the very end.
+private normal_command_line ::= simple_command+
+                                ((IDENTIFIER | WORD) &(!CRLF))*
+                                (COMMENT)? CRLF
 
-// Rest of grammar stays the same...
-comment_line ::= COMMENT
-
-argument ::= expression
-          | STRING
-          | IDENTIFIER
-          | address
-          | register_ref {
-  mixin="org.limepepper.gdb.psi.impl.GdbArgumentMixin"
-}
-
-// Expressions
-expression ::= logical_or_expr
-
-logical_or_expr ::= logical_and_expr ('||' logical_and_expr)*
-
-logical_and_expr ::= equality_expr ('&&' equality_expr)*
-
-equality_expr ::= relational_expr (('==' | '!=') relational_expr)*
-
-relational_expr ::= additive_expr (('<' | '>' | '<=' | '>=') additive_expr)*
-
-additive_expr ::= multiplicative_expr (('+' | '-') multiplicative_expr)*
-
-multiplicative_expr ::= unary_expr (('*' | '/' | '%') unary_expr)*
-
-unary_expr ::= ('!' | '-' | '+' | ADDRESS_MARKER)? primary_expr
-
-primary_expr ::= NUMBER
-              | HEX_NUMBER
-              | STRING
-              | register_ref
-              | function_call
-              | member_access
-              | array_access
-              | IDENTIFIER
-              | LPAREN expression RPAREN
-
-// Specific constructs
-address ::= ADDRESS_MARKER (HEX_NUMBER | IDENTIFIER | LPAREN expression RPAREN)
-
-register_ref ::= REGISTER
-
-function_call ::= IDENTIFIER LPAREN (expression (COMMA expression)*)? RPAREN
-
-member_access ::= (IDENTIFIER | register_ref) (DOT | ARROW) IDENTIFIER
-
-array_access ::= (IDENTIFIER | register_ref) LBRACKET expression RBRACKET
-
-// Conditional constructs
-condition ::= CONDITION_IF expression
+// A 'commands' block that attaches to a preceding command.
+private commands_block ::= COMMANDS CRLF statement* END CRLF?
