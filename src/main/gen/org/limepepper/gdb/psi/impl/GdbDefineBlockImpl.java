@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.limepepper.gdb.psi.GdbTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.limepepper.gdb.psi.GdbPsiElement;
 import org.limepepper.gdb.psi.*;
 
-public class GdbDefineBlockImpl extends ASTWrapperPsiElement implements GdbDefineBlock {
+public class GdbDefineBlockImpl extends GdbPsiElement implements GdbDefineBlock {
 
   public GdbDefineBlockImpl(@NotNull ASTNode node) {
     super(node);

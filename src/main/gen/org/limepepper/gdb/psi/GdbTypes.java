@@ -30,9 +30,12 @@ public interface GdbTypes {
   IElementType COMMENT = new GdbTokenType("COMMENT");
   IElementType CRLF = new GdbTokenType("CRLF");
   IElementType DEFINE = new GdbTokenType("define");
+  IElementType DOC_BLOCK = new GdbTokenType("DOC_BLOCK");
   IElementType DOT = new GdbTokenType(".");
+  IElementType DOUBLE_QUOTED_STRING = new GdbTokenType("DOUBLE_QUOTED_STRING");
   IElementType END = new GdbTokenType("end");
-  IElementType EQUALS = new GdbTokenType("=");
+  IElementType GUILE_BLOCK = new GdbTokenType("GUILE_BLOCK");
+  IElementType GUILE_KW = new GdbTokenType("guile");
   IElementType HEX_NUMBER = new GdbTokenType("HEX_NUMBER");
   IElementType IDENTIFIER = new GdbTokenType("IDENTIFIER");
   IElementType LBRACE = new GdbTokenType("{");
@@ -40,7 +43,21 @@ public interface GdbTypes {
   IElementType LINE_CONTINUATION = new GdbTokenType("LINE_CONTINUATION");
   IElementType LPAREN = new GdbTokenType("(");
   IElementType NUMBER = new GdbTokenType("NUMBER");
+  IElementType OP_ASSIGN = new GdbTokenType("=");
+  IElementType OP_DIV = new GdbTokenType("/");
+  IElementType OP_ELLIPSIS = new GdbTokenType("...");
+  IElementType OP_EQUAL = new GdbTokenType("==");
+  IElementType OP_GREATER = new GdbTokenType(">");
+  IElementType OP_GREATER_OR_EQUAL = new GdbTokenType(">=");
+  IElementType OP_LESS = new GdbTokenType("<");
+  IElementType OP_LESS_OR_EQUAL = new GdbTokenType("<=");
+  IElementType OP_MINUS = new GdbTokenType("-");
+  IElementType OP_MOD = new GdbTokenType("%");
+  IElementType OP_MUL = new GdbTokenType("*");
+  IElementType OP_PLUS = new GdbTokenType("+");
   IElementType PRINT_KW = new GdbTokenType("print");
+  IElementType PYTHON_BLOCK = new GdbTokenType("PYTHON_BLOCK");
+  IElementType PYTHON_KW = new GdbTokenType("python");
   IElementType RBRACE = new GdbTokenType("}");
   IElementType RBRACKET = new GdbTokenType("]");
   IElementType REGISTER = new GdbTokenType("REGISTER");
@@ -48,6 +65,7 @@ public interface GdbTypes {
   IElementType SCOPE_RESOLUTION = new GdbTokenType("::");
   IElementType SEMICOLON = new GdbTokenType(";");
   IElementType SET_KW = new GdbTokenType("set");
+  IElementType SINGLE_QUOTE = new GdbTokenType("'");
   IElementType STRING = new GdbTokenType("STRING");
   IElementType WORD = new GdbTokenType("WORD");
 

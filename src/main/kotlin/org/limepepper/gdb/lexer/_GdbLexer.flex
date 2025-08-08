@@ -25,61 +25,81 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 EOL=\R
 WHITE_SPACE=\s+
 
+PYTHON_BLOCK=python\n.*?(end\b)
+GUILE_BLOCK=guile\n.*?(end\b)
 COMMAND_EXECUTION=(run|r|start|continue|c|step|s|next|n|finish|until|u|kill|quit|q|detach)
-COMMAND_BREAKPOINT=(b|br|bre|brea|break|tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)
+COMMAND_BREAKPOINT=(b|br|bre|brea|break|tb|tbr|tbre|tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)
 COMMAND_STACK=(backtrace|bt|frame|f|up|down|select-frame)
 COMMAND_DATA=(display|output|printf|call|return|examine|info|i|show|list|l|disassemble|disas)
 COMMAND_CONFIG=(unset|source|exec-file|symbol-file|core-file|target|attach|load)
 WHITE_SPACE=[ \t]
 COMMENT=#[^\r\n]*
-LINE_CONTINUATION=\\(\r\n|\n|\r)
+LINE_CONTINUATION=\\\\(\r\n|\n|\r)
 CRLF=(\r\n|\n|\r)
 HEX_NUMBER=0x[0-9a-fA-F]+
 REGISTER=\$[a-zA-Z_][a-zA-Z0-9_]*|\$[0-9]+
 NUMBER=[0-9]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
 STRING=\"([^\"\\]|\\.)*\"
+DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
 WORD=[^#\s\\]+
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}              { return WHITE_SPACE; }
+  {WHITE_SPACE}                { return WHITE_SPACE; }
 
-  "set"                      { return SET_KW; }
-  "print"                    { return PRINT_KW; }
-  "define"                   { return DEFINE; }
-  "end"                      { return END; }
-  "commands"                 { return COMMANDS; }
-  "("                        { return LPAREN; }
-  ")"                        { return RPAREN; }
-  "["                        { return LBRACKET; }
-  "]"                        { return RBRACKET; }
-  "{"                        { return LBRACE; }
-  "}"                        { return RBRACE; }
-  "="                        { return EQUALS; }
-  ","                        { return COMMA; }
-  ";"                        { return SEMICOLON; }
-  ":"                        { return COLON; }
-  "."                        { return DOT; }
-  "->"                       { return ARROW; }
-  "::"                       { return SCOPE_RESOLUTION; }
-  "COMMAND_USER"             { return COMMAND_USER; }
+  "python"                     { return PYTHON_KW; }
+  "guile"                      { return GUILE_KW; }
+  "set"                        { return SET_KW; }
+  "print"                      { return PRINT_KW; }
+  "define"                     { return DEFINE; }
+  "end"                        { return END; }
+  "commands"                   { return COMMANDS; }
+  "->"                         { return ARROW; }
+  ":"                          { return COLON; }
+  ","                          { return COMMA; }
+  "."                          { return DOT; }
+  "="                          { return OP_ASSIGN; }
+  "=="                         { return OP_EQUAL; }
+  "{"                          { return LBRACE; }
+  "["                          { return LBRACKET; }
+  "("                          { return LPAREN; }
+  "/"                          { return OP_DIV; }
+  "..."                        { return OP_ELLIPSIS; }
+  ">"                          { return OP_GREATER; }
+  ">="                         { return OP_GREATER_OR_EQUAL; }
+  "<"                          { return OP_LESS; }
+  "<="                         { return OP_LESS_OR_EQUAL; }
+  "-"                          { return OP_MINUS; }
+  "%"                          { return OP_MOD; }
+  "*"                          { return OP_MUL; }
+  "+"                          { return OP_PLUS; }
+  "}"                          { return RBRACE; }
+  "]"                          { return RBRACKET; }
+  ")"                          { return RPAREN; }
+  ";"                          { return SEMICOLON; }
+  "'"                          { return SINGLE_QUOTE; }
+  "::"                         { return SCOPE_RESOLUTION; }
+  "COMMAND_USER"               { return COMMAND_USER; }
 
-  {COMMAND_EXECUTION}        { return COMMAND_EXECUTION; }
-  {COMMAND_BREAKPOINT}       { return COMMAND_BREAKPOINT; }
-  {COMMAND_STACK}            { return COMMAND_STACK; }
-  {COMMAND_DATA}             { return COMMAND_DATA; }
-  {COMMAND_CONFIG}           { return COMMAND_CONFIG; }
-  {WHITE_SPACE}              { return WHITE_SPACE; }
-  {COMMENT}                  { return COMMENT; }
-  {LINE_CONTINUATION}        { return LINE_CONTINUATION; }
-  {CRLF}                     { return CRLF; }
-  {HEX_NUMBER}               { return HEX_NUMBER; }
-  {REGISTER}                 { return REGISTER; }
-  {NUMBER}                   { return NUMBER; }
-  {IDENTIFIER}               { return IDENTIFIER; }
-  {STRING}                   { return STRING; }
-  {WORD}                     { return WORD; }
+  {PYTHON_BLOCK}               { return PYTHON_BLOCK; }
+  {GUILE_BLOCK}                { return GUILE_BLOCK; }
+  {COMMAND_EXECUTION}          { return COMMAND_EXECUTION; }
+  {COMMAND_BREAKPOINT}         { return COMMAND_BREAKPOINT; }
+  {COMMAND_STACK}              { return COMMAND_STACK; }
+  {COMMAND_DATA}               { return COMMAND_DATA; }
+  {COMMAND_CONFIG}             { return COMMAND_CONFIG; }
+  {WHITE_SPACE}                { return WHITE_SPACE; }
+  {COMMENT}                    { return COMMENT; }
+  {LINE_CONTINUATION}          { return LINE_CONTINUATION; }
+  {CRLF}                       { return CRLF; }
+  {HEX_NUMBER}                 { return HEX_NUMBER; }
+  {REGISTER}                   { return REGISTER; }
+  {NUMBER}                     { return NUMBER; }
+  {IDENTIFIER}                 { return IDENTIFIER; }
+  {STRING}                     { return STRING; }
+  {DOUBLE_QUOTED_STRING}       { return DOUBLE_QUOTED_STRING; }
+  {WORD}                       { return WORD; }
 
 }
 

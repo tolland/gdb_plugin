@@ -13,4 +13,6 @@ public interface GdbCommandStatement extends PsiElement {
   @Nullable
   GdbDefineBlock getDefineBlock();
 
+  @Nullable String getKey();
+
 }

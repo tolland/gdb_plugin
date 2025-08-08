@@ -2,13 +2,11 @@
 # This file demonstrates various formatting scenarios
 
 # Poor formatting that should be improved
-set confirm     off
-break main
-run    arg1   arg2
+  set confirm off
 print   variable_name
 
 # User-defined command (should indent body)
-define mycommand
+
 print "Inside command"
 info registers
 backtrace
@@ -23,3 +21,6 @@ print *(int*)0x400000
 info breakpoints
 x/10i $pc
 disassemble main
+
+bre
+

@@ -8,7 +8,14 @@ commands $bpnum
 end
 
 # conditional breakpoints
-break foo if x>0
+break foo1
+commands
+    silent
+    printf "x is %d\n",x
+    cont
+end
+
+break foo2
 commands
     silent
     printf "x is %d\n",x

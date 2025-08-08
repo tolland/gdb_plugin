@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.limepepper.gdb.psi.GdbTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.limepepper.gdb.psi.GdbPsiElement;
 import org.limepepper.gdb.psi.*;
 
-public class GdbSimpleCommandImpl extends ASTWrapperPsiElement implements GdbSimpleCommand {
+public class GdbSimpleCommandImpl extends GdbPsiElement implements GdbSimpleCommand {
 
   public GdbSimpleCommandImpl(@NotNull ASTNode node) {
     super(node);

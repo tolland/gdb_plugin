@@ -13,11 +13,10 @@ object GdbTokenSets {
 
     // common types
     val WHITESPACE: IElementType = TokenType.WHITE_SPACE
-    val LINE_CONTINUATION: IElementType = GdbTokenType("LINE_CONTINUATION")
 
     // Basic lexer tokens - use original GdbTokenTypes
     @JvmField
-    val whitespaceTokens = TokenSet.create(WHITESPACE, LINE_CONTINUATION)
+    val whitespaceTokens = TokenSet.create(WHITESPACE, GdbTypes.LINE_CONTINUATION, GdbTypes.CRLF)
 
     @JvmField
     val COMMENTS = TokenSet.create(GdbTypes.COMMENT)

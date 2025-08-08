@@ -14,23 +14,10 @@ set logging file gdb.output
 # Invalid character '#' in expression.
 set $var = 0
 
-# conditional breakpoints on named method
-break foo if x>0
-commands
-    silent
-    printf "x is %d\n",x
-    cont
-end
-
-# Set up signal handling
-handle SIGSEGV stop print
-
-# Set up catchpoints for exceptions
-catch throw
 
 # This is using the non ambiguous substr of command breakpoint
 bre function_name
-    command 1
+commands
     backtrace
     continue
 end

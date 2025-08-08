@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.limepepper.gdb.psi.GdbTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.limepepper.gdb.psi.GdbPsiElement;
 import org.limepepper.gdb.psi.*;
 
-public class GdbCommandStatementImpl extends ASTWrapperPsiElement implements GdbCommandStatement {
+public class GdbCommandStatementImpl extends GdbPsiElement implements GdbCommandStatement {
 
   public GdbCommandStatementImpl(@NotNull ASTNode node) {
     super(node);
@@ -37,6 +37,11 @@ public class GdbCommandStatementImpl extends ASTWrapperPsiElement implements Gdb
   @Nullable
   public GdbDefineBlock getDefineBlock() {
     return findChildByClass(GdbDefineBlock.class);
+  }
+
+  @Override
+  public @Nullable String getKey() {
+    return GdbPsiImplUtil.getKey(this);
   }
 
 }

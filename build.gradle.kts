@@ -51,9 +51,13 @@ dependencies {
         testFramework(TestFrameworkType.Platform)
         // Add necessary plugin dependencies for compilation here, example:
         bundledPlugin("com.jetbrains.sh")
-
+//        bundledPlugin("name.kropp.intellij.makefile")
+//251.23774.426
         // Development plugins for runIde
 //        plugin("PsiViewer", "252.23892.248")
+        plugin("name.kropp.intellij.makefile", "251.23774.318")
+        plugin("org.intellij.plugins.hcl", "251.23774.426")
+        plugin("DevKit", "251.23774.460")
 //        plugin("LivePlugin")
         // plugin("org.jetbrains.plugins.gradle", "251.3")
         pluginVerifier()

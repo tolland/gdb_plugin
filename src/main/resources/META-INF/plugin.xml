@@ -59,20 +59,27 @@
         <!--    <lang.formatter language="GDBScript"-->
         <!--                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>-->
 
-        <!-- Traditional DocumentationProvider for GDB language -->
-        <lang.documentationProvider
-            language="GDBScript"
-            implementationClass="org.limepepper.gdb.documentation.GdbDocumentationProvider"/>
-
         <!-- Documentation target provider (modern API) -->
         <platform.backend.documentation.psiTargetProvider
             order="first"
             implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>
 
         <!-- Documentation target provider (modern API) -->
-<!--        <platform.backend.documentation.targetProvider-->
-<!--            order="first"-->
-<!--            implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>-->
+        <platform.backend.documentation.targetProvider
+            order="first"
+            implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>
+
+
+        <annotator
+            language="GDBScript"
+            implementationClass="org.limepepper.lang.gdb.annotator.GdbAnnotator"/>
+
+
+        <completion.contributor
+            language="GDBScript"
+            implementationClass="org.limepepper.lang.gdb.completion.GdbCompletionContributor"/>
+
+
     </extensions>
 
     <!-- Actions -->

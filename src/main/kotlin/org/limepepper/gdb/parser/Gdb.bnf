@@ -1,17 +1,25 @@
 {
+
+  elementTypeClass="org.limepepper.gdb.psi.GdbElementType"
+  elementTypeHolderClass="org.limepepper.gdb.psi.GdbTypes"
+  extends='org.limepepper.gdb.psi.GdbPsiElement'
+//  implements = 'org.limepepper.gdb.psi.GdbPsiElement'
   parserClass="org.limepepper.gdb.parser.GdbParser"
-  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  parserUtilClass = "org.limepepper.gdb.parser.GdbParserUtil"
   psiClassPrefix="Gdb"
   psiImplClassSuffix="Impl"
-  psiPackage="org.limepepper.gdb.psi"
   psiImplPackage="org.limepepper.gdb.psi.impl"
-  elementTypeHolderClass="org.limepepper.gdb.psi.GdbTypes"
-  elementTypeClass="org.limepepper.gdb.psi.GdbElementType"
+  psiImplUtilClass="org.limepepper.gdb.psi.impl.GdbPsiImplUtil"
+  psiPackage="org.limepepper.gdb.psi"
   tokenTypeClass="org.limepepper.gdb.psi.GdbTokenType"
 
-  psiImplUtilClass="org.limepepper.gdb.psi.impl.GdbPsiUtil"
-
   tokens=[
+
+    PYTHON_KW = 'python'
+    GUILE_KW = 'guile'
+    DOC_BLOCK = 'regexp:document\n.*?(end\b)'
+    PYTHON_BLOCK = 'regexp:python\n.*?(end\b)'
+    GUILE_BLOCK = 'regexp:guile\n.*?(end\b)'
 
     // Special-case command keywords ---
     SET_KW           = 'set'
@@ -20,12 +28,14 @@
     END              = 'end'
     COMMANDS         = 'commands'
 
+
+
     // Basic commands (without x, print, p, break, b)
     COMMAND_EXECUTION='regexp:(run|r|start|continue|c|step|s|next|n|finish|until|u|kill|quit|q|detach)'
-    COMMAND_BREAKPOINT='regexp:(b|br|bre|brea|break|tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)'
+    COMMAND_BREAKPOINT='regexp:(b|br|bre|brea|break|tb|tbr|tbre|tbreak|hbreak|thbreak|rbreak|watch|rwatch|awatch|catch|delete|enable|disable|condition)'
     COMMAND_STACK='regexp:(backtrace|bt|frame|f|up|down|select-frame)'
     COMMAND_DATA='regexp:(display|output|printf|call|return|examine|info|i|show|list|l|disassemble|disas)'
-    COMMAND_CONFIG='regexp:(set|unset|source|exec-file|symbol-file|core-file|target|attach|load)'
+    COMMAND_CONFIG='regexp:(unset|source|exec-file|symbol-file|core-file|target|attach|load)'
     // COMMAND_USER='regexp:(d|if|else|while|loop_break|loop_continue)'
 
     // Structural tokens
@@ -42,19 +52,35 @@
     IDENTIFIER='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
     STRING='regexp:"([^"\\]|\\.)*"'
 
+    // strings
+    DOUBLE_QUOTED_STRING="regexp:\"([^\\\"\r\n]|\\[^\r\n])*\"?"
+
     // Punctuation
-    LPAREN='('
-    RPAREN=')'
-    LBRACKET='['
-    RBRACKET=']'
-    LBRACE='{'
-    RBRACE='}'
-    EQUALS = '='
-    COMMA=','
-    SEMICOLON=';'
-    COLON=':'
-    DOT='.'
     ARROW='->'
+    COLON=':'
+    COMMA=','
+    DOT='.'
+    OP_ASSIGN='='
+    OP_EQUAL='=='
+    LBRACE='{'
+    LBRACKET='['
+    LPAREN='('
+    OP_DIV='/'
+    OP_ELLIPSIS='...'
+    OP_GREATER='>'
+    OP_GREATER_OR_EQUAL='>='
+    OP_LESS='<'
+    OP_LESS_OR_EQUAL='<='
+    OP_MINUS='-'
+    OP_MOD='%'
+    OP_MUL='*'
+    OP_PLUS='+'
+    RBRACE='}'
+    RBRACKET=']'
+    RPAREN=')'
+    SEMICOLON=';'
+
+    SINGLE_QUOTE="'"
     SCOPE_RESOLUTION='::'
     WORD             = 'regexp:[^#\s\\]+'
   ]
@@ -88,6 +114,9 @@ doc_comment_block ::= (COMMENT CRLF)+
 // This rule now ONLY matches commands that are NOT preceded by a comment.
 // All doc-comment logic has been removed from here.
 command_statement ::= (define_block | command)
+{
+  methods=[getKey]
+}
 // {mixin="org.limepepper.gdb.psi.impl.GdbNamedElementImpl" implements=["org.limepepper.gdb.psi.GdbNamedElement" "com.intellij.navigation.NavigationItem"]}
 
 
@@ -105,7 +134,7 @@ private normal_command ::= normal_command_line commands_block? {pin=1}
 // The key is `(WORD | COMMENT)*`: it consumes the entire rest of the line,
 // treating COMMENT tokens as just another part of the arguments.
 private set_print_command_line ::= (SET_KW | PRINT_KW)
-                                   ((IDENTIFIER | REGISTER | EQUALS | COMMENT) &(!CRLF))*
+                                   ((IDENTIFIER | REGISTER | OP_ASSIGN | COMMENT) &(!CRLF))*
                                     value_statement
                                    CRLF {pin=1}
 

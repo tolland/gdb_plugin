@@ -1,10 +1,37 @@
 package org.limepepper.gdb.psi.impl
 
+import com.intellij.psi.PsiElement
+import org.limepepper.gdb.psi.GdbCommandStatement
+
 
 /**
  * Utility methods for generated PSI elements
  */
-object GdbPsiUtil {
+object GdbPsiImplUtil {
+
+    /**
+     * Get the command name from a statement
+     */
+    @JvmStatic
+    fun getKey(statement: GdbCommandStatement): String? {
+        return "test2";
+    }
+
+//    @JvmStatic
+//    fun getName(element: MakefileVariable): String {
+//        return element.text
+//    }
+//
+//    @JvmStatic
+//    fun setName(element: MakefileVariable, newName: String): PsiElement {
+//        val identifierNode = element.node.firstChildNode
+//        if (identifierNode != null) {
+//            val variable = MakefileElementFactory.createVariable(element.project, newName)
+//            val newIdentifierNode = variable.firstChild.node
+//            element.node.replaceChild(identifierNode, newIdentifierNode)
+//        }
+//        return element
+//    }
 
 //    /**
 //     * Get the command name from a statement

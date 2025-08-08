@@ -1,10 +1,23 @@
-# Jetbrains plugin for gdb scripts
+# gdb command scripts plugin
 
-gdb supports providing lists of commands as a file as an option:
+This project implements a subset of the available gdb command script
+
+gdb supports providing lists of commands as a file:
 
 ```shell
-gdb --command=file.gdb
+gdb --command=file.gdb --args some-prog --option arg
 ```
+
+This file can contain arbitrary gdb commands and user defined commands, settings, breakpoints, and extension code.
+
+## gdb syntax
+
+> A GDB command is a single line of input. There is no limit on how long it can be. It starts with a command name, which is followed by arguments whose meaning depends on the command name. For example, the command step accepts an argument which is the number of times to step, as in ‘step 5’. You can also use the step command with no arguments. Some commands do not allow any arguments.
+> <https://sourceware.org/gdb/current/onlinedocs/gdb.html/Command-Syntax.html>
+
+gdb supports line continuation and embedded blocks of whatever syntax the extension uses, such as python and guile.
+
+> GDB command names may always be truncated if that abbreviation is unambiguous. Other possible command abbreviations are listed in the documentation for individual commands. In some cases, even ambiguous abbreviations are allowed; for example, s is specially defined as equivalent to step even though there are other commands whose names start with s. You can test abbreviations by using them as arguments to the help command.
 
 
 ```shell
@@ -42,3 +55,7 @@ some complex cases:
 
 (gdb) with print array on -- print $myvar
 $2 = void
+
+## early initialization
+
+>  Only set or source commands should be placed into an early initialization file, and the only set commands that can be used are those that control how GDB starts up.

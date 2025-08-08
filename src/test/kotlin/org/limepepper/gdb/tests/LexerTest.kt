@@ -1,7 +1,6 @@
 package org.limepepper.gdb.tests
 
 import com.intellij.lexer.FlexLexer
-import com.intellij.lexer.Lexer
 import com.intellij.psi.tree.IElementType
 import org.junit.Test
 import org.limepepper.gdb.lexer.GdbLexer
@@ -11,6 +10,18 @@ import java.io.File
 
 class LexerTest {
 
+    private fun printTokens(lexer: FlexLexer, content: String) {
+        lexer.reset(content, 0, content.length, 0)
+        var token: IElementType? = lexer.advance()
+        while (token != null) {
+            val text = content.substring(lexer.tokenStart, lexer.tokenEnd).replace("\n", "\\n")
+                .replace("\r", "\\r")
+            val tokenName = token.toString()
+            println("${tokenName.padEnd(30)}: '$text'")
+            token = lexer.advance()
+        }
+    }
+
     @Test
     fun testGdbLexer() {
         println("=== DEBUG START ===")
@@ -18,18 +29,8 @@ class LexerTest {
         val content = File("src/test/testData/ParsingDataTest.gdb").readText()
         val lexer = GdbLexer()
 
-        // Reset the lexer with the content
-        lexer.reset(content, 0, content.length, 0)
+        printTokens(lexer, content)
 
-        var token: IElementType? = lexer.advance()
-        while (token != null) {
-            val text = lexer.yytext().toString().replace("\n", "\\n").replace("\r", "\\r")
-            val tokenName = token.toString()
-
-            println("${tokenName.padEnd(30)}: '$text'")
-
-            token = lexer.advance()
-        }
         println("=== DEBUG END ===")
     }
 
@@ -40,18 +41,8 @@ class LexerTest {
         val content = File("src/test/testData/ParsingDataTest.gdb").readText()
         val lexer = _GdbLexer()
 
-        // Reset the lexer with the content
-        lexer.reset(content, 0, content.length, 0)
+        printTokens(lexer, content)
 
-        var token: IElementType? = lexer.advance()
-        while (token != null) {
-            val text = lexer.yytext().toString().replace("\n", "\\n").replace("\r", "\\r")
-            val tokenName = token.toString()
-
-            println("${tokenName.padEnd(30)}: '$text'")
-
-            token = lexer.advance()
-        }
         println("=== DEBUG END ===")
     }
 
@@ -61,19 +52,7 @@ class LexerTest {
 
         val content = File("src/test/testData/ParsingDataTest.gdb").readText()
         val lexer = GdbLexer2()
-
-        // Reset the lexer with the content
-        lexer.reset(content, 0, content.length, 0)
-
-        var token: IElementType? = lexer.advance()
-        while (token != null) {
-            val text = lexer.yytext().toString().replace("\n", "\\n").replace("\r", "\\r")
-            val tokenName = token.toString()
-
-            println("${tokenName.padEnd(30)}: '$text'")
-
-            token = lexer.advance()
-        }
+        printTokens(lexer, content)
         println("=== DEBUG END ===")
     }
 
