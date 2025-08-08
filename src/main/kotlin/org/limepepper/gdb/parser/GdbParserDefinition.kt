@@ -11,10 +11,10 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import org.limepepper.gdb.lang.GdbLanguage
-import org.limepepper.gdb.psi.GdbTypes
-import org.limepepper.gdb.psi.GdbTokenSets
 import org.limepepper.gdb.lexer.GdbLexerAdapter
 import org.limepepper.gdb.psi.GdbFile
+import org.limepepper.gdb.psi.GdbTokenSets
+import org.limepepper.gdb.psi.GdbTypes
 
 /**
  * Parser definition for GDB language

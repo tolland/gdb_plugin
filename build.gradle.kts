@@ -1,17 +1,16 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id("java")
-    id("org.jetbrains.kotlin.jvm") version "2.1.0"
-    id("org.jetbrains.intellij.platform") version "2.7.0"
-    id("org.jetbrains.grammarkit") version "2022.3.2.2"
+  id("java")
+  id("org.jetbrains.kotlin.jvm") version "2.1.0"
+  id("org.jetbrains.intellij.platform") version "2.7.0"
+  id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
 kotlin {
-    jvmToolchain(21)
+  jvmToolchain(21)
 }
 
 // Configure Grammar-Kit
@@ -24,89 +23,85 @@ group = "org.limepepper"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    mavenCentral()
-    intellijPlatform {
-        defaultRepositories()
-    }
-    maven { url = uri("https://jitpack.io") }
+  mavenCentral()
+  intellijPlatform {
+    defaultRepositories()
+  }
+  maven { url = uri("https://jitpack.io") }
 }
 
 // Add generated sources to compilation
 sourceSets {
-    main {
-        java {
-            srcDirs("src/main/gen")
-        }
+  main {
+    java {
+      srcDirs("src/main/gen")
     }
+  }
 }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
-    intellijPlatform {
-        create("IC", "2025.1")
-        // clion("2025.1.4")
-        testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
-        testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testFramework(TestFrameworkType.Platform)
-        // Add necessary plugin dependencies for compilation here, example:
-        bundledPlugin("com.jetbrains.sh")
-//        bundledPlugin("name.kropp.intellij.makefile")
-//251.23774.426
-        // Development plugins for runIde
-//        plugin("PsiViewer", "252.23892.248")
-        plugin("name.kropp.intellij.makefile", "251.23774.318")
-        plugin("org.intellij.plugins.hcl", "251.23774.426")
-        plugin("DevKit", "251.23774.460")
+  intellijPlatform {
+    create("IC", "2025.1")
+    // clion("2025.1.4")
+    testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+//        testFramework(TestFrameworkType.Platform)
+    // Add necessary plugin dependencies for compilation here, example:
+    bundledPlugin("com.intellij.java")
+    bundledPlugin("com.jetbrains.sh")
+    plugin("name.kropp.intellij.makefile", "251.23774.318")
+    plugin("org.intellij.plugins.hcl", "251.23774.426")
+    plugin("DevKit", "251.23774.460")
 //        plugin("LivePlugin")
-        // plugin("org.jetbrains.plugins.gradle", "251.3")
-        pluginVerifier()
-        testFramework(TestFrameworkType.Plugin.Java)
-    }
+    pluginVerifier()
+//        testFramework(TestFrameworkType.Plugin.Java)
+  }
 }
 
 intellijPlatform {
-    pluginConfiguration {
-        ideaVersion {
-            sinceBuild = "251"
-        }
+  pluginConfiguration {
+    ideaVersion {
+      sinceBuild = "251"
+    }
 
-        changeNotes = """
+    changeNotes = """
       Initial version
     """.trimIndent()
-    }
+  }
 
-    // Disable buildSearchableOptions for development
-    buildSearchableOptions = false
+  // Disable buildSearchableOptions for development
+  buildSearchableOptions = false
 
-    pluginVerification {
-        ides {
-            recommended()
-            select {
-                types = listOf(IntelliJPlatformType.CLion)
-                channels = listOf(ProductRelease.Channel.RELEASE)
-            }
-        }
+  pluginVerification {
+    ides {
+      recommended()
+      select {
+        types = listOf(IntelliJPlatformType.CLion)
+        channels = listOf(ProductRelease.Channel.RELEASE)
+      }
     }
+  }
 }
 
 tasks {
-    generateParser {
-        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/parser/Gdb.bnf"))
-        targetRootOutputDir.set(file("src/main/gen"))
-        pathToParser.set("org/limepepper/gdb/parser/GdbParser.java")
-        pathToPsiRoot.set("org/limepepper/gdb/psi")
-        purgeOldFiles.set(true)
-    }
+  generateParser {
+    sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/parser/Gdb.bnf"))
+    targetRootOutputDir.set(file("src/main/gen"))
+    pathToParser.set("org/limepepper/gdb/parser/GdbParser.java")
+    pathToPsiRoot.set("org/limepepper/gdb/psi")
+    purgeOldFiles.set(true)
+  }
 
 //     Configure JFlex lexer generation
-    generateLexer {
-        sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/lexer/GdbLexer.flex"))
-        targetOutputDir.set(file("src/main/gen/org/limepepper/gdb/lexer"))
-    }
+  generateLexer {
+    sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/lexer/GdbLexer.flex"))
+    targetOutputDir.set(file("src/main/gen/org/limepepper/gdb/lexer"))
+  }
 
 
-    // Make sure generation happens before compilation
+  // Make sure generation happens before compilation
 //    compileKotlin {
 //        dependsOn("generateParser", "generateLexer")
 //    }
@@ -115,85 +110,78 @@ tasks {
 //        dependsOn("generateParser", "generateLexer")
 //    }
 
-    // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = "21"
-        targetCompatibility = "21"
+  // Set the JVM compatibility versions
+  withType<JavaCompile> {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+  }
+  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-        }
+  }
+
+  withType<PrepareSandboxTask> {
+    sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
+    sandboxSuffix = ""
+
+    // Declare sandbox config files as inputs for configuration cache compatibility
+    inputs.files(
+      "sandbox-config/ide.general.xml",
+      "sandbox-config/ui.lnf.xml",
+      "sandbox-config/trusted-paths.xml"
+    )
+      .withPropertyName("sandboxConfigFiles")
+
+    doLast {
+      // Use Gradle's built-in copy operations instead of Files.copy for configuration cache compatibility
+      val optionsDir = sandboxConfigDirectory.file("options").get().asFile
+      optionsDir.mkdirs()
+
+      // Access files through the declared inputs
+      val ideGeneralFile = inputs.files.find { it.name == "ide.general.xml" }
+      val uiLnfFile = inputs.files.find { it.name == "ui.lnf.xml" }
+      val trustedPaths = inputs.files.find { it.name == "trusted-paths.xml" }
+
+      ideGeneralFile?.copyTo(
+        optionsDir.resolve("ide.general.xml"),
+        overwrite = true
+      )
+
+      uiLnfFile?.copyTo(
+        optionsDir.resolve("ui.lnf.xml"),
+        overwrite = true
+      )
+
+      trustedPaths?.copyTo(
+        optionsDir.resolve("trusted-paths.xml"),
+        overwrite = true
+      )
     }
+  }
 
-    withType<PrepareSandboxTask> {
-        sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
-        sandboxSuffix = ""
-
-
-//        val trustedPathsFile =
-//            sandboxConfigDirectory.file("options/trusted-paths.xml").get().asFile
-//
-//        trustedPathsFile.writeText(
-//            """
-
-        // Declare sandbox config files as inputs for configuration cache compatibility
-        inputs.files(
-            "sandbox-config/ide.general.xml",
-            "sandbox-config/ui.lnf.xml",
-            "sandbox-config/trusted-paths.xml"
-        )
-            .withPropertyName("sandboxConfigFiles")
-
-        doLast {
-            // Use Gradle's built-in copy operations instead of Files.copy for configuration cache compatibility
-            val optionsDir = sandboxConfigDirectory.file("options").get().asFile
-            optionsDir.mkdirs()
-
-            // Access files through the declared inputs
-            val ideGeneralFile = inputs.files.find { it.name == "ide.general.xml" }
-            val uiLnfFile = inputs.files.find { it.name == "ui.lnf.xml" }
-            val trustedPaths = inputs.files.find { it.name == "trusted-paths.xml" }
-
-            ideGeneralFile?.copyTo(
-                optionsDir.resolve("ide.general.xml"),
-                overwrite = true
-            )
-
-            uiLnfFile?.copyTo(
-                optionsDir.resolve("ui.lnf.xml"),
-                overwrite = true
-            )
-
-            trustedPaths?.copyTo(
-                optionsDir.resolve("trusted-paths.xml"),
-                overwrite = true
-            )
-        }
-    }
-
-    runIde {
-        // Configure IDE launch options for better development experience
-        jvmArgs = listOf(
-            "-Djb.consents.confirmation.enabled=false",
-            "-Djb.privacy.policy.text=\"<!--999.999-->\"", // Skip EULA
-            "-Didea.suppress.statistics.report=true",
-            "-Didea.is.internal=true",
-            "-Dide.ui.compact.mode=true",
-            "-Dide.main.menu.separate=true",
-            "-Didea.auto.reload.plugins=true",
-            "-XX:+UnlockDiagnosticVMOptions",
-            "-Dide.log.level=DEBUG",
+  runIde {
+    // Configure IDE launch options for better development experience
+    jvmArgs = listOf(
+      "-Djb.consents.confirmation.enabled=false",
+      "-Djb.privacy.policy.text=\"<!--999.999-->\"", // Skip EULA
+      "-Didea.suppress.statistics.report=true",
+      "-Didea.is.internal=true",
+      "-Dide.ui.compact.mode=true",
+      "-Dide.main.menu.separate=true",
+      "-Didea.auto.reload.plugins=true",
+      "-XX:+UnlockDiagnosticVMOptions",
+      "-Dide.log.level=DEBUG",
 //            "-Dkotlinx.coroutines.debug=off"
-        )
-        args(listOf("nosplash"))
-        argumentProviders += CommandLineArgumentProvider {
-            listOf(
-                file("test-project").toString()
-            )
-        }
-
-        // Open test project automatically
-        systemProperty("idea.auto.reload.plugins", "true")
+    )
+    args(listOf("nosplash"))
+    argumentProviders += CommandLineArgumentProvider {
+      listOf(
+        file("test-project").toString()
+      )
     }
+
+    // Open test project automatically
+    systemProperty("idea.auto.reload.plugins", "true")
+  }
 }

@@ -7,8 +7,8 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import org.limepepper.gdb.lexer.GdbLexerAdapter
-import org.limepepper.gdb.psi.GdbTypes
 import org.limepepper.gdb.psi.GdbTokenSets
+import org.limepepper.gdb.psi.GdbTypes
 
 /**
  * Syntax highlighter for GDB script files

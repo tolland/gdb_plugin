@@ -1,6 +1,5 @@
 package org.limepepper.gdb.psi.impl
 
-import com.intellij.psi.PsiElement
 import org.limepepper.gdb.psi.GdbCommandStatement
 
 
