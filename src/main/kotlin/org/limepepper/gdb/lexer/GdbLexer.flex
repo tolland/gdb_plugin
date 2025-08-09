@@ -66,9 +66,6 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
       this((java.io.Reader)null);
     }
 
-    private int stringStart = -1;
-    private int currentState = YYINITIAL;
-
     // track state for popping back (from handlebars.flex)
     private Stack<Integer> stack = new Stack<>();
 
@@ -82,38 +79,27 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     }
 
     private IElementType finishDoubleString() {
-        yybegin(YYINITIAL);
-        zzStartRead = stringStart;
+        yypopState();
         return DOUBLE_QUOTED_STRING;
     }
 
     private IElementType finishPythonBlock() {
-        yybegin(YYINITIAL);
-        zzStartRead = stringStart;
+        yypopState();
         return PYTHON_BLOCK;
     }
 
     private IElementType finishGuileBlock() {
-        yybegin(YYINITIAL);
-        zzStartRead = stringStart;
+        yypopState();
         return GUILE_BLOCK;
     }
 
     private IElementType finishDocBlock() {
-        yybegin(YYINITIAL);
-        zzStartRead = stringStart;
+        yypopState();
         return DOC_BLOCK;
     }
 
     private IElementType finishArgsBlock() {
-        yybegin(YYINITIAL);
-        zzStartRead = stringStart;
-        return ARGS_BLOCK;
-    }
-
-    private IElementType enterArgsBlock(IElementType command) {
-        yybegin(YYINITIAL);
-        zzStartRead = stringStart;
+        yypopState();
         return ARGS_BLOCK;
     }
 
@@ -190,10 +176,16 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 // This is generic args processing, when no more specific one is available
 <STATE_ARGS_BLOCK> {
 
+    // String start transitions
+    \"                  { yypushState(STATE_D_STRING); }
+
+    // Check for end keyword to pop back
+    {END}               { yypopState(); return END; }
+    {CRLF}              { yypopState(); return CRLF; }
+
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
     {COMMENT}           { return COMMENT; }
-    {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
 
     // Punctuation
@@ -235,13 +227,12 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 // top level command context
 <YYINITIAL> {
     // String start transitions
-    // @TODO this not valid in global or command state
-    \"                  { stringStart = zzStartRead; yybegin(STATE_D_STRING); }
+    \"                  { yypushState(STATE_D_STRING); }
 
     // Language block transitions
-    {PYTHON_KW}{CRLF}      { stringStart = zzStartRead; yybegin(STATE_PYTHON_BLOCK); }
-    {GUILE_KW}{CRLF}       { stringStart = zzStartRead; yybegin(STATE_GUILE_BLOCK); }
-    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { stringStart = zzStartRead; yybegin(STATE_DOC_BLOCK); }
+    {PYTHON_KW}{CRLF}      { yypushState(STATE_PYTHON_BLOCK); }
+    {GUILE_KW}{CRLF}       { yypushState(STATE_GUILE_BLOCK); }
+    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { yypushState(STATE_DOC_BLOCK); }
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
@@ -254,9 +245,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {END}               { return END; }
     {COMMANDS}          { return COMMANDS; }
     {SET}               { return SET_KW; }
-    {PRINT}             {
-        yypushState(STATE_ARGS_BLOCK);
-        return PRINT_KW; }
+    {PRINT}             { return PRINT_KW; }
 
     // Language keywords (only if not followed by newline - handled above)
     {PYTHON_KW}            { return PYTHON_KW; }
@@ -269,6 +258,9 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
+
+    // Identifiers (must come before WORD)
+    {IDENTIFIER}        { return IDENTIFIER; }
 
     // Everything else as WORD
     {WORD}              { return WORD; }

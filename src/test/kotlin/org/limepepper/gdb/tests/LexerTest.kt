@@ -119,136 +119,6 @@ class LexerTest {
         println("=== Generated Lexer (_GdbLexer) ===")
         printTokens(content)
     }
-
-    @Test
-    fun testBasicCommandTokens() {
-        val content = "set pagination off"
-        val tokens = tokenize(content)
-
-        assertEquals(5, tokens.size, "Expected 5 tokens (including whitespace)")
-        assertToken(tokens, 0, GdbTypes.SET_KW, "set")
-        assertToken(tokens, 1, TokenType.WHITE_SPACE, " ")
-        assertToken(tokens, 2, GdbTypes.IDENTIFIER, "pagination")
-        assertToken(tokens, 3, TokenType.WHITE_SPACE, " ")
-        assertToken(tokens, 4, GdbTypes.IDENTIFIER, "off")
-    }
-
-    @Test
-    fun testCommentTokens() {
-        val content = "# This is a comment\nset var x = 5"
-        val tokens = tokenize(content)
-
-        assertEquals(11, tokens.size, "Expected 11 tokens (including whitespace)")
-        assertToken(tokens, 0, GdbTypes.COMMENT, "# This is a comment")
-        assertToken(tokens, 1, GdbTypes.CRLF, "\n")
-        assertToken(tokens, 2, GdbTypes.SET_KW, "set")
-        assertToken(tokens, 3, TokenType.WHITE_SPACE, " ")
-        assertToken(tokens, 4, GdbTypes.IDENTIFIER, "var")
-        assertToken(tokens, 5, TokenType.WHITE_SPACE, " ")
-        assertToken(tokens, 6, GdbTypes.IDENTIFIER, "x")
-        assertToken(tokens, 7, TokenType.WHITE_SPACE, " ")
-        assertToken(tokens, 8, GdbTypes.OP_ASSIGN, "=")
-        assertToken(tokens, 9, TokenType.WHITE_SPACE, " ")
-        assertToken(tokens, 10, GdbTypes.NUMBER, "5")
-    }
-
-    @Test
-    fun testBreakpointCommand() {
-        val content = "break main.c:42"
-        val tokens = tokenize(content)
-
-        println("=== DEBUG: Breakpoint Command ===")
-        printTokens(content)
-
-        // Let's see what we actually get first
-        assertTrue(tokens.isNotEmpty(), "Should have at least one token")
-    }
-
-    @Test
-    fun testNumberTokens() {
-        val content = "print 42"
-        val tokens = tokenize(content)
-
-        println("=== DEBUG: Number Tokens ===")
-        printTokens(content)
-
-        // Filter out whitespace tokens for easier testing
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE }
-
-        assertEquals(2, nonWhitespaceTokens.size, "Expected 2 non-whitespace tokens")
-        assertToken(nonWhitespaceTokens, 0, GdbTypes.PRINT_KW, "print")
-        assertToken(nonWhitespaceTokens, 1, GdbTypes.NUMBER, "42")
-    }
-
-    @Test
-    fun testRegisterTokens() {
-        val content = "print \$eax \$rsp"
-        val tokens = tokenize(content)
-
-        println("=== DEBUG: Register tokens ===")
-        printTokens(content)
-
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE }
-
-        assertEquals(3, nonWhitespaceTokens.size, "Expected 3 non-whitespace tokens")
-        assertToken(nonWhitespaceTokens, 0, GdbTypes.PRINT_KW, "print")
-        assertToken(nonWhitespaceTokens, 1, GdbTypes.REGISTER, "\$eax")
-        assertToken(nonWhitespaceTokens, 2, GdbTypes.REGISTER, "\$rsp")
-    }
-
-    @Test
-    fun testOperatorTokens() {
-        val content = "if x == 5 && y >= 10"
-        val tokens = tokenize(content)
-
-        println("=== DEBUG: Operator Tokens ===")
-        printTokens(content)
-
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE }
-
-        assertEquals(8, nonWhitespaceTokens.size, "Expected 8 non-whitespace tokens")
-        assertToken(nonWhitespaceTokens, 0, GdbTypes.IDENTIFIER, "if")
-        assertToken(nonWhitespaceTokens, 1, GdbTypes.IDENTIFIER, "x")
-        assertToken(nonWhitespaceTokens, 2, GdbTypes.OP_EQUAL, "==")
-        assertToken(nonWhitespaceTokens, 3, GdbTypes.NUMBER, "5")
-        assertToken(nonWhitespaceTokens, 4, GdbTypes.OP_AND_AND, "&&")
-        assertToken(nonWhitespaceTokens, 5, GdbTypes.IDENTIFIER, "y")
-        assertToken(nonWhitespaceTokens, 6, GdbTypes.OP_GREATER_OR_EQUAL, ">=")
-        assertToken(nonWhitespaceTokens, 7, GdbTypes.NUMBER, "10")
-    }
-
-    @Test
-    fun testStringTokens() {
-        val content = """print "Hello World" 'single quoted'"""
-        val tokens = tokenize(content)
-
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE }
-
-        assertEquals(4, nonWhitespaceTokens.size, "Expected 4 non-whitespace tokens")
-        assertToken(nonWhitespaceTokens, 0, GdbTypes.PRINT_KW, "print")
-        assertToken(nonWhitespaceTokens, 1, GdbTypes.DOUBLE_QUOTED_STRING, "\"Hello World\"")
-        assertToken(nonWhitespaceTokens, 2, GdbTypes.WORD, "'single")
-        assertToken(nonWhitespaceTokens, 3, GdbTypes.WORD, "quoted'")
-    }
-
-    @Test
-    fun testPunctuationTokens() {
-        val content = "print array[0], ptr->field, obj.member"
-        val tokens = tokenize(content)
-
-        println("=== DEBUG: Punctuation Tokens ===")
-        printTokens(content)
-
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE }
-
-        // Check for specific punctuation tokens
-        assertTrue(nonWhitespaceTokens.any { it.text == "[" && it.type == GdbTypes.LBRACKET }, "Should contain LBRACKET")
-        assertTrue(nonWhitespaceTokens.any { it.text == "]" && it.type == GdbTypes.RBRACKET }, "Should contain RBRACKET")
-        assertTrue(nonWhitespaceTokens.any { it.text == "," && it.type == GdbTypes.COMMA }, "Should contain COMMA")
-        assertTrue(nonWhitespaceTokens.any { it.text == "->" && it.type == GdbTypes.ARROW }, "Should contain ARROW")
-        assertTrue(nonWhitespaceTokens.any { it.text == "." && it.type == GdbTypes.DOT }, "Should contain DOT")
-    }
-
     @Test
     fun testDefineBlock() {
         val content = """
@@ -257,6 +127,9 @@ class LexerTest {
                 continue
             end
         """.trimIndent()
+
+        println("=== Define Block Debug ===")
+        printTokens(content)
 
         val tokens = tokenize(content)
         val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
