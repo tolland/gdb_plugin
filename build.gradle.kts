@@ -184,4 +184,9 @@ tasks {
     // Open test project automatically
     systemProperty("idea.auto.reload.plugins", "true")
   }
+  test {
+    this.testLogging {
+      this.showStandardStreams = true
+    }
+  }
 }

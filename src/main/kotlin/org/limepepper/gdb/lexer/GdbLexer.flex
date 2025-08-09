@@ -21,7 +21,8 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 // Basic patterns
 WHITE_SPACE=[ \t]+
 CRLF=(\r\n|\n|\r)
-COMMENT=#[^\r\n]*
+COMMENT=#[^\r\n\\]*
+COMMENT_WITH_CONTINUATION=#[^\r\n]*\\{CRLF}
 LINE_CONTINUATION=\\{CRLF}
 
 // Numbers and identifiers
@@ -62,6 +63,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 %state STATE_ARGS_BLOCK
 %state STATE_DEFINE_BODY
 %state STATE_COMMANDS_LIST
+%state STATE_COMMENT_CONTINUATION
 
 %{
     public GdbLexer() {
@@ -187,6 +189,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
 
@@ -226,6 +229,16 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     <<EOF>>             { return finishArgsBlock(); }
 }
 
+// Comment continuation state - handles comments that span multiple lines with backslash continuation
+<STATE_COMMENT_CONTINUATION> {
+    // Continue consuming content until we hit a bare CRLF (not preceded by backslash)
+    [^\r\n\\]+         { /* consume comment content */ }
+    \\{CRLF}           { /* consume line continuation */ }
+    {CRLF}             { yypopState(); return COMMENT; }
+    <<EOF>>            { yypopState(); return COMMENT; }
+    [^]                { /* consume any other character */ }
+}
+
 // Define body state - like YYINITIAL but can be nested and pops on 'end'
 <STATE_DEFINE_BODY> {
     // String start transitions
@@ -238,6 +251,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
@@ -275,6 +289,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
@@ -315,6 +330,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }

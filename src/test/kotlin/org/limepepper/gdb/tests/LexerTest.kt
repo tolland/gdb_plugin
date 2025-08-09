@@ -96,13 +96,13 @@ class LexerTest {
         # comment can have line \
         continuations in them
 
-        # command aregs can be split over lines
+        # command args can be split over lines by line continuation char
         set var \
         ${'$'}myvar2 \
         = \
         7
 
-        # command aregs can be split over lines
+        # command and args can be split by line continuation char
         set \
         var \
         ${'$'}myvar2 \
@@ -116,7 +116,7 @@ class LexerTest {
 
     """.trimIndent()
 
-        println("=== Generated Lexer (_GdbLexer) ===")
+        println("=== Line continuation tests ===")
         printTokens(content)
     }
     @Test
@@ -171,7 +171,7 @@ class LexerTest {
         assertTrue(nonWhitespaceTokens.any { it.text == "mycommand" && it.type == GdbTypes.IDENTIFIER }, "Should contain identifier 'mycommand'")
         assertTrue(nonWhitespaceTokens.any { it.text == "commands" && it.type == GdbTypes.COMMANDS }, "Should contain COMMANDS 'commands'")
         assertTrue(nonWhitespaceTokens.any { it.text == "mycommand2" && it.type == GdbTypes.IDENTIFIER }, "Should contain identifier 'mycommand2'")
-        
+
         // Should have multiple END tokens for proper nesting
         val endTokens = nonWhitespaceTokens.filter { it.text == "end" && it.type == GdbTypes.END }
         assertTrue(endTokens.size >= 3, "Should have at least 3 END tokens for nested structure, got ${endTokens.size}")
@@ -207,17 +207,17 @@ class LexerTest {
 
         // Verify the nested structure works as expected
         // The printf "x is %d\n",x should be in a COMMANDS_LIST state
-        // The define mycommand2 should be in a DEFINE_BODY state 
+        // The define mycommand2 should be in a DEFINE_BODY state
         // All should be properly nested with correct END tokens
 
         assertTrue(nonWhitespaceTokens.any { it.text == "printf" && it.type == GdbTypes.COMMAND_DATA }, "Should contain printf command")
         assertTrue(nonWhitespaceTokens.any { it.text == "silent" && it.type == GdbTypes.IDENTIFIER }, "Should contain silent command")
         assertTrue(nonWhitespaceTokens.any { it.text == "cont" && it.type == GdbTypes.IDENTIFIER }, "Should contain cont command")
-        
+
         // Count define tokens - should have 2 (mycommand and mycommand2)
         val defineTokens = nonWhitespaceTokens.filter { it.text == "define" && it.type == GdbTypes.DEFINE }
         assertTrue(defineTokens.size == 2, "Should have exactly 2 DEFINE tokens, got ${defineTokens.size}")
-        
+
         // Count end tokens - should have 3 (commands end, mycommand2 end, mycommand end)
         val endTokens = nonWhitespaceTokens.filter { it.text == "end" && it.type == GdbTypes.END }
         assertTrue(endTokens.size == 3, "Should have exactly 3 END tokens, got ${endTokens.size}")
