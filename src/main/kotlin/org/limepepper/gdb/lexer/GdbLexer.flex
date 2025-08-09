@@ -60,6 +60,8 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 %state STATE_GUILE_BLOCK
 %state STATE_DOC_BLOCK
 %state STATE_ARGS_BLOCK
+%state STATE_DEFINE_BODY
+%state STATE_COMMANDS_LIST
 
 %{
     public GdbLexer() {
@@ -224,6 +226,83 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     <<EOF>>             { return finishArgsBlock(); }
 }
 
+// Define body state - like YYINITIAL but can be nested and pops on 'end'
+<STATE_DEFINE_BODY> {
+    // String start transitions
+    \"                  { yypushState(STATE_D_STRING); }
+
+    // Language block transitions
+    {PYTHON_KW}{CRLF}      { yypushState(STATE_PYTHON_BLOCK); }
+    {GUILE_KW}{CRLF}       { yypushState(STATE_GUILE_BLOCK); }
+    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { yypushState(STATE_DOC_BLOCK); }
+
+    // Whitespace and comments
+    {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT}           { return COMMENT; }
+    {CRLF}              { return CRLF; }
+    {LINE_CONTINUATION} { return LINE_CONTINUATION; }
+
+    // Special keywords - DEFINE can be nested, END pops back
+    {DEFINE}            { yypushState(STATE_DEFINE_BODY); return DEFINE; }
+    {END}               { yypopState(); return END; }
+    {COMMANDS}          { yypushState(STATE_COMMANDS_LIST); return COMMANDS; }
+    {SET}               { return SET_KW; }
+    {PRINT}             { return PRINT_KW; }
+
+    // Language keywords (only if not followed by newline - handled above)
+    {PYTHON_KW}            { return PYTHON_KW; }
+    {GUILE_KW}             { return GUILE_KW; }
+
+    // Commands - only recognize at command boundaries
+    {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { return COMMAND_EXECUTION; }
+    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
+    {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
+    {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
+    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
+
+    // Identifiers (must come before WORD)
+    {IDENTIFIER}        { return IDENTIFIER; }
+
+    // Everything else as WORD
+    {WORD}              { return WORD; }
+}
+
+// Commands list state - for breakpoint commands blocks
+<STATE_COMMANDS_LIST> {
+    // String start transitions
+    \"                  { yypushState(STATE_D_STRING); }
+
+    // Whitespace and comments
+    {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT}           { return COMMENT; }
+    {CRLF}              { return CRLF; }
+    {LINE_CONTINUATION} { return LINE_CONTINUATION; }
+
+    // END pops back to parent state (could be DEFINE_BODY or YYINITIAL)
+    {END}               { yypopState(); return END; }
+
+    // All commands are allowed in commands list
+    {SET}               { return SET_KW; }
+    {PRINT}             { return PRINT_KW; }
+    {PYTHON_KW}         { return PYTHON_KW; }
+    {GUILE_KW}          { return GUILE_KW; }
+
+    // Commands - only recognize at command boundaries
+    {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { return COMMAND_EXECUTION; }
+    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
+    {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
+    {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
+    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
+
+    // Identifiers (must come before WORD)
+    {IDENTIFIER}        { return IDENTIFIER; }
+
+    // Everything else as WORD
+    {WORD}              { return WORD; }
+}
+
 // top level command context
 <YYINITIAL> {
     // String start transitions
@@ -241,9 +320,9 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
 
     // Special keywords (these should be recognized anywhere)
-    {DEFINE}            { return DEFINE; }
+    {DEFINE}            { yypushState(STATE_DEFINE_BODY); return DEFINE; }
     {END}               { return END; }
-    {COMMANDS}          { return COMMANDS; }
+    {COMMANDS}          { yypushState(STATE_COMMANDS_LIST); return COMMANDS; }
     {SET}               { return SET_KW; }
     {PRINT}             { return PRINT_KW; }
 
