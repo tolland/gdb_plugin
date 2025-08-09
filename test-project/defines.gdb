@@ -3,6 +3,13 @@ define mycommand
   print "Custom command"
   info warranty
 
+  break foo2
+  commands
+      silent
+      printf "x is %d\n",x
+      cont
+  end
+
   define mycommand2
     print "Custom command"
     info warranty

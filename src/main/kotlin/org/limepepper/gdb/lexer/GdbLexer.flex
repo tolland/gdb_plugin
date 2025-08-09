@@ -4,6 +4,7 @@ import com.intellij.lexer.FlexLexer;
 
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
+import com.intellij.util.containers.Stack;
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static org.limepepper.gdb.psi.GdbTypes.*;
@@ -52,15 +53,33 @@ STRING_CONTENT=[^\"\\\r\n]+
 ESCAPE_SEQUENCE=\\[^\r\n]
 
 // General word - anything that's not whitespace, comment, or special chars
-WORD=[^#\s\"\\(){}\[\]=,;:.>]+
+WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
-%state STATE_D_STRING, STATE_PYTHON_BLOCK, STATE_GUILE_BLOCK, STATE_DOC_BLOCK
+%state STATE_D_STRING
+%state STATE_PYTHON_BLOCK
+%state STATE_GUILE_BLOCK
+%state STATE_DOC_BLOCK
+%state STATE_ARGS_BLOCK
+
 %{
     public GdbLexer() {
       this((java.io.Reader)null);
     }
 
     private int stringStart = -1;
+    private int currentState = YYINITIAL;
+
+    // track state for popping back (from handlebars.flex)
+    private Stack<Integer> stack = new Stack<>();
+
+    public void yypushState(int newState) {
+      stack.push(yystate());
+      yybegin(newState);
+    }
+
+    public void yypopState() {
+      yybegin(stack.pop());
+    }
 
     private IElementType finishDoubleString() {
         yybegin(YYINITIAL);
@@ -84,6 +103,18 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>]+
         yybegin(YYINITIAL);
         zzStartRead = stringStart;
         return DOC_BLOCK;
+    }
+
+    private IElementType finishArgsBlock() {
+        yybegin(YYINITIAL);
+        zzStartRead = stringStart;
+        return ARGS_BLOCK;
+    }
+
+    private IElementType enterArgsBlock(IElementType command) {
+        yybegin(YYINITIAL);
+        zzStartRead = stringStart;
+        return ARGS_BLOCK;
     }
 
     private void pushbackEOL() {
@@ -155,8 +186,56 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>]+
     <<EOF>>             { return finishDocBlock(); }
 }
 
+// processing the args, subcommands and options of a command
+// This is generic args processing, when no more specific one is available
+<STATE_ARGS_BLOCK> {
+
+    // Whitespace and comments
+    {WHITE_SPACE}       { return WHITE_SPACE; }
+    {COMMENT}           { return COMMENT; }
+    {CRLF}              { return CRLF; }
+    {LINE_CONTINUATION} { return LINE_CONTINUATION; }
+
+    // Punctuation
+    "("                        { return LPAREN; }
+    ")"                        { return RPAREN; }
+    "["                        { return LBRACKET; }
+    "]"                        { return RBRACKET; }
+    "{"                        { return LBRACE; }
+    "}"                        { return RBRACE; }
+    "->"                         { return ARROW; }
+    ">="                         { return OP_GREATER_OR_EQUAL; }
+    ">"                          { return OP_GREATER; }
+    "<="                         { return OP_LESS_OR_EQUAL; }
+    "<"                          { return OP_LESS; }
+    "=="                       { return OP_EQUAL; }
+    "="                        { return OP_ASSIGN; }
+    ","                        { return COMMA; }
+    ";"                        { return SEMICOLON; }
+    ":"                        { return COLON; }
+    "."                        { return DOT; }
+    "->"                       { return ARROW; }
+    "::"                       { return SCOPE_RESOLUTION; }
+    "'"                        { return SINGLE_QUOTE; }
+    "..."                       { return OP_ELLIPSIS; }
+    "&&"                        { return OP_AND_AND; }
+    "||"                        { return OP_OR_OR; }
+    "|"                        { return OP_PIPE; }
+
+    // Identifiers (must come after command patterns)
+    {IDENTIFIER}               { return IDENTIFIER; }
+
+      // Numbers and registers
+    {HEX_NUMBER}               { return HEX_NUMBER; }
+    {REGISTER}                 { return REGISTER; }
+    {NUMBER}                   { return NUMBER; }
+    <<EOF>>             { return finishArgsBlock(); }
+}
+
+// top level command context
 <YYINITIAL> {
     // String start transitions
+    // @TODO this not valid in global or command state
     \"                  { stringStart = zzStartRead; yybegin(STATE_D_STRING); }
 
     // Language block transitions
@@ -165,7 +244,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>]+
     {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { stringStart = zzStartRead; yybegin(STATE_DOC_BLOCK); }
 
     // Whitespace and comments
-    {WHITE_SPACE}              { return WHITE_SPACE; }
+    {WHITE_SPACE}       { return WHITE_SPACE; }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
@@ -175,37 +254,13 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>]+
     {END}               { return END; }
     {COMMANDS}          { return COMMANDS; }
     {SET}               { return SET_KW; }
-    {PRINT}             { return PRINT_KW; }
+    {PRINT}             {
+        yypushState(STATE_ARGS_BLOCK);
+        return PRINT_KW; }
 
     // Language keywords (only if not followed by newline - handled above)
     {PYTHON_KW}            { return PYTHON_KW; }
     {GUILE_KW}             { return GUILE_KW; }
-
-    // Punctuation
-  "("                        { return LPAREN; }
-  ")"                        { return RPAREN; }
-  "["                        { return LBRACKET; }
-  "]"                        { return RBRACKET; }
-  "{"                        { return LBRACE; }
-  "}"                        { return RBRACE; }
-  "<="                        { return OP_LESS_OR_EQUAL; }
-  ">="                        { return OP_GREATER_OR_EQUAL; }
-  "<"                         { return OP_LESS; }
-  ">"                         { return OP_GREATER; }
-  "="                        { return OP_ASSIGN; }
-  ","                        { return COMMA; }
-  ";"                        { return SEMICOLON; }
-  ":"                        { return COLON; }
-  "."                        { return DOT; }
-  "->"                       { return ARROW; }
-  "::"                       { return SCOPE_RESOLUTION; }
-  "'"                        { return SINGLE_QUOTE; }
-  "..."                       { return OP_ELLIPSIS; }
-
-    // Numbers and registers
-  {HEX_NUMBER}               { return HEX_NUMBER; }
-  {REGISTER}                 { return REGISTER; }
-  {NUMBER}                   { return NUMBER; }
 
     // Commands - only recognize at command boundaries
     {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { return COMMAND_EXECUTION; }
@@ -214,9 +269,6 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>]+
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
-
-    // Identifiers (must come after command patterns)
-  {IDENTIFIER}               { return IDENTIFIER; }
 
     // Everything else as WORD
     {WORD}              { return WORD; }

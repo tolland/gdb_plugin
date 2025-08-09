@@ -25,6 +25,7 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 EOL=\R
 WHITE_SPACE=\s+
 
+DOC_BLOCK=document\n.*?(end\b)
 PYTHON_BLOCK=python\n.*?(end\b)
 GUILE_BLOCK=guile\n.*?(end\b)
 COMMAND_EXECUTION=(run|r|start|continue|c|step|s|next|n|finish|until|u|kill|quit|q|detach)
@@ -59,17 +60,17 @@ WORD=[^#\s\\]+
   ":"                          { return COLON; }
   ","                          { return COMMA; }
   "."                          { return DOT; }
-  "="                          { return OP_ASSIGN; }
   "=="                         { return OP_EQUAL; }
+  "="                          { return OP_ASSIGN; }
   "{"                          { return LBRACE; }
   "["                          { return LBRACKET; }
   "("                          { return LPAREN; }
   "/"                          { return OP_DIV; }
   "..."                        { return OP_ELLIPSIS; }
-  ">"                          { return OP_GREATER; }
   ">="                         { return OP_GREATER_OR_EQUAL; }
-  "<"                          { return OP_LESS; }
+  ">"                          { return OP_GREATER; }
   "<="                         { return OP_LESS_OR_EQUAL; }
+  "<"                          { return OP_LESS; }
   "-"                          { return OP_MINUS; }
   "%"                          { return OP_MOD; }
   "*"                          { return OP_MUL; }
@@ -82,6 +83,7 @@ WORD=[^#\s\\]+
   "::"                         { return SCOPE_RESOLUTION; }
   "COMMAND_USER"               { return COMMAND_USER; }
 
+  {DOC_BLOCK}                  { return DOC_BLOCK; }
   {PYTHON_BLOCK}               { return PYTHON_BLOCK; }
   {GUILE_BLOCK}                { return GUILE_BLOCK; }
   {COMMAND_EXECUTION}          { return COMMAND_EXECUTION; }

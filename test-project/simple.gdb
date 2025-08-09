@@ -2,5 +2,4 @@
 set pagination off
 
 # conditional breakpoints
-bre
-
+break main

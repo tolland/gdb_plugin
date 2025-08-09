@@ -1,5 +1,8 @@
 # This is at the start of the file
 
+if x == 5 && y >= 10
+  print "true"
+end
 
 print $a = "using the python extension syntax"
 

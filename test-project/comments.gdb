@@ -1,5 +1,7 @@
-# This is at the start of the file
+# This is a comment at the start of the file
 
+# comment can have line \
+continuations in them
 
 # This is floating
 

@@ -17,6 +17,7 @@ public interface GdbTypes {
   IElementType SIMPLE_COMMAND = new GdbElementType("SIMPLE_COMMAND");
   IElementType VALUE_STATEMENT = new GdbElementType("VALUE_STATEMENT");
 
+  IElementType ARGS_BLOCK = new GdbTokenType("ARGS_BLOCK");
   IElementType ARROW = new GdbTokenType("->");
   IElementType COLON = new GdbTokenType(":");
   IElementType COMMA = new GdbTokenType(",");
@@ -43,6 +44,7 @@ public interface GdbTypes {
   IElementType LINE_CONTINUATION = new GdbTokenType("LINE_CONTINUATION");
   IElementType LPAREN = new GdbTokenType("(");
   IElementType NUMBER = new GdbTokenType("NUMBER");
+  IElementType OP_AND_AND = new GdbTokenType("&&");
   IElementType OP_ASSIGN = new GdbTokenType("=");
   IElementType OP_DIV = new GdbTokenType("/");
   IElementType OP_ELLIPSIS = new GdbTokenType("...");
@@ -54,6 +56,8 @@ public interface GdbTypes {
   IElementType OP_MINUS = new GdbTokenType("-");
   IElementType OP_MOD = new GdbTokenType("%");
   IElementType OP_MUL = new GdbTokenType("*");
+  IElementType OP_OR_OR = new GdbTokenType("||");
+  IElementType OP_PIPE = new GdbTokenType("|");
   IElementType OP_PLUS = new GdbTokenType("+");
   IElementType PRINT_KW = new GdbTokenType("print");
   IElementType PYTHON_BLOCK = new GdbTokenType("PYTHON_BLOCK");
