@@ -156,7 +156,6 @@ class LexerTest {
     @Test
     fun testCommandArgsContext() {
         val content = """
-
             user_command1
 
             user_command2 some args
