@@ -772,6 +772,9 @@ public class GdbLexer implements FlexLexer {
     // track state for popping back (from handlebars.flex)
     private Stack<Integer> stack = new Stack<>();
 
+    // Track start of a multi-line (continued) comment so we can return a single COMMENT token
+    private int commentStart = -1;
+
     public void yypushState(int newState) {
       stack.push(yystate());
       yybegin(newState);
@@ -1127,7 +1130,12 @@ public class GdbLexer implements FlexLexer {
             }  // fall though
             case 319: break;
             case STATE_COMMENT_CONTINUATION: {
-              yypopState(); return COMMENT;
+              if (commentStart >= 0) {
+                              zzStartRead = commentStart;
+                              commentStart = -1;
+                            }
+                            yypopState();
+                            return COMMENT;
             }  // fall though
             case 320: break;
             default:
@@ -1287,7 +1295,14 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 98: break;
           case 31:
-            { yypopState(); return COMMENT;
+            { // finalize a single COMMENT token spanning from commentStart
+                            if (commentStart >= 0) {
+                              pushbackEOL();
+                              zzStartRead = commentStart;
+                              commentStart = -1;
+                            }
+                            yypopState();
+                            return COMMENT;
             }
           // fall through
           case 99: break;
@@ -1384,7 +1399,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 115: break;
           case 48:
-            { yypushState(STATE_COMMENT_CONTINUATION);
+            { commentStart = zzStartRead; yypushState(STATE_COMMENT_CONTINUATION);
             }
           // fall through
           case 116: break;

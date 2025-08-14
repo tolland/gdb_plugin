@@ -73,6 +73,9 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     // track state for popping back (from handlebars.flex)
     private Stack<Integer> stack = new Stack<>();
 
+    // Track start of a multi-line (continued) comment so we can return a single COMMENT token
+    private int commentStart = -1;
+
     public void yypushState(int newState) {
       stack.push(yystate());
       yybegin(newState);
@@ -181,17 +184,17 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 <STATE_ARGS_BLOCK> {
 
     // String start transitions
-    \"                  { yypushState(STATE_D_STRING); }
+    \"                        { yypushState(STATE_D_STRING); }
 
     // Check for end keyword to pop back
-    {END}               { yypopState(); return END; }
-    {CRLF}              { yypopState(); return CRLF; }
+    {END}                     { yypopState(); return END; }
+    {CRLF}                    { yypopState(); return CRLF; }
 
     // Whitespace and comments
-    {WHITE_SPACE}       { return WHITE_SPACE; }
-    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
-    {COMMENT}           { return COMMENT; }
-    {LINE_CONTINUATION} { return LINE_CONTINUATION; }
+    {WHITE_SPACE}               { return WHITE_SPACE; }
+    {COMMENT_WITH_CONTINUATION} { commentStart = zzStartRead; yypushState(STATE_COMMENT_CONTINUATION); }
+    {COMMENT}                   { return COMMENT; }
+    {LINE_CONTINUATION}         { return LINE_CONTINUATION; }
 
     // Punctuation
     "("                        { return LPAREN; }
@@ -234,8 +237,24 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     // Continue consuming content until we hit a bare CRLF (not preceded by backslash)
     [^\r\n\\]+         { /* consume comment content */ }
     \\{CRLF}           { /* consume line continuation */ }
-    {CRLF}             { yypopState(); return COMMENT; }
-    <<EOF>>            { yypopState(); return COMMENT; }
+    {CRLF}             {
+                            // finalize a single COMMENT token spanning from commentStart
+                            if (commentStart >= 0) {
+                              pushbackEOL();
+                              zzStartRead = commentStart;
+                              commentStart = -1;
+                            }
+                            yypopState();
+                            return COMMENT;
+                        }
+    <<EOF>>            {
+                            if (commentStart >= 0) {
+                              zzStartRead = commentStart;
+                              commentStart = -1;
+                            }
+                            yypopState();
+                            return COMMENT;
+                        }
     [^]                { /* consume any other character */ }
 }
 
@@ -251,7 +270,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
-    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
+    {COMMENT_WITH_CONTINUATION} { commentStart = zzStartRead; yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
@@ -289,7 +308,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
-    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
+    {COMMENT_WITH_CONTINUATION} { commentStart = zzStartRead; yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }
@@ -330,7 +349,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
-    {COMMENT_WITH_CONTINUATION} { yypushState(STATE_COMMENT_CONTINUATION); }
+    {COMMENT_WITH_CONTINUATION} { commentStart = zzStartRead; yypushState(STATE_COMMENT_CONTINUATION); }
     {COMMENT}           { return COMMENT; }
     {CRLF}              { return CRLF; }
     {LINE_CONTINUATION} { return LINE_CONTINUATION; }

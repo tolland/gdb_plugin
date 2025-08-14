@@ -1,12 +1,10 @@
 package org.limepepper.gdb.tests
 
-import com.intellij.lexer.FlexLexer
-import com.intellij.psi.tree.IElementType
 import com.intellij.psi.TokenType
+import com.intellij.psi.tree.IElementType
 import org.junit.Before
 import org.junit.Test
 import org.limepepper.gdb.lexer.GdbLexer
-import org.limepepper.gdb.parser.GdbTokenTypes
 import org.limepepper.gdb.psi.GdbTypes
 import java.io.File
 import kotlin.test.assertEquals
@@ -70,7 +68,12 @@ class LexerTest {
     /**
      * Helper method to assert token at a specific index
      */
-    private fun assertToken(tokens: List<TokenInfo>, index: Int, expectedType: IElementType, expectedText: String) {
+    private fun assertToken(
+        tokens: List<TokenInfo>,
+        index: Int,
+        expectedType: IElementType,
+        expectedText: String
+    ) {
         if (index >= tokens.size) {
             throw AssertionError("Token index $index is out of bounds. Total tokens: ${tokens.size}")
         }
@@ -94,7 +97,8 @@ class LexerTest {
         # This is a comment at the start of the file
 
         # comment can have line \
-        continuations in them
+        continuations in them \
+        and go on and on
 
         # command args can be split over lines by line continuation char
         set var \
@@ -117,8 +121,33 @@ class LexerTest {
     """.trimIndent()
 
         println("=== Line continuation tests ===")
+        val tokens = tokenize(content)
+
+        // Find the continued comment token
+        val continuedComment =
+            tokens.firstOrNull { it.type == GdbTypes.COMMENT && it.text.contains("comment can have line") }
+        assertTrue(continuedComment != null, "Expected a COMMENT token for the continued comment")
+        assertTrue(
+            continuedComment!!.text.contains("# comment can have line \\\ncontinuations in them"),
+            "Multi-line comment should preserve content across continuation"
+        )
+
+        // Second continued comment block
+        val secondContinued =
+            tokens.firstOrNull { it.type == GdbTypes.COMMENT && it.text.contains("with a command and a line") }
+        assertTrue(
+            secondContinued != null,
+            "Expected a COMMENT token for the second continued comment"
+        )
+        assertTrue(
+            secondContinued!!.text.contains("# with a command and a line \\\ncontinuation"),
+            "Second multi-line comment should preserve content across continuation"
+        )
+
+        // print at the end for debug if needed
         printTokens(content)
     }
+
     @Test
     fun testDefineBlock() {
         val content = """
@@ -132,11 +161,21 @@ class LexerTest {
         printTokens(content)
 
         val tokens = tokenize(content)
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+        val nonWhitespaceTokens =
+            tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
 
-        assertTrue(nonWhitespaceTokens.any { it.text == "define" && it.type == GdbTypes.DEFINE }, "Should contain DEFINE 'define'")
-        assertTrue(nonWhitespaceTokens.any { it.text == "mycommand" && it.type == GdbTypes.IDENTIFIER }, "Should contain identifier 'mycommand'")
-        assertTrue(nonWhitespaceTokens.any { it.text == "end" && it.type == GdbTypes.END }, "Should contain END 'end'")
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "define" && it.type == GdbTypes.DEFINE },
+            "Should contain DEFINE 'define'"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "mycommand" && it.type == GdbTypes.IDENTIFIER },
+            "Should contain identifier 'mycommand'"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "end" && it.type == GdbTypes.END },
+            "Should contain END 'end'"
+        )
     }
 
     @Test
@@ -164,17 +203,33 @@ class LexerTest {
         printTokens(content)
 
         val tokens = tokenize(content)
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+        val nonWhitespaceTokens =
+            tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
 
         // Should have proper nesting structure
-        assertTrue(nonWhitespaceTokens.any { it.text == "define" && it.type == GdbTypes.DEFINE }, "Should contain DEFINE 'define'")
-        assertTrue(nonWhitespaceTokens.any { it.text == "mycommand" && it.type == GdbTypes.IDENTIFIER }, "Should contain identifier 'mycommand'")
-        assertTrue(nonWhitespaceTokens.any { it.text == "commands" && it.type == GdbTypes.COMMANDS }, "Should contain COMMANDS 'commands'")
-        assertTrue(nonWhitespaceTokens.any { it.text == "mycommand2" && it.type == GdbTypes.IDENTIFIER }, "Should contain identifier 'mycommand2'")
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "define" && it.type == GdbTypes.DEFINE },
+            "Should contain DEFINE 'define'"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "mycommand" && it.type == GdbTypes.IDENTIFIER },
+            "Should contain identifier 'mycommand'"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "commands" && it.type == GdbTypes.COMMANDS },
+            "Should contain COMMANDS 'commands'"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "mycommand2" && it.type == GdbTypes.IDENTIFIER },
+            "Should contain identifier 'mycommand2'"
+        )
 
         // Should have multiple END tokens for proper nesting
         val endTokens = nonWhitespaceTokens.filter { it.text == "end" && it.type == GdbTypes.END }
-        assertTrue(endTokens.size >= 3, "Should have at least 3 END tokens for nested structure, got ${endTokens.size}")
+        assertTrue(
+            endTokens.size >= 3,
+            "Should have at least 3 END tokens for nested structure, got ${endTokens.size}"
+        )
     }
 
     @Test
@@ -203,20 +258,34 @@ class LexerTest {
         printTokens(content)
 
         val tokens = tokenize(content)
-        val nonWhitespaceTokens = tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+        val nonWhitespaceTokens =
+            tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
 
         // Verify the nested structure works as expected
         // The printf "x is %d\n",x should be in a COMMANDS_LIST state
         // The define mycommand2 should be in a DEFINE_BODY state
         // All should be properly nested with correct END tokens
 
-        assertTrue(nonWhitespaceTokens.any { it.text == "printf" && it.type == GdbTypes.COMMAND_DATA }, "Should contain printf command")
-        assertTrue(nonWhitespaceTokens.any { it.text == "silent" && it.type == GdbTypes.IDENTIFIER }, "Should contain silent command")
-        assertTrue(nonWhitespaceTokens.any { it.text == "cont" && it.type == GdbTypes.IDENTIFIER }, "Should contain cont command")
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "printf" && it.type == GdbTypes.COMMAND_DATA },
+            "Should contain printf command"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "silent" && it.type == GdbTypes.IDENTIFIER },
+            "Should contain silent command"
+        )
+        assertTrue(
+            nonWhitespaceTokens.any { it.text == "cont" && it.type == GdbTypes.IDENTIFIER },
+            "Should contain cont command"
+        )
 
         // Count define tokens - should have 2 (mycommand and mycommand2)
-        val defineTokens = nonWhitespaceTokens.filter { it.text == "define" && it.type == GdbTypes.DEFINE }
-        assertTrue(defineTokens.size == 2, "Should have exactly 2 DEFINE tokens, got ${defineTokens.size}")
+        val defineTokens =
+            nonWhitespaceTokens.filter { it.text == "define" && it.type == GdbTypes.DEFINE }
+        assertTrue(
+            defineTokens.size == 2,
+            "Should have exactly 2 DEFINE tokens, got ${defineTokens.size}"
+        )
 
         // Count end tokens - should have 3 (commands end, mycommand2 end, mycommand end)
         val endTokens = nonWhitespaceTokens.filter { it.text == "end" && it.type == GdbTypes.END }
