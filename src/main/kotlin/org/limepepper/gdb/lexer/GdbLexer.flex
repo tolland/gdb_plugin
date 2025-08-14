@@ -339,8 +339,6 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
 // top level command context
 <YYINITIAL> {
-    // String start transitions
-    \"                  { yypushState(STATE_D_STRING); }
 
     // Language block transitions
     {PYTHON_KW}{CRLF}      { yypushState(STATE_PYTHON_BLOCK); }
@@ -358,7 +356,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {DEFINE}            { yypushState(STATE_DEFINE_BODY); return DEFINE; }
     {END}               { return END; }
     {COMMANDS}          { yypushState(STATE_COMMANDS_LIST); return COMMANDS; }
-    {SET}               { yypushState(STATE_ARGS_BLOCK); }
+    {SET}               { yypushState(STATE_ARGS_BLOCK); return SET_KW; }
     {PRINT}             { return PRINT_KW; }
 
     // Language keywords (only if not followed by newline - handled above)
@@ -370,11 +368,11 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
     {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
-    {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
+    {COMMAND_DATA} / [^a-zA-Z0-9_]      {  yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
 
     // Identifiers (must come before WORD)
-    {IDENTIFIER}        { return IDENTIFIER; }
+    {IDENTIFIER}        { yypushState(STATE_ARGS_BLOCK); return COMMAND_GENERIC; }
 
     // Everything else as WORD
     {WORD}              { return WORD; }

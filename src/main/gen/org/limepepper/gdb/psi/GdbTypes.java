@@ -26,6 +26,7 @@ public interface GdbTypes {
   IElementType COMMAND_CONFIG = new GdbTokenType("COMMAND_CONFIG");
   IElementType COMMAND_DATA = new GdbTokenType("COMMAND_DATA");
   IElementType COMMAND_EXECUTION = new GdbTokenType("COMMAND_EXECUTION");
+  IElementType COMMAND_GENERIC = new GdbTokenType("COMMAND_GENERIC");
   IElementType COMMAND_STACK = new GdbTokenType("COMMAND_STACK");
   IElementType COMMAND_USER = new GdbTokenType("COMMAND_USER");
   IElementType COMMENT = new GdbTokenType("COMMENT");

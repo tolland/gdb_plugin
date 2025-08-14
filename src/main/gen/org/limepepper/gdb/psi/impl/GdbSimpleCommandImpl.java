@@ -53,6 +53,12 @@ public class GdbSimpleCommandImpl extends GdbPsiElement implements GdbSimpleComm
 
   @Override
   @Nullable
+  public PsiElement getCommandGeneric() {
+    return findChildByType(COMMAND_GENERIC);
+  }
+
+  @Override
+  @Nullable
   public PsiElement getCommandStack() {
     return findChildByType(COMMAND_STACK);
   }

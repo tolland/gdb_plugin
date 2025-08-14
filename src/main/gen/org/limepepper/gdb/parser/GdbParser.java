@@ -458,6 +458,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
   //          | COMMAND_DATA
   //          | COMMAND_CONFIG
   //          | COMMAND_USER
+  //          | COMMAND_GENERIC
   public static boolean simple_command(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simple_command")) return false;
     boolean r;
@@ -468,6 +469,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, COMMAND_DATA);
     if (!r) r = consumeToken(b, COMMAND_CONFIG);
     if (!r) r = consumeToken(b, COMMAND_USER);
+    if (!r) r = consumeToken(b, COMMAND_GENERIC);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

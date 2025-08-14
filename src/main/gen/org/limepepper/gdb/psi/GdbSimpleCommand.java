@@ -20,6 +20,9 @@ public interface GdbSimpleCommand extends PsiElement {
   PsiElement getCommandExecution();
 
   @Nullable
+  PsiElement getCommandGeneric();
+
+  @Nullable
   PsiElement getCommandStack();
 
 }

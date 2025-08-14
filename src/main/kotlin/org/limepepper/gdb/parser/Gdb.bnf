@@ -38,6 +38,8 @@
     COMMAND_DATA='regexp:(display|output|printf|call|return|examine|info|i|show|list|l|disassemble|disas)'
     COMMAND_CONFIG='regexp:(unset|source|exec-file|symbol-file|core-file|target|attach|load)'
     // COMMAND_USER='regexp:(d|if|else|while|loop_break|loop_continue)'
+    // token for any other command in command context, including user defined
+    COMMAND_GENERIC='regexp:[a-zA-Z_][a-zA-Z0-9_]*'
 
     // Structural tokens
     WHITE_SPACE       = 'regexp:[ \t]'
@@ -154,6 +156,7 @@ simple_command ::= COMMAND_EXECUTION
          | COMMAND_DATA
          | COMMAND_CONFIG
          | COMMAND_USER
+         | COMMAND_GENERIC
 
 // A command line for any other command.
 // The key is `(COMMENT)?`: it allows an OPTIONAL

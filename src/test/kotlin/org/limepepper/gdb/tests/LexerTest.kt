@@ -66,6 +66,17 @@ class LexerTest {
     }
 
     /**
+     * Assert that there are no BAD_CHARACTER tokens present
+     */
+    private fun assertNoBadCharacters(tokens: List<TokenInfo>) {
+        val badTokens = tokens.filter { it.type == TokenType.BAD_CHARACTER }
+        assertTrue(
+            badTokens.isEmpty(),
+            "Unexpected BAD_CHARACTER tokens found: ${badTokens.joinToString { it.toString() }}"
+        )
+    }
+
+    /**
      * Helper method to assert token at a specific index
      */
     private fun assertToken(
@@ -89,6 +100,8 @@ class LexerTest {
     fun testGdbLexer() {
         val content = File("src/test/testData/ParsingDataTest.gdb").readText()
         printTokens(content)
+        val tokens = tokenize(content)
+        assertNoBadCharacters(tokens)
     }
 
     @Test
@@ -122,6 +135,7 @@ class LexerTest {
 
         println("=== Line continuation tests ===")
         val tokens = tokenize(content)
+        assertNoBadCharacters(tokens)
 
         // Find the continued comment token
         val continuedComment =
@@ -174,6 +188,7 @@ class LexerTest {
         val tokens = tokenize(content)
         val nonWhitespaceTokens =
             tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+        assertNoBadCharacters(tokens)
     }
 
     @Test
@@ -191,6 +206,7 @@ class LexerTest {
         val tokens = tokenize(content)
         val nonWhitespaceTokens =
             tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+//        assertNoBadCharacters(tokens)
 
         assertTrue(
             nonWhitespaceTokens.any { it.text == "define" && it.type == GdbTypes.DEFINE },
@@ -233,6 +249,7 @@ class LexerTest {
         val tokens = tokenize(content)
         val nonWhitespaceTokens =
             tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+//        assertNoBadCharacters(tokens)
 
         // Should have proper nesting structure
         assertTrue(
@@ -288,6 +305,7 @@ class LexerTest {
         val tokens = tokenize(content)
         val nonWhitespaceTokens =
             tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+//        assertNoBadCharacters(tokens)
 
         // Verify the nested structure works as expected
         // The printf "x is %d\n",x should be in a COMMANDS_LIST state
@@ -320,4 +338,30 @@ class LexerTest {
         assertTrue(endTokens.size == 3, "Should have exactly 3 END tokens, got ${endTokens.size}")
     }
 
+    @Test
+    fun testBadCharacterInInitialState() {
+        val content = "="
+        printTokens(content)
+        val tokens = tokenize(content)
+        val bads = tokens.filter { it.type == TokenType.BAD_CHARACTER }
+        assertTrue(bads.isNotEmpty(), "Expected BAD_CHARACTER token for '=' in YYINITIAL")
+        assertTrue(bads.any { it.text == "=" }, "BAD_CHARACTER token should be '='")
+    }
+
+    @Test
+    fun testPrintfExample() {
+        // This is the exact example from the user's original request
+        val content = """
+            define mycommand
+              print "Custom command"
+            end
+            set var ${'$'}myvar1 = "this is a string"
+            set var ${'$'}myvar2 = 7
+            printf "x is %d\n",x
+            printfXX "x is %d\n",x
+        """.trimIndent()
+
+        println("=== Original printf Debug ===")
+        printTokens(content)
+    }
 }
