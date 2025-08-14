@@ -358,7 +358,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {DEFINE}            { yypushState(STATE_DEFINE_BODY); return DEFINE; }
     {END}               { return END; }
     {COMMANDS}          { yypushState(STATE_COMMANDS_LIST); return COMMANDS; }
-    {SET}               { return SET_KW; }
+    {SET}               { yypushState(STATE_ARGS_BLOCK); }
     {PRINT}             { return PRINT_KW; }
 
     // Language keywords (only if not followed by newline - handled above)

@@ -148,6 +148,35 @@ class LexerTest {
         printTokens(content)
     }
 
+    /**
+     * Test scenarios of detecting a keyword that is a command due to its position
+     * and that we tokenze specific commands e.g. "set", or generic commands
+     * such as "my_user_command" correctly
+     */
+    @Test
+    fun testCommandArgsContext() {
+        val content = """
+
+            user_command1
+
+            user_command2 some args
+
+            set var ${'$'}myvar2 = 7
+
+            set var \
+            ${'$'}myvar2 \
+            = \
+            7
+        """.trimIndent()
+
+        println("=== Define Block Debug ===")
+        printTokens(content)
+
+        val tokens = tokenize(content)
+        val nonWhitespaceTokens =
+            tokens.filter { it.type != TokenType.WHITE_SPACE && it.type != GdbTypes.CRLF }
+    }
+
     @Test
     fun testDefineBlock() {
         val content = """
