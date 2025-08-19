@@ -18,6 +18,7 @@ class BlockLexerTest {
             end
         """.trimIndent()
         val tokens = LexerTestUtils.tokenize(content, GdbLexer()).filter { it.type != TokenType.WHITE_SPACE }
+        // LexerTestUtils.printTokens(tokens)
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER })
         assertEquals(GdbTypes.PYTHON_KW, tokens[0].type)
         assertEquals(GdbTypes.PYTHON_BLOCK, tokens[1].type)
@@ -32,6 +33,7 @@ class BlockLexerTest {
             end
         """.trimIndent()
         val tokens = LexerTestUtils.tokenize(content, GdbLexer()).filter { it.type != TokenType.WHITE_SPACE }
+        // LexerTestUtils.printTokens(tokens)
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER })
         assertEquals(GdbTypes.GUILE_KW, tokens[0].type)
         assertEquals(GdbTypes.GUILE_BLOCK, tokens[1].type)

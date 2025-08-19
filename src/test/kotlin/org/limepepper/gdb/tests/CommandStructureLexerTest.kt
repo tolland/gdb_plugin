@@ -21,6 +21,8 @@ class CommandStructureLexerTest {
         """.trimIndent()
 
         val tokens = LexerTestUtils.tokenize(content, GdbLexer())
+        // Developer-friendly print (guarded by LEXER_DEBUG env/sysprop)
+        // LexerTestUtils.printTokens(tokens)
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER }, "No BAD_CHARACTER tokens expected")
 
         // sanity: should see DEFINE/END/COMMANDS or generic COMMAND tokens in order

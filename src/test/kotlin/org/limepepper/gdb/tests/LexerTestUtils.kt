@@ -11,6 +11,10 @@ data class TokenInfo(
 )
 
 object LexerTestUtils {
+    private val DEBUG: Boolean =
+        (System.getProperty("LEXER_DEBUG")?.equals("true", ignoreCase = true) == true) ||
+        (System.getenv("LEXER_DEBUG")?.equals("true", ignoreCase = true) == true)
+
     fun tokenize(content: String, lexer: GdbLexer = GdbLexer()): List<TokenInfo> {
         val tokens = mutableListOf<TokenInfo>()
         lexer.reset(content, 0, content.length, 0)
@@ -20,7 +24,48 @@ object LexerTestUtils {
             tokens.add(TokenInfo(token, text, lexer.tokenStart, lexer.tokenEnd))
             token = lexer.advance()
         }
+        if (DEBUG) printTokens(tokens)
         return tokens
+    }
+
+    fun printTokens(tokens: List<TokenInfo>) {
+        println("==== TOKENS (${tokens.size}) ====")
+        tokens.forEachIndexed { idx, t ->
+            println(
+                "[%3d] %-24s | '%s' | %d..%d".format(
+                    idx,
+                    t.type.toString(),
+                    escape(t.text),
+                    t.start,
+                    t.end
+                )
+            )
+        }
+    }
+
+    private fun escape(s: String): String = buildString {
+        s.forEach { ch ->
+            when (ch) {
+                '\n' -> append("\\n")
+                '\r' -> append("\\r")
+                '\t' -> append("\\t")
+                else -> append(ch)
+            }
+        }
+    }
+
+    fun types(tokens: List<TokenInfo>) = tokens.map { it.type }
+
+    fun assertTypes(tokens: List<TokenInfo>, vararg expected: IElementType) {
+        kotlin.test.assertEquals(expected.toList(), types(tokens))
+    }
+
+    fun assertTypesAndTextsExact(tokens: List<TokenInfo>, expected: List<Pair<IElementType, String>>) {
+        kotlin.test.assertEquals(expected.size, tokens.size, "Token count mismatch")
+        expected.forEachIndexed { i, (type, text) ->
+            kotlin.test.assertEquals(type, tokens[i].type, "Token type mismatch at $i")
+            kotlin.test.assertEquals(text, tokens[i].text, "Token text mismatch at $i")
+        }
     }
 }
 
