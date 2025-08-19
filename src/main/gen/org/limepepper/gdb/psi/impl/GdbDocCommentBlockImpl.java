@@ -13,7 +13,7 @@ import org.limepepper.gdb.psi.*;
 
 public class GdbDocCommentBlockImpl extends GdbPsiElement implements GdbDocCommentBlock {
 
-  public GdbDocCommentBlockImpl(@NotNull ASTNode node) {
+  public GdbDocCommentBlockImpl(ASTNode node) {
     super(node);
   }
 

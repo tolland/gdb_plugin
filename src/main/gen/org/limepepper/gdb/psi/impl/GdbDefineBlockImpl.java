@@ -13,7 +13,7 @@ import org.limepepper.gdb.psi.*;
 
 public class GdbDefineBlockImpl extends GdbPsiElement implements GdbDefineBlock {
 
-  public GdbDefineBlockImpl(@NotNull ASTNode node) {
+  public GdbDefineBlockImpl(ASTNode node) {
     super(node);
   }
 

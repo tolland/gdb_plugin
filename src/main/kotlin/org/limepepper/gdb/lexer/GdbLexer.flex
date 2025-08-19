@@ -22,8 +22,8 @@ import static org.limepepper.gdb.psi.GdbTypes.*;
 // Basic patterns
 WHITE_SPACE=[ \t]+
 CRLF=(\r\n|\n|\r)
-COMMENT=#[^\r\n\\]*
 COMMENT_WITH_CONTINUATION=#[^\r\n]*\\{CRLF}
+COMMENT=#[^\r\n]*
 LINE_CONTINUATION=\\{CRLF}
 
 // Numbers and identifiers
@@ -129,17 +129,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     }
 
     // Check if we're at start of line or after whitespace (for command recognition)
-    private boolean isCommandContext() {
-        if (zzStartRead == 0) return true; // Start of file
-
-        // Look backwards to see if we're after whitespace or newline
-        for (int i = zzStartRead - 1; i >= 0; i--) {
-            char c = zzBuffer.charAt(i);
-            if (c == '\n' || c == '\r') return true;
-            if (c != ' ' && c != '\t') return false;
-        }
-        return true;
-    }
+    // removed unused isCommandContext()
 %}
 
 
@@ -206,7 +196,6 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     "]"                        { return RBRACKET; }
     "{"                        { return LBRACE; }
     "}"                        { return RBRACE; }
-    "->"                         { return ARROW; }
     ">="                         { return OP_GREATER_OR_EQUAL; }
     ">"                          { return OP_GREATER; }
     "<="                         { return OP_LESS_OR_EQUAL; }
@@ -282,7 +271,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {DEFINE}            { yypushState(STATE_DEFINE_BODY); return DEFINE; }
     {END}               { yypopState(); return END; }
     {COMMANDS}          { yypushState(STATE_COMMANDS_LIST); return COMMANDS; }
-    {SET}               { return SET_KW; }
+    {SET}               { yypushState(STATE_ARGS_BLOCK); return SET_KW; }
     {PRINT}             { return PRINT_KW; }
 
     // Language keywords (only if not followed by newline - handled above)
@@ -294,11 +283,11 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
     {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
-    {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
-    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
+    {COMMAND_DATA} / [^a-zA-Z0-9_]      { yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
+    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(STATE_ARGS_BLOCK); return COMMAND_CONFIG; }
 
     // Identifiers (must come before WORD)
-    {IDENTIFIER}        { return IDENTIFIER; }
+    {IDENTIFIER}        { yypushState(STATE_ARGS_BLOCK); return COMMAND_GENERIC; }
 
     // Everything else as WORD
     {WORD}              { return WORD; }
@@ -320,7 +309,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {END}               { yypopState(); return END; }
 
     // All commands are allowed in commands list
-    {SET}               { return SET_KW; }
+    {SET}               { yypushState(STATE_ARGS_BLOCK); return SET_KW; }
     {PRINT}             { return PRINT_KW; }
     {PYTHON_KW}         { return PYTHON_KW; }
     {GUILE_KW}          { return GUILE_KW; }
@@ -330,11 +319,11 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
     {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
-    {COMMAND_DATA} / [^a-zA-Z0-9_]      { return COMMAND_DATA; }
-    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
+    {COMMAND_DATA} / [^a-zA-Z0-9_]      { yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
+    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(STATE_ARGS_BLOCK); return COMMAND_CONFIG; }
 
     // Identifiers (must come before WORD)
-    {IDENTIFIER}        { return IDENTIFIER; }
+    {IDENTIFIER}        { yypushState(STATE_ARGS_BLOCK); return COMMAND_GENERIC; }
 
     // Everything else as WORD
     {WORD}              { return WORD; }
@@ -372,7 +361,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      {  yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
-    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { return COMMAND_CONFIG; }
+    {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(STATE_ARGS_BLOCK); return COMMAND_CONFIG; }
 
     // Identifiers (must come before WORD)
     {IDENTIFIER}        { yypushState(STATE_ARGS_BLOCK); return COMMAND_GENERIC; }

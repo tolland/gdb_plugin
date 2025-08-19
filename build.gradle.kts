@@ -102,13 +102,13 @@ tasks {
 
 
   // Make sure generation happens before compilation
-//    compileKotlin {
-//        dependsOn("generateParser", "generateLexer")
-//    }
-//
-//    compileJava {
-//        dependsOn("generateParser", "generateLexer")
-//    }
+  named("compileKotlin") {
+    dependsOn("generateLexer")
+  }
+
+  named("compileJava") {
+    dependsOn("generateLexer")
+  }
 
   // Set the JVM compatibility versions
   withType<JavaCompile> {

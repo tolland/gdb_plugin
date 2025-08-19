@@ -13,7 +13,7 @@ import org.limepepper.gdb.psi.*;
 
 public class GdbValueStatementImpl extends GdbPsiElement implements GdbValueStatement {
 
-  public GdbValueStatementImpl(@NotNull ASTNode node) {
+  public GdbValueStatementImpl(ASTNode node) {
     super(node);
   }
 

@@ -13,7 +13,7 @@ import org.limepepper.gdb.psi.*;
 
 public class GdbFloatingCommentImpl extends GdbPsiElement implements GdbFloatingComment {
 
-  public GdbFloatingCommentImpl(@NotNull ASTNode node) {
+  public GdbFloatingCommentImpl(ASTNode node) {
     super(node);
   }
 

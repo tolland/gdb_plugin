@@ -13,7 +13,7 @@ import org.limepepper.gdb.psi.*;
 
 public class GdbCommandStatementImpl extends GdbPsiElement implements GdbCommandStatement {
 
-  public GdbCommandStatementImpl(@NotNull ASTNode node) {
+  public GdbCommandStatementImpl(ASTNode node) {
     super(node);
   }
 
@@ -37,11 +37,6 @@ public class GdbCommandStatementImpl extends GdbPsiElement implements GdbCommand
   @Nullable
   public GdbDefineBlock getDefineBlock() {
     return findChildByClass(GdbDefineBlock.class);
-  }
-
-  @Override
-  public @Nullable String getKey() {
-    return GdbPsiImplUtil.getKey(this);
   }
 
 }

@@ -13,7 +13,7 @@ import org.limepepper.gdb.psi.*;
 
 public class GdbCommandImpl extends GdbPsiElement implements GdbCommand {
 
-  public GdbCommandImpl(@NotNull ASTNode node) {
+  public GdbCommandImpl(ASTNode node) {
     super(node);
   }
 

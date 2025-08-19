@@ -30,7 +30,7 @@ class GdbUtil {
                     PsiTreeUtil.getChildrenOfType(gdbFile, GdbCommandStatement::class.java)
                 if (statements != null) {
                     for (statement in statements) {
-                        if (key == statement.getKey()) {
+                        if (statement.text.startsWith(key)) {
                             result.add(statement)
                         }
                     }

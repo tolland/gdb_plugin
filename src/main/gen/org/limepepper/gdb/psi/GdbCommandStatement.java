@@ -13,6 +13,8 @@ public interface GdbCommandStatement extends PsiElement {
   @Nullable
   GdbDefineBlock getDefineBlock();
 
-  @Nullable String getKey();
+  //WARNING: getKey(...) is skipped
+  //matching getKey(GdbCommandStatement, ...)
+  //methods are not found in GdbPsiImplUtil
 
 }
