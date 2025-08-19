@@ -1209,7 +1209,7 @@ public class GdbLexer implements FlexLexer {
             // lookahead expression with fixed lookahead length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL, zzMarkedPos, -1);
-            { return COMMAND_BREAKPOINT;
+            { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT;
             }
           // fall through
           case 69: break;

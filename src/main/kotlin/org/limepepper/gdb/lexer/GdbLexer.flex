@@ -320,8 +320,8 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Commands - only recognize at command boundaries
     {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { return COMMAND_EXECUTION; }
-    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
-    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      { yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(STATE_ARGS_BLOCK); return COMMAND_CONFIG; }
@@ -356,8 +356,8 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Commands - only recognize at command boundaries
     {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { return COMMAND_EXECUTION; }
-    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
-    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      { yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(STATE_ARGS_BLOCK); return COMMAND_CONFIG; }
@@ -397,8 +397,8 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
     // Commands - only recognize at command boundaries
     {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { return COMMAND_EXECUTION; }
-    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { return COMMAND_BREAKPOINT; }
-    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_SHORT} / [^a-zA-Z0-9_] { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT; }
+    {COMMAND_BREAKPOINT_LONG} / [^a-zA-Z0-9_]  { yypushState(STATE_ARGS_BLOCK); return COMMAND_BREAKPOINT; }
     {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      {  yypushState(STATE_ARGS_BLOCK); return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(STATE_ARGS_BLOCK); return COMMAND_CONFIG; }
