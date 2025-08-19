@@ -1,3 +1,4 @@
+// src/main/kotlin/org/limepepper/gdb/lexer/GdbLexer.flex
 package org.limepepper.gdb.lexer;
 
 import com.intellij.lexer.FlexLexer;
@@ -84,9 +85,11 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     public void yypopState() {
       yybegin(stack.pop());
     }
+    private int stringStart = -1;
 
     private IElementType finishDoubleString() {
         yypopState();
+        zzStartRead = stringStart;
         return DOUBLE_QUOTED_STRING;
     }
 
@@ -184,7 +187,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 <STATE_ARGS_BLOCK> {
 
     // String start transitions
-    \"                        { yypushState(STATE_D_STRING); }
+    \"                        { stringStart = zzStartRead; yypushState(STATE_D_STRING); }
 
     // Check for end keyword to pop back
     {END}                     { yypopState(); return END; }
@@ -261,7 +264,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 // Define body state - like YYINITIAL but can be nested and pops on 'end'
 <STATE_DEFINE_BODY> {
     // String start transitions
-    \"                  { yypushState(STATE_D_STRING); }
+    \"                        { stringStart = zzStartRead; yypushState(STATE_D_STRING); }
 
     // Language block transitions
     {PYTHON_KW}{CRLF}      { yypushState(STATE_PYTHON_BLOCK); }

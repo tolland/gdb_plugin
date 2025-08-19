@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "interactive",
+		"cSpell.words": [
+			"yybegin"
+		],
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
+}

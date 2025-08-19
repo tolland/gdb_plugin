@@ -1,9 +1,6 @@
 # This is at the start of the file
 
-set var $x1 = 1
-set var $y1 = 12
-
-if $x1 == 5 && $y1 >= 10
+if x == 5 && y >= 10
   print "true"
 end
 
@@ -30,13 +27,6 @@ end
 document user_defined_command
 This is some documentation for the user defined command. It shows up in
 `help user_defined_command`
-end
-
-python
-def do_something_on_exit(x):
-    pass
-
-gdb.events.exited.connect(do_something_on_exit)
 end
 
 python

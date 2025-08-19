@@ -133,6 +133,10 @@ class LexerTest {
 
     """.trimIndent()
 
+
+        // print at the end for debug if needed
+        printTokens(content)
+
         println("=== Line continuation tests ===")
         val tokens = tokenize(content)
         assertNoBadCharacters(tokens)
@@ -158,8 +162,6 @@ class LexerTest {
             "Second multi-line comment should preserve content across continuation"
         )
 
-        // print at the end for debug if needed
-        printTokens(content)
     }
 
     /**

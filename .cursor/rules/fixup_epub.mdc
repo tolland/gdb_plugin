@@ -1,7 +1,0 @@
----
-alwaysApply: true
----
-
-The goal of this project is to implement a simple plugin for jetbrains projects to provide language support for gdb debugging scripts.
-
-gdb scripts are usually suffixed with gdb.
