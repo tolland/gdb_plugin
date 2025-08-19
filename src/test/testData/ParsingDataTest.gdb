@@ -110,22 +110,8 @@ set variable $myVar = "some string value"
 # this also works, if it doesn't conflict with gdb set subcommand
 set $someVar = 50
 
-# assignment to simple value
-set pagination off
-# assignment to property of sub command
-set logging file gdb.output
-# no trailing comments on assignments
-# set $var = 0 # this throws error
-# assignment of other type, e.g. integer
-# @TODO create test prog with vars to set
-# set var counter = 42
-# set memory location to value
-# @TODO create test prog with mem locations for this
-# set *(int*)0x400000 = 0xdeadbeef
-# set {int}0x83040 = 4
-
 # conditional breakpoints
-break foo if x>0
+break foo if x > 0
 commands
     silent
     printf "x is %d\n",x

@@ -38,52 +38,23 @@
         <lang.parserDefinition language="GDBScript"
                                implementationClass="org.limepepper.gdb.parser.GdbParserDefinition"/>
 
-        <!-- Syntax highlighting -->
+        <!-- Disabled optional IDE features during lexer iteration
         <lang.syntaxHighlighterFactory language="GDBScript"
                                        implementationClass="org.limepepper.gdb.highlighting.GdbSyntaxHighlighterFactory"/>
-
-        <!-- Color settings page -->
         <colorSettingsPage implementation="org.limepepper.gdb.highlighting.GdbColorSettingsPage"/>
-
-
-        <lang.commenter
-            language="GDBScript"
-            implementationClass="org.limepepper.gdb.commenter.GdbCommenter"/>
-
-
-        <lang.psiStructureViewFactory
-            language="GDBScript"
-            implementationClass="org.limepepper.gdb.structure.GdbStructureViewFactory"/>
-
-
-        <!--    &lt;!&ndash; Code formatting &ndash;&gt;-->
-        <!--    <lang.formatter language="GDBScript"-->
-        <!--                    implementationClass="org.limepepper.gdb.formatting.GdbFormattingModelBuilder"/>-->
-
-        <!-- Documentation target provider (modern API) -->
-        <platform.backend.documentation.psiTargetProvider
-            order="first"
-            implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>
-
-        <!-- Documentation target provider (modern API) -->
-        <platform.backend.documentation.targetProvider
-            order="first"
-            implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>
-
-
-        <annotator
-            language="GDBScript"
-            implementationClass="org.limepepper.lang.gdb.annotator.GdbAnnotator"/>
-
-
-        <completion.contributor
-            language="GDBScript"
-            implementationClass="org.limepepper.lang.gdb.completion.GdbCompletionContributor"/>
+        <lang.commenter language="GDBScript" implementationClass="org.limepepper.gdb.commenter.GdbCommenter"/>
+        <lang.psiStructureViewFactory language="GDBScript" implementationClass="org.limepepper.gdb.structure.GdbStructureViewFactory"/>
+        <platform.backend.documentation.psiTargetProvider order="first" implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>
+        <platform.backend.documentation.targetProvider order="first" implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>
+        <annotator language="GDBScript" implementationClass="org.limepepper.lang.gdb.annotator.GdbAnnotator"/>
+        <completion.contributor language="GDBScript" implementationClass="org.limepepper.lang.gdb.completion.GdbCompletionContributor"/>
+        -->
 
 
     </extensions>
 
     <!-- Actions -->
+    <!-- Disabled actions during lexer iteration
     <actions>
         <action id="org.limepepper.gdb.debug.DebugDocumentationAction"
                 class="org.limepepper.gdb.debug.DebugDocumentationAction"
@@ -92,4 +63,5 @@
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
+    -->
 </idea-plugin>

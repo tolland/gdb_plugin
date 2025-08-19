@@ -6,6 +6,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.intellij.util.containers.Stack;
+import org.limepepper.gdb.parser.GdbTokenTypes;
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static org.limepepper.gdb.psi.GdbTypes.*;
@@ -189,32 +190,33 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMENT}                   { return COMMENT; }
     {LINE_CONTINUATION}         { return LINE_CONTINUATION; }
 
-    // Punctuation
-    "("                        { return LPAREN; }
-    ")"                        { return RPAREN; }
-    "["                        { return LBRACKET; }
-    "]"                        { return RBRACKET; }
-    "{"                        { return LBRACE; }
-    "}"                        { return RBRACE; }
-    ">="                         { return OP_GREATER_OR_EQUAL; }
-    ">"                          { return OP_GREATER; }
-    "<="                         { return OP_LESS_OR_EQUAL; }
-    "<"                          { return OP_LESS; }
-    "=="                       { return OP_EQUAL; }
-    "="                        { return OP_ASSIGN; }
-    ","                        { return COMMA; }
-    ";"                        { return SEMICOLON; }
-    ":"                        { return COLON; }
-    "."                        { return DOT; }
-    "->"                       { return ARROW; }
-    "::"                       { return SCOPE_RESOLUTION; }
-    "'"                        { return SINGLE_QUOTE; }
-    "..."                       { return OP_ELLIPSIS; }
-    "&&"                        { return OP_AND_AND; }
-    "||"                        { return OP_OR_OR; }
-    "|"                        { return OP_PIPE; }
+    // Punctuation and symbols treated generically as ARG for simplification
+    "("                        { return GdbTokenTypes.ARG; }
+    ")"                        { return GdbTokenTypes.ARG; }
+    "["                        { return GdbTokenTypes.ARG; }
+    "]"                        { return GdbTokenTypes.ARG; }
+    "{"                        { return GdbTokenTypes.ARG; }
+    "}"                        { return GdbTokenTypes.ARG; }
+    "->"                       { return GdbTokenTypes.ARG; }
+    ">="                        { return GdbTokenTypes.ARG; }
+    ">"                         { return GdbTokenTypes.ARG; }
+    "<="                        { return GdbTokenTypes.ARG; }
+    "<"                         { return GdbTokenTypes.ARG; }
+    "=="                        { return GdbTokenTypes.ARG; }
+    "="                         { return GdbTokenTypes.ARG; }
+    ","                         { return GdbTokenTypes.ARG; }
+    ";"                         { return GdbTokenTypes.ARG; }
+    ":"                         { return GdbTokenTypes.ARG; }
+    "."                         { return GdbTokenTypes.ARG; }
+    "::"                        { return GdbTokenTypes.ARG; }
+    "'"                         { return GdbTokenTypes.ARG; }
+    "..."                       { return GdbTokenTypes.ARG; }
+    "&&"                        { return GdbTokenTypes.ARG; }
+    "||"                        { return GdbTokenTypes.ARG; }
+    "|"                         { return GdbTokenTypes.ARG; }
+    "--"                        { return GdbTokenTypes.ARG; }
 
-    // Identifiers (must come after command patterns)
+    // Identifiers (keep as IDENTIFIER for now; tests rely on it)
     {IDENTIFIER}               { return IDENTIFIER; }
 
       // Numbers and registers

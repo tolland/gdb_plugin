@@ -7,6 +7,13 @@ import org.limepepper.gdb.psi.GdbTypes
  * Token types for GDB script lexical analysis
  */
 object GdbTokenTypes : GdbTypes {
+    // Generic argument token (punctuation, symbols, etc. in args context)
+    @JvmField
+    val ARG = GdbTokenType("ARG")
+
+    // Generic command token (for non-special categorized commands)
+    @JvmField
+    val COMMAND = GdbTokenType("COMMAND")
 
     // Comments
     @JvmField
