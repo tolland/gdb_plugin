@@ -714,6 +714,7 @@ public class GdbLexer implements FlexLexer {
       yybegin(stack.pop());
     }
     private int stringStart = -1;
+    private int blockStart = -1;
 
     private IElementType finishDoubleString() {
         yypopState();
@@ -721,18 +722,34 @@ public class GdbLexer implements FlexLexer {
         return DOUBLE_QUOTED_STRING;
     }
 
-    private IElementType finishPythonBlock() {
+    private IElementType finishPythonBlockPushbackEnd() {
+        // push back matched 'end' so it will be lexed by parent state
         yypopState();
+        yypushback(yylength());
+        if (blockStart >= 0) {
+            zzStartRead = blockStart;
+            blockStart = -1;
+        }
         return PYTHON_BLOCK;
     }
 
-    private IElementType finishGuileBlock() {
+    private IElementType finishGuileBlockPushbackEnd() {
         yypopState();
+        yypushback(yylength());
+        if (blockStart >= 0) {
+            zzStartRead = blockStart;
+            blockStart = -1;
+        }
         return GUILE_BLOCK;
     }
 
-    private IElementType finishDocBlock() {
+    private IElementType finishDocBlockPushbackEnd() {
         yypopState();
+        yypushback(yylength());
+        if (blockStart >= 0) {
+            zzStartRead = blockStart;
+            blockStart = -1;
+        }
         return DOC_BLOCK;
     }
 
@@ -1036,15 +1053,30 @@ public class GdbLexer implements FlexLexer {
             }  // fall though
             case 297: break;
             case STATE_PYTHON_BLOCK: {
-              return finishPythonBlock();
+              yypopState();
+                            if (blockStart >= 0) {
+                                zzStartRead = blockStart;
+                                blockStart = -1;
+                            }
+                            return PYTHON_BLOCK;
             }  // fall though
             case 298: break;
             case STATE_GUILE_BLOCK: {
-              return finishGuileBlock();
+              yypopState();
+                            if (blockStart >= 0) {
+                                zzStartRead = blockStart;
+                                blockStart = -1;
+                            }
+                            return GUILE_BLOCK;
             }  // fall though
             case 299: break;
             case STATE_DOC_BLOCK: {
-              return finishDocBlock();
+              yypopState();
+                            if (blockStart >= 0) {
+                                zzStartRead = blockStart;
+                                blockStart = -1;
+                            }
+                            return DOC_BLOCK;
             }  // fall though
             case 300: break;
             case STATE_ARGS_BLOCK: {
@@ -1241,17 +1273,17 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 79: break;
           case 32:
-            { return finishPythonBlock();
+            { return finishPythonBlockPushbackEnd();
             }
           // fall through
           case 80: break;
           case 33:
-            { return finishGuileBlock();
+            { return finishGuileBlockPushbackEnd();
             }
           // fall through
           case 81: break;
           case 34:
-            { return finishDocBlock();
+            { return finishDocBlockPushbackEnd();
             }
           // fall through
           case 82: break;
@@ -1269,7 +1301,7 @@ public class GdbLexer implements FlexLexer {
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL, zzStartRead, 3);
-            { return finishPythonBlock();
+            { return finishPythonBlockPushbackEnd();
             }
           // fall through
           case 85: break;
@@ -1277,7 +1309,7 @@ public class GdbLexer implements FlexLexer {
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL, zzStartRead, 3);
-            { return finishGuileBlock();
+            { return finishGuileBlockPushbackEnd();
             }
           // fall through
           case 86: break;
@@ -1285,7 +1317,7 @@ public class GdbLexer implements FlexLexer {
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL, zzStartRead, 3);
-            { return finishDocBlock();
+            { return finishDocBlockPushbackEnd();
             }
           // fall through
           case 87: break;
@@ -1313,7 +1345,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 91: break;
           case 44:
-            { yypushState(STATE_GUILE_BLOCK);
+            { blockStart = zzStartRead; yypushState(STATE_GUILE_BLOCK); return GUILE_KW;
             }
           // fall through
           case 92: break;
@@ -1323,7 +1355,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 93: break;
           case 46:
-            { yypushState(STATE_PYTHON_BLOCK);
+            { blockStart = zzStartRead; yypushState(STATE_PYTHON_BLOCK); return PYTHON_KW;
             }
           // fall through
           case 94: break;
@@ -1333,7 +1365,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 95: break;
           case 48:
-            { yypushState(STATE_DOC_BLOCK);
+            { blockStart = zzStartRead; yypushState(STATE_DOC_BLOCK); return DOC_BLOCK;
             }
           // fall through
           case 96: break;

@@ -87,6 +87,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
       yybegin(stack.pop());
     }
     private int stringStart = -1;
+    private int blockStart = -1;
 
     private IElementType finishDoubleString() {
         yypopState();
@@ -94,18 +95,34 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
         return DOUBLE_QUOTED_STRING;
     }
 
-    private IElementType finishPythonBlock() {
+    private IElementType finishPythonBlockPushbackEnd() {
+        // push back matched 'end' so it will be lexed by parent state
         yypopState();
+        yypushback(yylength());
+        if (blockStart >= 0) {
+            zzStartRead = blockStart;
+            blockStart = -1;
+        }
         return PYTHON_BLOCK;
     }
 
-    private IElementType finishGuileBlock() {
+    private IElementType finishGuileBlockPushbackEnd() {
         yypopState();
+        yypushback(yylength());
+        if (blockStart >= 0) {
+            zzStartRead = blockStart;
+            blockStart = -1;
+        }
         return GUILE_BLOCK;
     }
 
-    private IElementType finishDocBlock() {
+    private IElementType finishDocBlockPushbackEnd() {
         yypopState();
+        yypushback(yylength());
+        if (blockStart >= 0) {
+            zzStartRead = blockStart;
+            blockStart = -1;
+        }
         return DOC_BLOCK;
     }
 
@@ -148,29 +165,50 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 
 // Python block handling - consume everything until 'end' at start of line
 <STATE_PYTHON_BLOCK> {
-    ^end / [^a-zA-Z0-9_] { return finishPythonBlock(); }
-    ^end{CRLF}          { return finishPythonBlock(); }
-    ^end                { return finishPythonBlock(); }
+    ^end / [^a-zA-Z0-9_] { return finishPythonBlockPushbackEnd(); }
+    ^end{CRLF}          { return finishPythonBlockPushbackEnd(); }
+    ^end                { return finishPythonBlockPushbackEnd(); }
     [^]                 { /* consume any character */ }
-    <<EOF>>             { return finishPythonBlock(); }
+    <<EOF>>             {
+                            yypopState();
+                            if (blockStart >= 0) {
+                                zzStartRead = blockStart;
+                                blockStart = -1;
+                            }
+                            return PYTHON_BLOCK;
+                        }
 }
 
 // Guile block handling - consume everything until 'end' at start of line
 <STATE_GUILE_BLOCK> {
-    ^end / [^a-zA-Z0-9_] { return finishGuileBlock(); }
-    ^end{CRLF}          { return finishGuileBlock(); }
-    ^end                { return finishGuileBlock(); }
+    ^end / [^a-zA-Z0-9_] { return finishGuileBlockPushbackEnd(); }
+    ^end{CRLF}          { return finishGuileBlockPushbackEnd(); }
+    ^end                { return finishGuileBlockPushbackEnd(); }
     [^]                 { /* consume any character */ }
-    <<EOF>>             { return finishGuileBlock(); }
+    <<EOF>>             {
+                            yypopState();
+                            if (blockStart >= 0) {
+                                zzStartRead = blockStart;
+                                blockStart = -1;
+                            }
+                            return GUILE_BLOCK;
+                        }
 }
 
 // user function document block handling - consume everything until 'end' at start of line
 <STATE_DOC_BLOCK> {
-    ^end / [^a-zA-Z0-9_] { return finishDocBlock(); }
-    ^end{CRLF}          { return finishDocBlock(); }
-    ^end                { return finishDocBlock(); }
+    ^end / [^a-zA-Z0-9_] { return finishDocBlockPushbackEnd(); }
+    ^end{CRLF}          { return finishDocBlockPushbackEnd(); }
+    ^end                { return finishDocBlockPushbackEnd(); }
     [^]                 { /* consume any character */ }
-    <<EOF>>             { return finishDocBlock(); }
+    <<EOF>>             {
+                            yypopState();
+                            if (blockStart >= 0) {
+                                zzStartRead = blockStart;
+                                blockStart = -1;
+                            }
+                            return DOC_BLOCK;
+                        }
 }
 
 // processing the args, subcommands and options of a command
@@ -258,9 +296,9 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     \"                        { stringStart = zzStartRead; yypushState(STATE_D_STRING); }
 
     // Language block transitions
-    {PYTHON_KW}{CRLF}      { yypushState(STATE_PYTHON_BLOCK); }
-    {GUILE_KW}{CRLF}       { yypushState(STATE_GUILE_BLOCK); }
-    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { yypushState(STATE_DOC_BLOCK); }
+    {PYTHON_KW}{CRLF}      { blockStart = zzStartRead; yypushState(STATE_PYTHON_BLOCK); return PYTHON_KW; }
+    {GUILE_KW}{CRLF}       { blockStart = zzStartRead; yypushState(STATE_GUILE_BLOCK); return GUILE_KW; }
+    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { blockStart = zzStartRead; yypushState(STATE_DOC_BLOCK); return DOC_BLOCK; }
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
@@ -335,9 +373,9 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 <YYINITIAL> {
 
     // Language block transitions
-    {PYTHON_KW}{CRLF}      { yypushState(STATE_PYTHON_BLOCK); }
-    {GUILE_KW}{CRLF}       { yypushState(STATE_GUILE_BLOCK); }
-    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { yypushState(STATE_DOC_BLOCK); }
+    {PYTHON_KW}{CRLF}      { blockStart = zzStartRead; yypushState(STATE_PYTHON_BLOCK); return PYTHON_KW; }
+    {GUILE_KW}{CRLF}       { blockStart = zzStartRead; yypushState(STATE_GUILE_BLOCK); return GUILE_KW; }
+    {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { blockStart = zzStartRead; yypushState(STATE_DOC_BLOCK); return DOC_BLOCK; }
 
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
