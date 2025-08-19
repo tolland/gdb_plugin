@@ -48,12 +48,28 @@ class CommandStructureLexerTest {
         val tokens = LexerTestUtils.tokenize(content, GdbLexer())
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER }, "No BAD_CHARACTER tokens expected")
         
+        // Debug: print tokens to see what we're actually getting
+        println("==== TOKENS for delimiter test ====")
+        tokens.forEachIndexed { i, token ->
+            println("[$i] ${token.type} | '${token.text}' | ${token.start}..${token.end}")
+        }
+        
         val nonWs = tokens.filter { it.type != TokenType.WHITE_SPACE }
         
-        // Should see: with (COMMAND) + args + -- (ARG) + my_complex_command (COMMAND)
+        // Should see: with (COMMAND_GENERIC) + args (ARG) + -- (ARG) + my_complex_command (ARG)
+        // The -- delimiter allows additional arguments to be specified
         assertTrue(nonWs.any { it.type == GdbTypes.COMMAND_GENERIC && it.text == "with" })
-        assertTrue(nonWs.any { it.type == GdbTypes.COMMAND_GENERIC && it.text == "my_complex_command" })
         assertTrue(nonWs.any { it.type == GdbTokenTypes.ARG && it.text == "--" })
+        assertTrue(nonWs.any { it.type == GdbTokenTypes.ARG && it.text == "my_complex_command" })
+        
+        // Verify the structure: COMMAND + ARGS + DELIMITER + MORE_ARGS
+        val commandIndex = nonWs.indexOfFirst { it.type == GdbTypes.COMMAND_GENERIC && it.text == "with" }
+        assertTrue(commandIndex >= 0, "Should find 'with' command")
+        
+        // Everything after 'with' should be ARG tokens (excluding the final ARGS_BLOCK token)
+        val afterCommand = nonWs.drop(commandIndex + 1).filter { it.type != GdbTypes.ARGS_BLOCK }
+        assertTrue(afterCommand.isNotEmpty(), "Should have args after 'with'")
+        assertTrue(afterCommand.all { it.type == GdbTokenTypes.ARG }, "All args after 'with' should be ARG tokens")
     }
 }
 

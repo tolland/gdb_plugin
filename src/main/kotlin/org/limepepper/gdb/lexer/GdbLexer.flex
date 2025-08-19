@@ -228,39 +228,9 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
     {COMMENT}                   { return COMMENT; }
     {LINE_CONTINUATION}         { return LINE_CONTINUATION; }
 
-    // Punctuation and symbols treated generically as ARG for simplification
-    "("                        { return GdbTokenTypes.ARG; }
-    ")"                        { return GdbTokenTypes.ARG; }
-    "["                        { return GdbTokenTypes.ARG; }
-    "]"                        { return GdbTokenTypes.ARG; }
-    "{"                        { return GdbTokenTypes.ARG; }
-    "}"                        { return GdbTokenTypes.ARG; }
-    "->"                       { return GdbTokenTypes.ARG; }
-    ">="                        { return GdbTokenTypes.ARG; }
-    ">"                         { return GdbTokenTypes.ARG; }
-    "<="                        { return GdbTokenTypes.ARG; }
-    "<"                         { return GdbTokenTypes.ARG; }
-    "=="                        { return GdbTokenTypes.ARG; }
-    "="                         { return GdbTokenTypes.ARG; }
-    ","                         { return GdbTokenTypes.ARG; }
-    ";"                         { return GdbTokenTypes.ARG; }
-    ":"                         { return GdbTokenTypes.ARG; }
-    "."                         { return GdbTokenTypes.ARG; }
-    "::"                        { return GdbTokenTypes.ARG; }
-    "'"                         { return GdbTokenTypes.ARG; }
-    "..."                       { return GdbTokenTypes.ARG; }
-    "&&"                        { return GdbTokenTypes.ARG; }
-    "||"                        { return GdbTokenTypes.ARG; }
-    "|"                         { return GdbTokenTypes.ARG; }
-    "--"                        { return GdbTokenTypes.ARG; }
+    // Consume everything else as ARG until we hit CRLF or END
+    [^\"\r\n\s#\\]+            { return GdbTokenTypes.ARG; }
 
-    // Identifiers (keep as IDENTIFIER for now; tests rely on it)
-    {IDENTIFIER}               { return IDENTIFIER; }
-
-      // Numbers and registers
-    {HEX_NUMBER}               { return HEX_NUMBER; }
-    {REGISTER}                 { return REGISTER; }
-    {NUMBER}                   { return NUMBER; }
     <<EOF>>             { return finishArgsBlock(); }
 }
 

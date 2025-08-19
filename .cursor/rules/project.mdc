@@ -11,5 +11,3 @@ after
 2) parser
 3) syntax highlighting based on tokens
 4) documentation provider
-
-Agent should run commands directly e.g. "git add ." "./gradlew test" where possible to facilitate allowlist whitelisting and avoid "bash -lc"
