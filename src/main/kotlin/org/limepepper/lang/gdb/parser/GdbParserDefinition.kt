@@ -13,7 +13,6 @@ import com.intellij.psi.tree.TokenSet
 import org.limepepper.lang.gdb.GdbLanguage
 import org.limepepper.lang.gdb.lexer.GdbLexerAdapter
 import org.limepepper.lang.gdb.psi.GdbFile
-import org.limepepper.lang.gdb.psi.GdbTokenSets
 import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**

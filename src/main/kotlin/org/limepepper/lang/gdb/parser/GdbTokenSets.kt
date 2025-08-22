@@ -1,9 +1,8 @@
-package org.limepepper.lang.gdb.psi
+package org.limepepper.lang.gdb.parser
 
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import org.limepepper.lang.gdb.parser.GdbTokenTypes
 import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**

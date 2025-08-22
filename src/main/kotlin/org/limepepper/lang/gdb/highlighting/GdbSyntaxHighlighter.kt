@@ -7,8 +7,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import org.limepepper.lang.gdb.lexer.GdbLexerAdapter
-import org.limepepper.lang.gdb.parser.GdbTokenTypes
-import org.limepepper.lang.gdb.psi.GdbTokenSets
+import org.limepepper.lang.gdb.parser.GdbTokenSets
 import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
