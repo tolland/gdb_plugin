@@ -1,0 +1,5 @@
+<idea-plugin>
+
+
+ <depends optional="true" config-file="gdbscript-injections.xml">org.intellij.intelliLang</depends>
+</idea-plugin>

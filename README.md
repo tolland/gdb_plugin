@@ -187,3 +187,7 @@ This matches the longest match, not the one we want. so have to fall back to suc
     {LineTerminator}              { yybegin(HERE_DOC_END_MARKER); return HEREDOC_CONTENT; }
 }
 ```
+
+### python extension
+
+gdb supports running python, it injects a `gdb` module

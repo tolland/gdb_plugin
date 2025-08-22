@@ -61,6 +61,48 @@ class GdbParsingTest : ParsingTestCase("", "gdb", GdbParserDefinition()) {
         println(toParseTreeText(myFile, true, includeRanges()))
     }
 
+    fun testSourceTestParsing() {
+        val content = """
+
+            # Set up breakpoints for key Epub3Generator methods
+            break Epub3Generator::Epub3Generator
+            commands 1
+                echo "\n=== Epub3Generator Constructor ===\n"
+                bt
+                continue
+            end
+
+            # conditional breakpoints
+            break foo1
+            commands
+                silent
+                printf "x is %d\n",x
+                cont
+            end
+
+            break foo2
+            commands
+                silent
+                printf "x is %d\n",x
+                cont
+            end
+
+            # break on line number
+            break 403
+            commands
+            silent
+            set x = y + 4
+            cont
+            end
+
+        """.trimIndent()
+        val myFile = parseFile(
+            "randomFile",
+            content
+        )
+        println(toParseTreeText(myFile, true, includeRanges()))
+    }
+
     fun doTestWithDump(checkResult: Boolean, ensureNoErrorElements: Boolean) {
         val name = getTestName()
         try {

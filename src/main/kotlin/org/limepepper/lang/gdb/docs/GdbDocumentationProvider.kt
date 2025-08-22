@@ -1,12 +1,12 @@
-package org.limepepper.lang.gdb.documentation
+package org.limepepper.lang.gdb.docs
 
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import org.limepepper.lang.gdb.lang.GdbLanguage
-import org.limepepper.lang.gdb.parser.GdbTokenTypes
+import org.limepepper.lang.gdb.GdbLanguage
+import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
  * Traditional DocumentationProvider for GDB language
@@ -59,14 +59,13 @@ class GdbDocumentationProvider : DocumentationProvider {
 
     private fun isDocumentableElement(element: PsiElement): Boolean {
         val isDocumentable = when (element.node.elementType) {
-            GdbTokenTypes.COMMAND_EXECUTION,
-            GdbTokenTypes.COMMAND_BREAKPOINT,
-            GdbTokenTypes.COMMAND_STACK,
-            GdbTokenTypes.COMMAND_DATA,
-            GdbTokenTypes.COMMAND_CONFIG,
-            GdbTokenTypes.COMMAND_USER,
-            GdbTokenTypes.REGISTER,
-            GdbTokenTypes.HEX_NUMBER -> true
+            GdbTypes.COMMAND_EXECUTION,
+            GdbTypes.COMMAND_BREAKPOINT,
+            GdbTypes.COMMAND_STACK,
+            GdbTypes.COMMAND_DATA,
+            GdbTypes.COMMAND_CONFIG,
+            GdbTypes.REGISTER,
+            GdbTypes.HEX_NUMBER -> true
 
             else -> {
                 // Fallback: check if the text matches known GDB commands
@@ -90,20 +89,20 @@ class GdbDocumentationProvider : DocumentationProvider {
         val elementText = element.text.trim()
 
         return when (element.node.elementType) {
-            GdbTokenTypes.COMMAND_EXECUTION,
-            GdbTokenTypes.COMMAND_BREAKPOINT,
-            GdbTokenTypes.COMMAND_STACK,
-            GdbTokenTypes.COMMAND_DATA,
-            GdbTokenTypes.COMMAND_CONFIG,
-            GdbTokenTypes.COMMAND_USER -> {
+            GdbTypes.COMMAND_EXECUTION,
+            GdbTypes.COMMAND_BREAKPOINT,
+            GdbTypes.COMMAND_STACK,
+            GdbTypes.COMMAND_DATA,
+            GdbTypes.COMMAND_CONFIG,
+            GdbTypes.COMMAND_USER -> {
                 generateCommandDocumentation(elementText)
             }
 
-            GdbTokenTypes.REGISTER -> {
+            GdbTypes.REGISTER -> {
                 generateRegisterDocumentation(elementText)
             }
 
-            GdbTokenTypes.HEX_NUMBER -> {
+            GdbTypes.HEX_NUMBER -> {
                 generateHexNumberDocumentation(elementText)
             }
 

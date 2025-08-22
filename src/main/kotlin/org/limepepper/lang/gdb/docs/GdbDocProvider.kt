@@ -1,11 +1,10 @@
-package org.limepepper.lang.gdb.documentation
+package org.limepepper.lang.gdb.docs
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.platform.backend.documentation.DocumentationTargetProvider
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.elementType
-import org.limepepper.lang.gdb.parser.GdbTokenTypes
 import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
@@ -78,14 +77,14 @@ class GdbDocProvider : DocumentationTargetProvider {
 
     private fun isDocumentableElement(element: com.intellij.psi.PsiElement): Boolean {
         val isDocumentable = when (element.elementType) {
-            GdbTokenTypes.COMMAND_EXECUTION,
+            GdbTypes.COMMAND_EXECUTION,
             GdbTypes.COMMAND_BREAKPOINT,
-            GdbTokenTypes.COMMAND_STACK,
-            GdbTokenTypes.COMMAND_DATA,
-            GdbTokenTypes.COMMAND_CONFIG,
-            GdbTokenTypes.COMMAND_USER,
-            GdbTokenTypes.REGISTER,
-            GdbTokenTypes.HEX_NUMBER -> true
+            GdbTypes.COMMAND_STACK,
+            GdbTypes.COMMAND_DATA,
+            GdbTypes.COMMAND_CONFIG,
+            GdbTypes.COMMAND_USER,
+            GdbTypes.REGISTER,
+            GdbTypes.HEX_NUMBER -> true
             else -> {
                 // Fallback: check if the text matches known GDB commands
                 val text = element.text.trim()

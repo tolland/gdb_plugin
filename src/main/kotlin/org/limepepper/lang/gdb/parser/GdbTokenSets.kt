@@ -26,7 +26,7 @@ object GdbTokenSets {
 
     @JvmField
     val STRINGS = TokenSet.create(
-        GdbTokenTypes.STRING,
+        GdbTypes.STRING,
         GdbTypes.DOUBLE_QUOTED_STRING,
     )
 
@@ -67,7 +67,7 @@ object GdbTokenSets {
         GdbTypes.NUMBER,
         GdbTypes.HEX_NUMBER,
         GdbTypes.STRING,
-        GdbTokenTypes.REGISTER // Use original since may not be generated
+        GdbTypes.REGISTER // Use original since may not be generated
     )
 
 //    // Identifiers
@@ -79,8 +79,8 @@ object GdbTokenSets {
     // Operators - use original since they're basic lexer tokens
     @JvmField
     val OPERATORS = TokenSet.create(
-        GdbTokenTypes.OPERATOR,
-        GdbTokenTypes.ASSIGNMENT
+        GdbTypes.OPERATOR,
+        GdbTypes.ASSIGNMENT
     )
 
     // Punctuation - use generated types

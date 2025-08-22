@@ -8,7 +8,6 @@ import com.intellij.lexer.FlexLexer;
 
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.Stack;
-import org.limepepper.lang.gdb.parser.GdbTokenTypes;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
@@ -535,16 +534,6 @@ public class GdbLexer implements FlexLexer {
         return ARGS_BLOCK;
     }
 
-    private IElementType finishDocBlockPushbackEnd() {
-        yypopState();
-        yypushback(yylength());
-        if (blockStart >= 0) {
-            zzStartRead = blockStart;
-            blockStart = -1;
-        }
-        return DOC_BLOCK;
-    }
-
     private void pushbackEOL() {
         int eolLength = 0;
         if (yylength() > 0) {
@@ -844,7 +833,7 @@ public class GdbLexer implements FlexLexer {
             case 248: break;
             case STATE_PYTHON_INLINE: {
               yypopState();
-                           return GdbTokenTypes.PYTHON_INLINE;
+                           return PYTHON_INLINE;
             }  // fall though
             case 249: break;
             case STATE_COMMENT_CONTINUATION: {
@@ -913,7 +902,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 48: break;
           case 11:
-            { return GdbTokenTypes.PYTHON_INLINE;
+            { return PYTHON_INLINE;
             }
           // fall through
           case 49: break;
@@ -928,7 +917,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 51: break;
           case 14:
-            { return GdbTokenTypes.ARG;
+            { return ARG;
             }
           // fall through
           case 52: break;
@@ -1032,7 +1021,9 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 68: break;
           case 31:
-            { yypushState(STATE_COMMANDS_LIST); return COMMAND_COMMANDS;
+            { yypushState(STATE_COMMANDS_LIST);
+        yypushState(IN_ARGS);
+        return COMMAND_COMMANDS;
             }
           // fall through
           case 69: break;

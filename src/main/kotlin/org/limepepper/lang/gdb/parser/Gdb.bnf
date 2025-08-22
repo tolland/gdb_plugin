@@ -19,6 +19,7 @@
     GUILE_KW = 'guile'
     DOC_BLOCK_LINE = 'regexp:"([^"\\]|\\.)*"'
     PYTHON_BLOCK = 'regexp:python\n.*?(end\b)'
+    PYTHON_INLINE = 'PYTHON_INLINE'
     GUILE_BLOCK = 'regexp:guile\n.*?(end\b)'
     ARGS_BLOCK = 'regexp:args\n.*?(end\b)'
 
@@ -115,6 +116,9 @@
     OP_MUL='*'
     OP_DIV='/'
     OP_MOD='%'
+
+    OPERATOR='OPERATOR'
+    ASSIGNMENT='ASSIGNMENT'
 
     SINGLE_QUOTE="'"
     SCOPE_RESOLUTION='::'

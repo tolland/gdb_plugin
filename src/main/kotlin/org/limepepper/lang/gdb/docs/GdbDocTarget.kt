@@ -1,4 +1,4 @@
-package org.limepepper.lang.gdb.documentation
+package org.limepepper.lang.gdb.docs
 
 import com.intellij.model.Pointer
 import com.intellij.platform.backend.documentation.DocumentationResult
@@ -7,7 +7,6 @@ import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.createSmartPointer
 import com.intellij.psi.util.elementType
-import org.limepepper.lang.gdb.parser.GdbTokenTypes
 import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
@@ -26,23 +25,23 @@ class GdbDocTarget(private val element: PsiElement) : DocumentationTarget {
     override fun computePresentation(): TargetPresentation {
         val elementText = element.text
         return when (element.elementType) {
-            GdbTokenTypes.COMMAND_EXECUTION,
+            GdbTypes.COMMAND_EXECUTION,
             GdbTypes.COMMAND_BREAKPOINT,
-            GdbTokenTypes.COMMAND_STACK,
-            GdbTokenTypes.COMMAND_DATA,
-            GdbTokenTypes.COMMAND_CONFIG,
-            GdbTokenTypes.COMMAND_USER -> {
+            GdbTypes.COMMAND_STACK,
+            GdbTypes.COMMAND_DATA,
+            GdbTypes.COMMAND_CONFIG,
+            GdbTypes.COMMAND_USER -> {
                 val doc = GdbCommandDoc.getDocumentation(elementText)
                 TargetPresentation.builder("GDB Command: $elementText")
                     .presentation()
             }
 
-            GdbTokenTypes.REGISTER -> {
+            GdbTypes.REGISTER -> {
                 TargetPresentation.builder("Register: $elementText")
                     .presentation()
             }
 
-            GdbTokenTypes.HEX_NUMBER -> {
+            GdbTypes.HEX_NUMBER -> {
                 TargetPresentation.builder("Hex: $elementText")
                     .presentation()
             }
@@ -59,20 +58,20 @@ class GdbDocTarget(private val element: PsiElement) : DocumentationTarget {
         val elementText = currentElement.text
 
         val htmlContent = when (currentElement.elementType) {
-            GdbTokenTypes.COMMAND_EXECUTION,
+            GdbTypes.COMMAND_EXECUTION,
             GdbTypes.COMMAND_BREAKPOINT,
-            GdbTokenTypes.COMMAND_STACK,
-            GdbTokenTypes.COMMAND_DATA,
-            GdbTokenTypes.COMMAND_CONFIG,
-            GdbTokenTypes.COMMAND_USER -> {
+            GdbTypes.COMMAND_STACK,
+            GdbTypes.COMMAND_DATA,
+            GdbTypes.COMMAND_CONFIG,
+            GdbTypes.COMMAND_USER -> {
                 generateCommandDocumentation(elementText)
             }
 
-            GdbTokenTypes.REGISTER -> {
+            GdbTypes.REGISTER -> {
                 generateRegisterDocumentation(elementText)
             }
 
-            GdbTokenTypes.HEX_NUMBER -> {
+            GdbTypes.HEX_NUMBER -> {
                 generateHexNumberDocumentation(elementText)
             }
 

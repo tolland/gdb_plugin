@@ -5,7 +5,6 @@ import com.intellij.lexer.FlexLexer;
 
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.Stack;
-import org.limepepper.lang.gdb.parser.GdbTokenTypes;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
@@ -200,16 +199,6 @@ ENDLINE_BODY=\s*end\s*
         return ARGS_BLOCK;
     }
 
-    private IElementType finishDocBlockPushbackEnd() {
-        yypopState();
-        yypushback(yylength());
-        if (blockStart >= 0) {
-            zzStartRead = blockStart;
-            blockStart = -1;
-        }
-        return DOC_BLOCK;
-    }
-
     private void pushbackEOL() {
         int eolLength = 0;
         if (yylength() > 0) {
@@ -262,11 +251,11 @@ ENDLINE_BODY=\s*end\s*
 
 <STATE_PYTHON_INLINE> {
 //    [^]                 { /* consume any character */ }
-      [^\r\n\\]+           { return GdbTokenTypes.PYTHON_INLINE; }
+      [^\r\n\\]+           { return PYTHON_INLINE; }
     {CRLF}                 { yypopState(); return CRLF; }
       {WHITE_SPACE}        { return WHITE_SPACE; }
        <<EOF>>             {  yypopState();
-                           return GdbTokenTypes.PYTHON_INLINE;
+                           return PYTHON_INLINE;
       }
 }
 
@@ -305,7 +294,7 @@ ENDLINE_BODY=\s*end\s*
     {LINE_CONTINUATION}         { return LINE_CONTINUATION; }
 
     // Consume everything else as ARG until we hit CRLF or END
-    [^\"\r\n\s#\\]+            { return GdbTokenTypes.ARG; }
+    [^\"\r\n\s#\\]+            { return ARG; }
 
 }
 
@@ -386,7 +375,11 @@ ENDLINE_BODY=\s*end\s*
     {COMMAND_BREAKPOINT} / [^a-zA-Z0-9_] { yypushState(IN_ARGS); return COMMAND_BREAKPOINT; }
 
       // command optionally takes and argument has a required block
-    {COMMAND_COMMANDS}          { yypushState(STATE_COMMANDS_LIST); return COMMAND_COMMANDS; }
+    {COMMAND_COMMANDS}          {
+        yypushState(STATE_COMMANDS_LIST);
+        yypushState(IN_ARGS);
+        return COMMAND_COMMANDS;
+      }
 
      // commands require an argument and have a required block
     {COMMAND_USER}            { yypushState(IN_ARGS); return COMMAND_USER; }

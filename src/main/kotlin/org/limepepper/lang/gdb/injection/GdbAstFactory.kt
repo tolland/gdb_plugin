@@ -1,0 +1,21 @@
+package org.limepepper.lang.gdb.injection
+
+import com.intellij.extapi.psi.ASTWrapperPsiElement
+import com.intellij.lang.ASTFactory
+import com.intellij.psi.impl.source.tree.LeafElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.tree.IElementType
+import org.limepepper.lang.gdb.psi.GdbTypes
+import org.limepepper.lang.gdb.injection.GdbPyBlockPsi
+
+class GdbAstFactory : ASTFactory() {
+    override fun createLeaf(type: IElementType, text: CharSequence): LeafElement? {
+        println("type " + type)
+        return if (type == GdbTypes.PYTHON_BLOCK) {
+            println("replacing python block node")
+            return GdbPyBlockPsi(type, text)
+        } else {
+            super.createLeaf(type, text)
+        }
+    }
+}

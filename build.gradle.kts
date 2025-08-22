@@ -47,28 +47,25 @@ sourceSets {
   }
 }
 
-// No-op: disabled sources moved out of source sets
-
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
   testImplementation("org.jetbrains.kotlin:kotlin-test")
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-  
+
   intellijPlatform {
     create("IC", "2025.1")
-    // clion("2025.1.4")
+    // clion("2025.2") // this is the intended target, but is not good for dev
     testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
-//        testFramework(TestFrameworkType.Platform)
-    // Add necessary plugin dependencies for compilation here, example:
     bundledPlugin("com.intellij.java")
     bundledPlugin("com.jetbrains.sh")
-   // plugin("name.kropp.intellij.makefile", "251.23774.318")
-   // plugin("org.intellij.plugins.hcl", "251.23774.426")
-    //plugin("DevKit", "251.23774.460")
-//        plugin("LivePlugin")
+    bundledPlugin("org.intellij.intelliLang")
+    plugin("PythonCore", "251.23774.460")
+//    plugins("org.intellij.intelliLang")
+    // plugin("name.kropp.intellij.makefile", "251.23774.318")
+    // plugin("org.intellij.plugins.hcl", "251.23774.426")
+    // plugin("DevKit", "251.23774.460")
     pluginVerifier()
-//        testFramework(TestFrameworkType.Plugin.Java)
   }
 }
 
@@ -106,14 +103,11 @@ tasks {
     purgeOldFiles.set(true)
   }
 
-//     Configure JFlex lexer generation
   generateLexer {
     sourceFile.set(file("src/main/kotlin/org/limepepper/lang/gdb/lexer/GdbLexer.flex"))
     targetOutputDir.set(file("src/main/gen/org/limepepper/lang/gdb/lexer"))
   }
 
-
-  // Make sure generation happens before compilation
   named("compileKotlin") {
     dependsOn("generateLexer", "generateParser")
   }
@@ -122,7 +116,6 @@ tasks {
     dependsOn("generateLexer", "generateParser")
   }
 
-  // Make sure test compilation also depends on generation
   named("compileTestKotlin") {
     dependsOn("generateLexer", "generateParser")
   }
@@ -193,7 +186,7 @@ tasks {
       "-Didea.auto.reload.plugins=true",
       "-XX:+UnlockDiagnosticVMOptions",
       "-Dide.log.level=DEBUG",
-//            "-Dkotlinx.coroutines.debug=off"
+      // "-Dkotlinx.coroutines.debug=off"
     )
     args(listOf("nosplash"))
     argumentProviders += CommandLineArgumentProvider {
@@ -202,7 +195,6 @@ tasks {
       )
     }
 
-    // Open test project automatically
     systemProperty("idea.auto.reload.plugins", "true")
   }
   test {

@@ -6,7 +6,6 @@ import org.limepepper.lang.gdb.lexer.GdbLexer
 import org.limepepper.lang.gdb.psi.GdbTypes
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.limepepper.lang.gdb.parser.GdbTokenTypes;
 import org.limepepper.lang.gdb.tests.lexer.utils.LexerTestUtils
 
 class PythonLexerTest {
@@ -20,7 +19,7 @@ class PythonLexerTest {
         // LexerTestUtils.printTokens(tokens)
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER })
         assertEquals(GdbTypes.PYTHON_KW, tokens[0].type)
-        assertEquals(GdbTokenTypes.PYTHON_INLINE, tokens[1].type)
+        assertEquals(GdbTypes.PYTHON_INLINE, tokens[1].type)
         assertEquals(GdbTypes.CRLF, tokens[2].type)
     }
     @Test
@@ -33,7 +32,7 @@ class PythonLexerTest {
         // LexerTestUtils.printTokens(tokens)
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER })
         assertEquals(GdbTypes.PYTHON_KW, tokens[0].type)
-        assertEquals(GdbTokenTypes.PYTHON_INLINE, tokens[1].type)
+        assertEquals(GdbTypes.PYTHON_INLINE, tokens[1].type)
         assertEquals(GdbTypes.CRLF, tokens[2].type)
     }
 

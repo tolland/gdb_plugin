@@ -1,4 +1,4 @@
-package org.limepepper.lang.gdb.documentation
+package org.limepepper.lang.gdb.docs
 
 /**
  * Documentation data for GDB commands

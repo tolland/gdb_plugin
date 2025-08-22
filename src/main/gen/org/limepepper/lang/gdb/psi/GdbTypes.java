@@ -22,6 +22,7 @@ public interface GdbTypes {
   IElementType ARG = new GdbTokenType("ARG");
   IElementType ARGS_BLOCK = new GdbTokenType("ARGS_BLOCK");
   IElementType ARROW = new GdbTokenType("->");
+  IElementType ASSIGNMENT = new GdbTokenType("ASSIGNMENT");
   IElementType COLON = new GdbTokenType(":");
   IElementType COMMA = new GdbTokenType(",");
   IElementType COMMAND_BREAKPOINT = new GdbTokenType("COMMAND_BREAKPOINT");
@@ -52,6 +53,7 @@ public interface GdbTypes {
   IElementType LINE_CONTINUATION = new GdbTokenType("LINE_CONTINUATION");
   IElementType LPAREN = new GdbTokenType("(");
   IElementType NUMBER = new GdbTokenType("NUMBER");
+  IElementType OPERATOR = new GdbTokenType("OPERATOR");
   IElementType OP_AND_AND = new GdbTokenType("&&");
   IElementType OP_ASSIGN = new GdbTokenType("=");
   IElementType OP_DIV = new GdbTokenType("/");
@@ -68,6 +70,7 @@ public interface GdbTypes {
   IElementType OP_PIPE = new GdbTokenType("|");
   IElementType OP_PLUS = new GdbTokenType("+");
   IElementType PYTHON_BLOCK = new GdbTokenType("PYTHON_BLOCK");
+  IElementType PYTHON_INLINE = new GdbTokenType("PYTHON_INLINE");
   IElementType PYTHON_KW = new GdbTokenType("python");
   IElementType RBRACE = new GdbTokenType("}");
   IElementType RBRACKET = new GdbTokenType("]");

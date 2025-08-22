@@ -1,13 +1,8 @@
 
-print "using the python extension syntax"
+## python language feature
 
-print "this is some other command"
 
-break main
-
-print "test"
-
-python
+```python
 def switch_inferior_and_continue(x):
     print("switching inferior and continuing")
     gdb.execute("inferior %d" % x)
@@ -22,6 +17,10 @@ def exit_handler(event):
         gdb.post_event(lambda: switch_inferior_and_continue(has_threads[0]))
 
 gdb.events.exited.connect(exit_handler)
-end
+```
 
+```shell
 
+echo "this is some shelll stuff"
+
+```

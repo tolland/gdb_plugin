@@ -77,6 +77,11 @@ class GdbSyntaxHighlighter : SyntaxHighlighterBase() {
             DefaultLanguageHighlighterColors.STRING
         )
 
+        @JvmField val TEXT = TextAttributesKey.createTextAttributesKey(
+            "GDB_TEXT",
+            DefaultLanguageHighlighterColors.STRING
+        )
+
         @JvmField val REGISTER = TextAttributesKey.createTextAttributesKey(
             "GDB_REGISTER",
             DefaultLanguageHighlighterColors.INSTANCE_FIELD
@@ -135,6 +140,7 @@ class GdbSyntaxHighlighter : SyntaxHighlighterBase() {
             tokenType == GdbTypes.REGISTER -> arrayOf(REGISTER)
             tokenType == GdbTypes.HEX_NUMBER -> arrayOf(HEX_NUMBER)
             tokenType == GdbTypes.ARG -> arrayOf(HEX_NUMBER)
+            tokenType == GdbTypes.DOC_BLOCK_LINE -> arrayOf(STRING)
 
             else -> emptyArray()
         }

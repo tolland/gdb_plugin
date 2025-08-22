@@ -1,8 +1,8 @@
 
 # Set up breakpoints for key Epub3Generator methods
 break Epub3Generator::Epub3Generator
-commands $bpnum
-    echo \n=== Epub3Generator Constructor ===\n
+commands 1
+    echo "\n=== Epub3Generator Constructor ===\n"
     bt
     continue
 end
