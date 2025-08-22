@@ -1,12 +1,12 @@
-package org.limepepper.gdb.documentation
+package org.limepepper.lang.gdb.documentation
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.platform.backend.documentation.DocumentationTargetProvider
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.elementType
-import org.limepepper.gdb.parser.GdbTokenTypes
-import org.limepepper.gdb.psi.GdbTypes
+import org.limepepper.lang.gdb.parser.GdbTokenTypes
+import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
  * Documentation target provider that works with file offsets

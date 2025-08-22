@@ -1,4 +1,4 @@
-package org.limepepper.gdb.documentation
+package org.limepepper.lang.gdb.documentation
 
 import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.platform.backend.documentation.PsiDocumentationTargetProvider

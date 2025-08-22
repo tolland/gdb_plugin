@@ -4,7 +4,7 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.util.ProcessingContext
-import org.limepepper.gdb.parser.GdbTokenTypes
+import org.limepepper.lang.gdb.parser.GdbTokenTypes
 
 class GdbCompletionContributor : CompletionContributor() {
     init {

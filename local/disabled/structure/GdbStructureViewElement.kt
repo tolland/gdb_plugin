@@ -1,4 +1,4 @@
-package org.limepepper.gdb.structure
+package org.limepepper.lang.gdb.structure
 
 import com.intellij.ide.projectView.PresentationData
 import com.intellij.ide.structureView.StructureViewTreeElement

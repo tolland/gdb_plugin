@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>org.limepepper.gdb</id>
+    <id>org.limepepper.lang.gdb</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
@@ -28,7 +28,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- File type registration -->
         <fileType name="GDB Script"
-                  implementationClass="org.limepepper.gdb.lang.GdbFileType"
+                  implementationClass="org.limepepper.lang.gdb.GdbFileType"
                   fieldName="INSTANCE"
                   language="GDBScript"
                   extensions="gdb"
@@ -36,19 +36,21 @@
 
         <!-- Parser definition -->
         <lang.parserDefinition language="GDBScript"
-                               implementationClass="org.limepepper.gdb.parser.GdbParserDefinition"/>
+                               implementationClass="org.limepepper.lang.gdb.parser.GdbParserDefinition"/>
 
-        <!-- Disabled optional IDE features during lexer iteration
         <lang.syntaxHighlighterFactory language="GDBScript"
-                                       implementationClass="org.limepepper.gdb.highlighting.GdbSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="org.limepepper.gdb.highlighting.GdbColorSettingsPage"/>
-        <lang.commenter language="GDBScript" implementationClass="org.limepepper.gdb.commenter.GdbCommenter"/>
-        <lang.psiStructureViewFactory language="GDBScript" implementationClass="org.limepepper.gdb.structure.GdbStructureViewFactory"/>
-        <platform.backend.documentation.psiTargetProvider order="first" implementation="org.limepepper.gdb.documentation.GdbPsiDocProvider"/>
-        <platform.backend.documentation.targetProvider order="first" implementation="org.limepepper.gdb.documentation.GdbDocProvider"/>
-        <annotator language="GDBScript" implementationClass="org.limepepper.lang.gdb.annotator.GdbAnnotator"/>
-        <completion.contributor language="GDBScript" implementationClass="org.limepepper.lang.gdb.completion.GdbCompletionContributor"/>
-        -->
+                                       implementationClass="org.limepepper.lang.gdb.highlighting.GdbSyntaxHighlighterFactory"/>
+
+      <!-- Disabled optional IDE features during lexer iteration
+
+      <colorSettingsPage implementation="org.limepepper.lang.gdb.highlighting.GdbColorSettingsPage"/>
+      <lang.commenter language="GDBScript" implementationClass="org.limepepper.lang.gdb.commenter.GdbCommenter"/>
+      <lang.psiStructureViewFactory language="GDBScript" implementationClass="org.limepepper.lang.gdb.structure.GdbStructureViewFactory"/>
+      <platform.backend.documentation.psiTargetProvider order="first" implementation="org.limepepper.lang.gdb.documentation.GdbPsiDocProvider"/>
+      <platform.backend.documentation.targetProvider order="first" implementation="org.limepepper.lang.gdb.documentation.GdbDocProvider"/>
+      <annotator language="GDBScript" implementationClass="org.limepepper.lang.gdb.annotator.GdbAnnotator"/>
+      <completion.contributor language="GDBScript" implementationClass="org.limepepper.lang.gdb.completion.GdbCompletionContributor"/>
+      -->
 
 
     </extensions>
@@ -56,12 +58,17 @@
     <!-- Actions -->
     <!-- Disabled actions during lexer iteration
     <actions>
-        <action id="org.limepepper.gdb.debug.DebugDocumentationAction"
-                class="org.limepepper.gdb.debug.DebugDocumentationAction"
+        <action id="org.limepepper.lang.gdb.debug.DebugDocumentationAction"
+                class="org.limepepper.lang.gdb.debug.DebugDocumentationAction"
                 text="Debug Documentation Providers"
                 description="List all loaded PsiDocumentationTargetProviders in the log">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
     -->
+
+<!--  <applicationListeners>-->
+<!--    <listener topic="com.intellij.ide.plugins.DynamicPluginListener"-->
+<!--              class="org.limepepper.lang.gdb.internal.GdbPluginListener" />-->
+<!--  </applicationListeners>-->
 </idea-plugin>

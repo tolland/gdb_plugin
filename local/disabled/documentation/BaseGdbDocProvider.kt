@@ -1,8 +1,8 @@
-package org.limepepper.gdb.documentation
+package org.limepepper.lang.gdb.documentation
 
 import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.psi.PsiElement
-import org.limepepper.gdb.psi.GdbPsiElement
+import org.limepepper.lang.gdb.psi.GdbPsiElement
 
 internal abstract class BaseGdbDocProvider {
 

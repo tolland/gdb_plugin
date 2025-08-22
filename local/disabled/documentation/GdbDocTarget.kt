@@ -1,4 +1,4 @@
-package org.limepepper.gdb.documentation
+package org.limepepper.lang.gdb.documentation
 
 import com.intellij.model.Pointer
 import com.intellij.platform.backend.documentation.DocumentationResult
@@ -7,8 +7,8 @@ import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.createSmartPointer
 import com.intellij.psi.util.elementType
-import org.limepepper.gdb.parser.GdbTokenTypes
-import org.limepepper.gdb.psi.GdbTypes
+import org.limepepper.lang.gdb.parser.GdbTokenTypes
+import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
  * Documentation target for GDB language elements using the modern API

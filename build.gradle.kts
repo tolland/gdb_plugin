@@ -19,7 +19,7 @@ grammarKit {
 //    // jflexRelease.set("1.7.0-2")
 }
 
-group = "org.limepepper"
+group = "org.limepepper.lang"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -37,6 +37,14 @@ sourceSets {
       srcDirs("src/main/gen")
     }
   }
+  test {
+    java {
+      srcDirs("src/main/gen")
+    }
+    kotlin {
+      srcDirs("src/test/kotlin")
+    }
+  }
 }
 
 // No-op: disabled sources moved out of source sets
@@ -44,18 +52,20 @@ sourceSets {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
+  testImplementation("org.jetbrains.kotlin:kotlin-test")
+  testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+  
   intellijPlatform {
     create("IC", "2025.1")
     // clion("2025.1.4")
     testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
 //        testFramework(TestFrameworkType.Platform)
     // Add necessary plugin dependencies for compilation here, example:
     bundledPlugin("com.intellij.java")
     bundledPlugin("com.jetbrains.sh")
-    plugin("name.kropp.intellij.makefile", "251.23774.318")
-    plugin("org.intellij.plugins.hcl", "251.23774.426")
-    plugin("DevKit", "251.23774.460")
+   // plugin("name.kropp.intellij.makefile", "251.23774.318")
+   // plugin("org.intellij.plugins.hcl", "251.23774.426")
+    //plugin("DevKit", "251.23774.460")
 //        plugin("LivePlugin")
     pluginVerifier()
 //        testFramework(TestFrameworkType.Plugin.Java)
@@ -89,27 +99,36 @@ intellijPlatform {
 
 tasks {
   generateParser {
-    sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/parser/Gdb.bnf"))
+    sourceFile.set(file("src/main/kotlin/org/limepepper/lang/gdb/parser/Gdb.bnf"))
     targetRootOutputDir.set(file("src/main/gen"))
-    pathToParser.set("org/limepepper/gdb/parser/GdbParser.java")
-    pathToPsiRoot.set("org/limepepper/gdb/psi")
+    pathToParser.set("org/limepepper/lang/gdb/parser/GdbParser.java")
+    pathToPsiRoot.set("org/limepepper/lang/gdb/psi")
     purgeOldFiles.set(true)
   }
 
 //     Configure JFlex lexer generation
   generateLexer {
-    sourceFile.set(file("src/main/kotlin/org/limepepper/gdb/lexer/GdbLexer.flex"))
-    targetOutputDir.set(file("src/main/gen/org/limepepper/gdb/lexer"))
+    sourceFile.set(file("src/main/kotlin/org/limepepper/lang/gdb/lexer/GdbLexer.flex"))
+    targetOutputDir.set(file("src/main/gen/org/limepepper/lang/gdb/lexer"))
   }
 
 
   // Make sure generation happens before compilation
   named("compileKotlin") {
-    dependsOn("generateLexer")
+    dependsOn("generateLexer", "generateParser")
   }
 
   named("compileJava") {
-    dependsOn("generateLexer")
+    dependsOn("generateLexer", "generateParser")
+  }
+
+  // Make sure test compilation also depends on generation
+  named("compileTestKotlin") {
+    dependsOn("generateLexer", "generateParser")
+  }
+
+  named("compileTestJava") {
+    dependsOn("generateLexer", "generateParser")
   }
 
   // Set the JVM compatibility versions

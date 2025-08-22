@@ -6,7 +6,7 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import org.limepepper.gdb.psi.GdbCommandStatement
+import org.limepepper.lang.gdb.psi.GdbCommandStatement
 
 class GdbAnnotator : Annotator {
     override fun annotate(

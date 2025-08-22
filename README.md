@@ -59,3 +59,99 @@ $2 = void
 ## early initialization
 
 >  Only set or source commands should be placed into an early initialization file, and the only set commands that can be used are those that control how GDB starts up.
+
+
+## gdb syntax structures
+
+
+gdb is pretty flexible, that makes it complicated to lex.
+
+### basic structure
+
+> A GDB command is a single line of input. There is no limit on how long it can be. It starts with a command name, which is followed by arguments whose meaning depends on the command name. For example, the command step accepts an argument which is the number of times to step, as in ‘step 5’. You can also use the step command with no arguments. Some commands do not allow any arguments.
+<https://sourceware.org/gdb/current/onlinedocs/gdb.html/Command-Syntax.html#Command-Syntax>
+
+```gdb
+cont
+step
+s
+```
+
+### command abbreviation
+
+> You can abbreviate a GDB command to the first few letters of the command name, if that abbreviation is unambiguous;
+<https://sourceware.org/gdb/current/onlinedocs/gdb.html/Commands.html#Commands>
+
+
+```gdb
+b main
+br main
+bre main
+break main
+```
+
+are all valid
+
+
+### flexible white space
+
+
+```gdb
+(gdb) define myfunc2
+Type commands for definition of "myfunc2".
+End with a line saying just "end".
+>print "myfunc2"
+>    end
+(gdb) myfunc2
+$5 = "myfunc2"
+(gdb)
+// end has trailing whitespace, is valid. no trailing comments though
+```
+
+## lexer used by live preview
+
+
+- matches regexp on the first hit, so `COMMAND_PRINT='regexp:(print|p)` needs to be in that order to allow print to hit before p
+
+
+## jflex macros
+
+> The regular expression on the right hand side must be well formed and must not contain the ^, / or $ operators.
+
+## jflex lookaheads
+
+### lookahead
+
+```
+<YYINITIAL> {IDENTIFIER} / (".")  {
+    if (ArrayUtil.find(CfmlUtil.getVariableScopes(myProject), StringUtil.toLowerCase(yytext().toString())) != -1) {
+        return CfscriptTokenTypes.SCOPE_KEYWORD;
+    } else {
+        return CfscriptTokenTypes.IDENTIFIER;
+    }
+ }
+```
+
+
+```
+  {LineTerminator} / {WhiteSpace}? ":" {Identifier} {
+    endBlockOrContinueOnNewline();
+    startBlock(JadeTokenTypes.FILTER_CODE, BlockInfo.State.PREDICTED);
+    return doRegularEol();
+  }
+```
+
+### up and including
+
+```
+  ~"}}" {
+      // backtrack over any extra stache characters at the end of this string
+      while (yylength() > 2 && yytext().subSequence(yylength() - 3, yylength()).toString().equals("}}}")) {
+        yypushback(1);
+      }
+
+      yypushback(2);
+      yybegin(comment_end);
+      return HbTokenTypes.COMMENT_CONTENT;
+  }
+```

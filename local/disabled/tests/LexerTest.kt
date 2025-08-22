@@ -1,11 +1,11 @@
-package org.limepepper.gdb.tests
+package org.limepepper.lang.gdb.tests
 
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import org.junit.Before
 import org.junit.Test
-import org.limepepper.gdb.lexer.GdbLexer
-import org.limepepper.gdb.psi.GdbTypes
+import org.limepepper.lang.gdb.lexer.GdbLexer
+import org.limepepper.lang.gdb.psi.GdbTypes
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

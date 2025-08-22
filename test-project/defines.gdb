@@ -16,7 +16,7 @@ define mycommand
   end
 end
 
-print "Somerthing here"
+print "Something here"
 
 document mycommand
 Source file and execute command in it

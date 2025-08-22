@@ -1,12 +1,12 @@
-package org.limepepper.gdb.documentation
+package org.limepepper.lang.gdb.documentation
 
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import org.limepepper.gdb.lang.GdbLanguage
-import org.limepepper.gdb.parser.GdbTokenTypes
+import org.limepepper.lang.gdb.lang.GdbLanguage
+import org.limepepper.lang.gdb.parser.GdbTokenTypes
 
 /**
  * Traditional DocumentationProvider for GDB language
