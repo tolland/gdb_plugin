@@ -23,6 +23,6 @@ public interface GdbCommandsBlock extends PsiElement {
   GdbCommandsBlockStart getCommandsBlockStart();
 
   @NotNull
-  List<GdbTextBlock> getTextBlockList();
+  List<GdbDocBlock> getDocBlockList();
 
 }

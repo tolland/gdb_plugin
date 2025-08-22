@@ -4,7 +4,6 @@ package org.limepepper.lang.gdb.lexer;
 import com.intellij.lexer.FlexLexer;
 
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.TokenType;
 import com.intellij.util.containers.Stack;
 import org.limepepper.lang.gdb.parser.GdbTokenTypes;
 
@@ -141,7 +140,7 @@ ENDLINE_BODY=\s*end\s*
 %state STATE_PYTHON_BLOCK
 %state PYTHON_BLOCK_BODY
 %state STATE_PYTHON_INLINE
-%state TEXT_BLOCK
+%state IN_TEXT_BLOCK
 %state IN_ARGS
 %state STATE_DEFINE_BODY
 %state STATE_COMMANDS_LIST
@@ -271,12 +270,15 @@ ENDLINE_BODY=\s*end\s*
       }
 }
 
-<TEXT_BLOCK> {
-    // the [^]+ is required to ensure the match can't be an empty string
-    [^]+ !([^]* {CRLF}{ENDLINE_BODY}{CRLF} [^]*) {CRLF} / {ENDLINE_BODY}{CRLF}? {
-        yybegin(END_TOKEN);
-        return DOC_BLOCK;
-      }
+<IN_TEXT_BLOCK> {
+  /* Standalone 'end' line: optional indent + 'end' + optional trailing spaces + optional newline */
+  ^{WHITE_SPACE}*end{WHITE_SPACE}*{CRLF}?   { yypopState(); return END; }
+
+  /* Any other full line */
+  [^\r\n]*{CRLF}          { return DOC_BLOCK_LINE; }
+
+  /* Last partial line before EOF */
+  [^\r\n]+                { return DOC_BLOCK_LINE; }
 }
 
 <END_TOKEN> {
@@ -293,7 +295,7 @@ ENDLINE_BODY=\s*end\s*
     \"                        { stringStart = zzStartRead; yypushState(STATE_D_STRING, zzStartRead, -1); }
 
     // Check for end keyword to pop back
-    {END}                     { yypopState(); return END; }
+//    {END}                     { yypopState(); return END; }
     {CRLF}                    { yypopState(); return CRLF;  }
 
     // Whitespace and comments
@@ -391,10 +393,10 @@ ENDLINE_BODY=\s*end\s*
     {COMMAND_CONTROL}            { yypushState(IN_ARGS); return COMMAND_CONTROL; }
       //     {DOC_KW}{WHITE_SPACE}{IDENTIFIER}{CRLF}       { blockStart = zzStartRead; yypushState(STATE_DOC_BLOCK); return DOC_BLOCK; }
     {COMMAND_DOCUMENT}            {
-        yypushState(TEXT_BLOCK);
-        yypushState(IN_ARGS);
-        return COMMAND_DOCUMENT;
-      }
+            yypushState(IN_TEXT_BLOCK);
+            yypushState(IN_ARGS);
+            return COMMAND_DOCUMENT;
+          }
 
     // catch all for unknown commands. If a block command matches this it
     // will run to end before failing

@@ -15,7 +15,8 @@ public interface GdbTypes {
   IElementType COMMAND_ARGUMENT = new GdbElementType("COMMAND_ARGUMENT");
   IElementType COMMAND_NAME = new GdbElementType("COMMAND_NAME");
   IElementType COMMAND_STATEMENT = new GdbElementType("COMMAND_STATEMENT");
-  IElementType TEXT_BLOCK = new GdbElementType("TEXT_BLOCK");
+  IElementType DOC_BLOCK = new GdbElementType("DOC_BLOCK");
+  IElementType DOC_BLOCK_BODY = new GdbElementType("DOC_BLOCK_BODY");
   IElementType TEXT_BLOCK_START = new GdbElementType("TEXT_BLOCK_START");
 
   IElementType ARG = new GdbTokenType("ARG");
@@ -38,7 +39,7 @@ public interface GdbTypes {
   IElementType COMMAND_USER = new GdbTokenType("COMMAND_USER");
   IElementType COMMENT = new GdbTokenType("comment");
   IElementType CRLF = new GdbTokenType("CRLF");
-  IElementType DOC_BLOCK = new GdbTokenType("DOC_BLOCK");
+  IElementType DOC_BLOCK_LINE = new GdbTokenType("DOC_BLOCK_LINE");
   IElementType DOT = new GdbTokenType(".");
   IElementType DOUBLE_QUOTED_STRING = new GdbTokenType("DOUBLE_QUOTED_STRING");
   IElementType END = new GdbTokenType("end");
@@ -102,8 +103,11 @@ public interface GdbTypes {
       else if (type == COMMAND_STATEMENT) {
         return new GdbCommandStatementImpl(node);
       }
-      else if (type == TEXT_BLOCK) {
-        return new GdbTextBlockImpl(node);
+      else if (type == DOC_BLOCK) {
+        return new GdbDocBlockImpl(node);
+      }
+      else if (type == DOC_BLOCK_BODY) {
+        return new GdbDocBlockBodyImpl(node);
       }
       else if (type == TEXT_BLOCK_START) {
         return new GdbTextBlockStartImpl(node);

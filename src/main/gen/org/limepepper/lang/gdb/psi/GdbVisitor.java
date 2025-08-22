@@ -35,7 +35,11 @@ public class GdbVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTextBlock(@NotNull GdbTextBlock o) {
+  public void visitDocBlock(@NotNull GdbDocBlock o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDocBlockBody(@NotNull GdbDocBlockBody o) {
     visitPsiElement(o);
   }
 

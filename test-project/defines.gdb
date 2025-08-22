@@ -34,3 +34,5 @@ define adder
     print $arg0 + $arg1 + $arg2
   end
 end
+
+# test

@@ -59,8 +59,8 @@ public class GdbCommandsBlockImpl extends GdbPsiElement implements GdbCommandsBl
 
   @Override
   @NotNull
-  public List<GdbTextBlock> getTextBlockList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, GdbTextBlock.class);
+  public List<GdbDocBlock> getDocBlockList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, GdbDocBlock.class);
   }
 
 }

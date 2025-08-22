@@ -229,6 +229,63 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // text_block_start command_argument* {CRLF}? doc_block_body END
+  public static boolean doc_block(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_block")) return false;
+    if (!nextTokenIs(builder_, COMMAND_DOCUMENT)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = text_block_start(builder_, level_ + 1);
+    result_ = result_ && doc_block_1(builder_, level_ + 1);
+    result_ = result_ && doc_block_2(builder_, level_ + 1);
+    result_ = result_ && doc_block_body(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, END);
+    exit_section_(builder_, marker_, DOC_BLOCK, result_);
+    return result_;
+  }
+
+  // command_argument*
+  private static boolean doc_block_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_block_1")) return false;
+    while (true) {
+      int pos_ = current_position_(builder_);
+      if (!command_argument(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "doc_block_1", pos_)) break;
+    }
+    return true;
+  }
+
+  // {CRLF}?
+  private static boolean doc_block_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_block_2")) return false;
+    consumeToken(builder_, CRLF);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // doc_block_lines
+  public static boolean doc_block_body(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_block_body")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, DOC_BLOCK_BODY, "<doc block body>");
+    result_ = doc_block_lines(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, result_, false, null);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // DOC_BLOCK_LINE*
+  static boolean doc_block_lines(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "doc_block_lines")) return false;
+    while (true) {
+      int pos_ = current_position_(builder_);
+      if (!consumeToken(builder_, DOC_BLOCK_LINE)) break;
+      if (!empty_element_parsed_guard_(builder_, "doc_block_lines", pos_)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
   // statement*
   static boolean gdbFile(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "gdbFile")) return false;
@@ -244,7 +301,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
   // CRLF
   //             | comment
   //             | commands_block
-  //             | text_block
+  //             | doc_block
   //             | code_block
   //             | command_statement
   static boolean statement(PsiBuilder builder_, int level_) {
@@ -253,47 +310,10 @@ public class GdbParser implements PsiParser, LightPsiParser {
     result_ = consumeToken(builder_, CRLF);
     if (!result_) result_ = consumeToken(builder_, COMMENT);
     if (!result_) result_ = commands_block(builder_, level_ + 1);
-    if (!result_) result_ = text_block(builder_, level_ + 1);
+    if (!result_) result_ = doc_block(builder_, level_ + 1);
     if (!result_) result_ = code_block(builder_, level_ + 1);
     if (!result_) result_ = command_statement(builder_, level_ + 1);
     return result_;
-  }
-
-  /* ********************************************************** */
-  // text_block_start command_argument* DOC_BLOCK* END
-  public static boolean text_block(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "text_block")) return false;
-    if (!nextTokenIs(builder_, COMMAND_DOCUMENT)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = text_block_start(builder_, level_ + 1);
-    result_ = result_ && text_block_1(builder_, level_ + 1);
-    result_ = result_ && text_block_2(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, END);
-    exit_section_(builder_, marker_, TEXT_BLOCK, result_);
-    return result_;
-  }
-
-  // command_argument*
-  private static boolean text_block_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "text_block_1")) return false;
-    while (true) {
-      int pos_ = current_position_(builder_);
-      if (!command_argument(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "text_block_1", pos_)) break;
-    }
-    return true;
-  }
-
-  // DOC_BLOCK*
-  private static boolean text_block_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "text_block_2")) return false;
-    while (true) {
-      int pos_ = current_position_(builder_);
-      if (!consumeToken(builder_, DOC_BLOCK)) break;
-      if (!empty_element_parsed_guard_(builder_, "text_block_2", pos_)) break;
-    }
-    return true;
   }
 
   /* ********************************************************** */

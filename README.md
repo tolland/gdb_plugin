@@ -155,3 +155,35 @@ $5 = "myfunc2"
       return HbTokenTypes.COMMENT_CONTENT;
   }
 ```
+
+### attempting lexing multiple line blocks is bad
+
+the negative lookahead is not well-supported. so trying to do multi line except
+in cases like line continuation characters is bad.
+
+```
+// the [^]+ is required to ensure the match can't be an empty string
+[^]+ !([^]* {CRLF}{ENDLINE_BODY}{CRLF} [^]*) {CRLF} / {ENDLINE_BODY}{CRLF}? {
+    yybegin(END_TOKEN);
+    return DOC_BLOCK;
+  }
+```
+
+This matches the longest match, not the one we want. so have to fall back to successive line based BLOCKS. not the end of the world
+
+## flip back and forth with end
+
+```
+<HERE_DOC_END_MARKER> {
+  {WhiteSpace}+                   { if (!heredocWithWhiteSpaceIgnore) yybegin(HERE_DOC_BODY); return HEREDOC_CONTENT; }
+  {HeredocMarker}+                { if (yytext().toString().equals(heredocMarker))
+                                  { heredocMarker = null; heredocWithWhiteSpaceIgnore = false; popState(); return HEREDOC_MARKER_END; }
+                                    else { yypushback(yylength()); yybegin(HERE_DOC_BODY); } }
+  [^]                             { yypushback(yylength()); yybegin(HERE_DOC_BODY); }
+}
+
+<HERE_DOC_BODY> {
+    {InputCharacter}+             { return HEREDOC_CONTENT; }
+    {LineTerminator}              { yybegin(HERE_DOC_END_MARKER); return HEREDOC_CONTENT; }
+}
+```

@@ -17,7 +17,7 @@
 
     PYTHON_KW = 'python'
     GUILE_KW = 'guile'
-    DOC_BLOCK = 'regexp:document\n.*?(end\b)'
+    DOC_BLOCK_LINE = 'regexp:"([^"\\]|\\.)*"'
     PYTHON_BLOCK = 'regexp:python\n.*?(end\b)'
     GUILE_BLOCK = 'regexp:guile\n.*?(end\b)'
     ARGS_BLOCK = 'regexp:args\n.*?(end\b)'
@@ -128,7 +128,7 @@ gdbFile ::= statement*
 private statement ::= (CRLF
             | comment
             | commands_block
-            | text_block
+            | doc_block
             | code_block
             | command_statement
             )
@@ -157,11 +157,15 @@ commands_block_start ::= COMMAND_COMMANDS
                       | COMMAND_CONTROL
 
 commands_block ::= commands_block_start command_argument* statement* END
-text_block ::= text_block_start command_argument* DOC_BLOCK* END
-code_block ::= code_block_start command_argument* PYTHON_BLOCK* END
 
+// free text that occurs in document block body
 text_block_start ::= COMMAND_DOCUMENT
+private doc_block_lines ::= DOC_BLOCK_LINE*
+doc_block_body ::= doc_block_lines
+doc_block ::= text_block_start command_argument* {CRLF}? doc_block_body END
 
+// code blocks such as guile and python
+code_block ::= code_block_start command_argument* PYTHON_BLOCK* END
 code_block_start ::= PYTHON_KW
                     | GUILE_KW
 
