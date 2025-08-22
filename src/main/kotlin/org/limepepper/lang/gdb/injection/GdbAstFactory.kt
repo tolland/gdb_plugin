@@ -11,9 +11,10 @@ import org.limepepper.lang.gdb.injection.GdbPyBlockPsi
 class GdbAstFactory : ASTFactory() {
     override fun createLeaf(type: IElementType, text: CharSequence): LeafElement? {
         println("type " + type)
-        return if (type == GdbTypes.PYTHON_BLOCK) {
+        return if (type == GdbTypes.PYTHON_BLOCK || type == GdbTypes.PYTHON_BLOCK_LINE) {
             println("replacing python block node")
-            return GdbPyBlockPsi(type, text)
+            // Use PYTHON_BLOCK as the type for the PSI element regardless of input type
+            return GdbPyBlockPsi(GdbTypes.PYTHON_BLOCK, text)
         } else {
             super.createLeaf(type, text)
         }

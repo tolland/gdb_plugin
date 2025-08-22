@@ -30,12 +30,6 @@ This is a JetBrains IntelliJ Platform plugin written in Kotlin that provides GDB
 ./gradlew runIde                  # Run plugin in development IDE instance
 ```
 
-**Development:**
-```bash
-./gradlew verifyPlugin            # Verify plugin structure and compatibility
-./gradlew publishPlugin           # Publish to JetBrains marketplace (requires token)
-```
-
 ## Architecture
 
 The plugin follows IntelliJ Platform's language support architecture with these key components:

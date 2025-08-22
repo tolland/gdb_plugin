@@ -6,9 +6,12 @@ import com.intellij.psi.tree.TokenSet
 import org.limepepper.lang.gdb.psi.GdbTypes
 
 /**
- * Adapter for the JFlex-generated GDB lexer
+ * Lexer adapter that merges consecutive PYTHON_BLOCK_LINE and DOC_BLOCK_LINE tokens
  */
 class GdbLexerAdapter : MergingLexerAdapter(
-    FlexAdapter(GdbLexer(null)),                 // your generated JFlex lexer
-    TokenSet.create(GdbTypes.DOC_BLOCK_LINE)
+    FlexAdapter(GdbLexer(null)),
+    TokenSet.create(
+        GdbTypes.DOC_BLOCK_LINE,
+        GdbTypes.PYTHON_BLOCK_LINE
+    )
 )

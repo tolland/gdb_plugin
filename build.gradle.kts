@@ -198,6 +198,7 @@ tasks {
     systemProperty("idea.auto.reload.plugins", "true")
   }
   test {
+    systemProperty("LEXER_DEBUG", "true")
     this.testLogging {
       this.showStandardStreams = true
     }

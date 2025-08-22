@@ -136,8 +136,7 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 ENDLINE_BODY=\s*end\s*
 
 %state STATE_D_STRING
-%state STATE_PYTHON_BLOCK
-%state PYTHON_BLOCK_BODY
+%state IN_PYTHON_BLOCK
 %state STATE_PYTHON_INLINE
 %state IN_TEXT_BLOCK
 %state IN_ARGS
@@ -145,12 +144,14 @@ ENDLINE_BODY=\s*end\s*
 %state STATE_COMMANDS_LIST
 %state STATE_COMMENT_CONTINUATION
 %state ARGS_AND_BLOCK
-%state END_TOKEN
 
 %{
     public GdbLexer() {
       this((java.io.Reader)null);
     }
+
+    // preserve FlexLexer import
+    FlexLexer dummyFlex = null;
 
     public record StackState (int stack, int start, int next) {}
 
@@ -234,21 +235,6 @@ ENDLINE_BODY=\s*end\s*
     [^]                { /* consume any other character */ }
 }
 
-// Python block handling - consume everything until 'end' at start of line
-<STATE_PYTHON_BLOCK> {
-  ^end / [^a-zA-Z0-9_] {
-    yypopState();
-    return PYTHON_BLOCK;
-  }
-}
-
-<PYTHON_BLOCK_BODY> {
-    [^]+ !([^]* {CRLF}{ENDLINE_BODY}{CRLF} [^]*) {CRLF} / {ENDLINE_BODY}{CRLF}? {
-        yybegin(END_TOKEN);
-        return PYTHON_BLOCK;
-      }
-}
-
 <STATE_PYTHON_INLINE> {
 //    [^]                 { /* consume any character */ }
       [^\r\n\\]+           { return PYTHON_INLINE; }
@@ -257,6 +243,16 @@ ENDLINE_BODY=\s*end\s*
        <<EOF>>             {  yypopState();
                            return PYTHON_INLINE;
       }
+}
+
+<IN_PYTHON_BLOCK> {
+  ^{WHITE_SPACE}*end{WHITE_SPACE}*{CRLF}?   { yypopState(); return END; }
+
+  /* Any other full line */
+  [^\r\n]*{CRLF}          { return PYTHON_BLOCK_LINE; }
+
+  /* Last partial line before EOF */
+  [^\r\n]+                { return PYTHON_BLOCK_LINE; }
 }
 
 <IN_TEXT_BLOCK> {
@@ -268,12 +264,6 @@ ENDLINE_BODY=\s*end\s*
 
   /* Last partial line before EOF */
   [^\r\n]+                { return DOC_BLOCK_LINE; }
-}
-
-<END_TOKEN> {
-    {CRLF}                    { return CRLF; }
-    {WHITE_SPACE}             { return WHITE_SPACE; }
-    end                       { yypopState(); return END; }
 }
 
 // processing the args, subcommands and options of a command
@@ -338,17 +328,6 @@ ENDLINE_BODY=\s*end\s*
 
     {END}               { return END; }
 
-    // Language block transitions
-    {PYTHON_KW} / {WHITE_SPACE}*{CRLF} {
-      yypushState(PYTHON_BLOCK_BODY);
-      return PYTHON_KW;
-     }
-    // Single-line python (followed by non-newline content)
-    {PYTHON_KW}{WHITE_SPACE}+ / [^\r\n] {
-        yypushState(STATE_PYTHON_INLINE);
-        return PYTHON_KW;
-    }
-
     // Whitespace and comments
     {WHITE_SPACE}       { return WHITE_SPACE; }
     {COMMENT_WITH_CONTINUATION} { commentStart = zzStartRead; yypushState(STATE_COMMENT_CONTINUATION); }
@@ -390,6 +369,13 @@ ENDLINE_BODY=\s*end\s*
             yypushState(IN_ARGS);
             return COMMAND_DOCUMENT;
           }
+
+    // Language block transitions
+    {PYTHON_KW}                  {
+          yypushState(IN_PYTHON_BLOCK);
+          yypushState(IN_ARGS);
+          return PYTHON_KW;
+         }
 
     // catch all for unknown commands. If a block command matches this it
     // will run to end before failing

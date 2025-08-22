@@ -141,6 +141,16 @@ $5 = "myfunc2"
   }
 ```
 
+this one doesn't work
+```
+<PYTHON_BLOCK_BODY> {
+    [^]+ !([^]* {CRLF}{ENDLINE_BODY}{CRLF} [^]*) {CRLF} / {ENDLINE_BODY}{CRLF}? {
+        yybegin(END_TOKEN);
+        return PYTHON_BLOCK;
+      }
+}
+```
+
 ### up and including
 
 ```

@@ -36,7 +36,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // code_block_start command_argument* PYTHON_BLOCK* END
+  // code_block_start command_argument* PYTHON_BLOCK_LINE* END
   public static boolean code_block(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "code_block")) return false;
     if (!nextTokenIs(builder_, "<code block>", GUILE_KW, PYTHON_KW)) return false;
@@ -61,12 +61,12 @@ public class GdbParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // PYTHON_BLOCK*
+  // PYTHON_BLOCK_LINE*
   private static boolean code_block_2(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "code_block_2")) return false;
     while (true) {
       int pos_ = current_position_(builder_);
-      if (!consumeToken(builder_, PYTHON_BLOCK)) break;
+      if (!consumeToken(builder_, PYTHON_BLOCK_LINE)) break;
       if (!empty_element_parsed_guard_(builder_, "code_block_2", pos_)) break;
     }
     return true;

@@ -30,6 +30,18 @@ object LexerTestUtils {
         return tokens
     }
 
+    fun tokenizeWithAdapter(content: String, lexer: com.intellij.lexer.Lexer): List<TokenInfo> {
+        val tokens = mutableListOf<TokenInfo>()
+        lexer.start(content, 0, content.length, 0)
+        while (lexer.tokenType != null) {
+            val text = content.substring(lexer.tokenStart, lexer.tokenEnd)
+            tokens.add(TokenInfo(lexer.tokenType!!, text, lexer.tokenStart, lexer.tokenEnd))
+            lexer.advance()
+        }
+        if (DEBUG) printTokens(tokens)
+        return tokens
+    }
+
     fun printTokens(tokens: List<TokenInfo>) {
         println("==== TOKENS (${tokens.size}) ====")
         var nonWhitespaceIndex = 0

@@ -70,6 +70,7 @@ public interface GdbTypes {
   IElementType OP_PIPE = new GdbTokenType("|");
   IElementType OP_PLUS = new GdbTokenType("+");
   IElementType PYTHON_BLOCK = new GdbTokenType("PYTHON_BLOCK");
+  IElementType PYTHON_BLOCK_LINE = new GdbTokenType("PYTHON_BLOCK_LINE");
   IElementType PYTHON_INLINE = new GdbTokenType("PYTHON_INLINE");
   IElementType PYTHON_KW = new GdbTokenType("python");
   IElementType RBRACE = new GdbTokenType("}");
