@@ -11,14 +11,14 @@ import static org.limepepper.lang.gdb.psi.GdbTypes.*;
 import org.limepepper.lang.gdb.psi.GdbPsiElement;
 import org.limepepper.lang.gdb.psi.*;
 
-public class GdbCodeBlockImpl extends GdbPsiElement implements GdbCodeBlock {
+public class GdbPythonCodeBlockImpl extends GdbPsiElement implements GdbPythonCodeBlock {
 
-  public GdbCodeBlockImpl(ASTNode node) {
+  public GdbPythonCodeBlockImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull GdbVisitor visitor) {
-    visitor.visitCodeBlock(this);
+    visitor.visitPythonCodeBlock(this);
   }
 
   @Override
@@ -28,27 +28,9 @@ public class GdbCodeBlockImpl extends GdbPsiElement implements GdbCodeBlock {
   }
 
   @Override
-  @NotNull
-  public GdbCodeBlockStart getCodeBlockStart() {
-    return findNotNullChildByClass(GdbCodeBlockStart.class);
-  }
-
-  @Override
-  @NotNull
-  public List<GdbCommandArgument> getCommandArgumentList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, GdbCommandArgument.class);
-  }
-
-  @Override
-  @NotNull
-  public GdbPythonCodeBlock getPythonCodeBlock() {
-    return findNotNullChildByClass(GdbPythonCodeBlock.class);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getCrlf() {
-    return findNotNullChildByType(CRLF);
+  @Nullable
+  public PsiElement getPythonBlock() {
+    return findChildByType(PYTHON_BLOCK);
   }
 
 }

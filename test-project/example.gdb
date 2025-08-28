@@ -1,6 +1,8 @@
 # GDB test script demonstrating syntax highlighting
 # This file shows different command categories and syntax elements
 
+break -label LABEL
+
 # GDB script for debugging Epub3Generator
 
 # set in the form key = value

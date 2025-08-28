@@ -43,6 +43,10 @@ public class GdbVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPythonCodeBlock(@NotNull GdbPythonCodeBlock o) {
+    visitPsiElement(o);
+  }
+
   public void visitTextBlockStart(@NotNull GdbTextBlockStart o) {
     visitPsiElement(o);
   }

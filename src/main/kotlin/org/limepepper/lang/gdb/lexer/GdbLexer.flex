@@ -21,6 +21,9 @@ import static org.limepepper.lang.gdb.psi.GdbTypes.*;
 
 // Basic patterns
 WHITE_SPACE=[ \t]+
+LineTerminator           = \r\n | \r | \n
+LineContinuation         = "\\" {LineTerminator}
+WS               = [ \t\f] {LineContinuation}*
 CRLF=(\r\n|\n|\r)
 COMMENT_WITH_CONTINUATION=#[^\r\n]*\\{CRLF}
 COMMENT=#[^\r\n]*
@@ -94,8 +97,14 @@ With no LOCATION, uses current execution address of the selected
 stack frame.  This is useful for breaking on return to a stack frame.
  */
 COMMAND_BREAKPOINT=(b|br|bre|brea|break|until|unti|unt)
+
 COMMAND_STACK=(backtrace|bt|f|frame|up|down|select-frame)
-COMMAND_DATA=(display|output|printf|call|return|examine|i|info|show|l|list|disassemble|disas)
+
+COMMAND_STATUS=(show|info|i)
+
+COMMAND_FILES=(cd|core-file|directory|exec-file)
+
+COMMAND_DATA=(display|output|printf|call|return|examine|l|list|disassemble|disas)
 /**
 (gdb) help source
 Read commands from a file named FILE.
@@ -108,7 +117,8 @@ Usage: source [-s] [-v] FILE
 Note that the file ".gdbinit" is read automatically in this way
 when GDB is started.
  */
-COMMAND_CONFIG=(unset|source|exec-file|symbol-file|core-file|target|attach|load)
+COMMAND_CONFIG=(unset|source|symbol-file|core-file|target|attach|load)
+
 COMMAND_PRINT=(print|p)
 // user defined commands
 /*
@@ -136,6 +146,8 @@ WORD=[^#\s\"\\(){}\[\]=,;:.>-]+
 ENDLINE_BODY=\s*end\s*
 
 %state STATE_D_STRING
+%state IS_PYTHON_INLINE
+%state IN_PYTHON_INLINE
 %state IN_PYTHON_BLOCK
 %state STATE_PYTHON_INLINE
 %state IN_TEXT_BLOCK
@@ -153,11 +165,8 @@ ENDLINE_BODY=\s*end\s*
     // preserve FlexLexer import
     FlexLexer dummyFlex = null;
 
-    public record StackState (int stack, int start, int next) {}
-
     // track state for popping back (from handlebars.flex)
     private Stack<Integer> stack = new Stack<>();
-    private Stack<StackState> stackState = new Stack<>();
 
     // Track start of a multi-line (continued) comment so we can return a single COMMENT token
     private int commentStart = -1;
@@ -170,7 +179,6 @@ ENDLINE_BODY=\s*end\s*
       int currentState = yystate();
       assert currentState != YYINITIAL || stack.empty() : "Can't push initial state into the not empty stack";
       stack.push(currentState);
-      stackState.push(new StackState(currentState,start,next));
       yybegin(newState);
     }
 
@@ -186,13 +194,6 @@ ENDLINE_BODY=\s*end\s*
         yypopState();
         zzStartRead = stringStart;
         return DOUBLE_QUOTED_STRING;
-    }
-
-    private IElementType finishPythonBlockPushbackEnd() {
-        // push back matched 'end' so it will be lexed by parent state
-        yypopState();
-        yypushback(yylength());
-        return PYTHON_BLOCK;
     }
 
     private IElementType finishArgsBlock() {
@@ -235,24 +236,48 @@ ENDLINE_BODY=\s*end\s*
     [^]                { /* consume any other character */ }
 }
 
-<STATE_PYTHON_INLINE> {
-//    [^]                 { /* consume any character */ }
-      [^\r\n\\]+           { return PYTHON_INLINE; }
-    {CRLF}                 { yypopState(); return CRLF; }
-      {WHITE_SPACE}        { return WHITE_SPACE; }
-       <<EOF>>             {  yypopState();
-                           return PYTHON_INLINE;
+//<STATE_PYTHON_INLINE> {
+////    [^]                 { /* consume any character */ }
+//      [^\r\n\\]+           { return PYTHON_INLINE; }
+//    {CRLF}                 { yypopState(); return CRLF; }
+//      {WHITE_SPACE}        { return WHITE_SPACE; }
+//       <<EOF>>             {  yypopState();
+//                           return PYTHON_INLINE;
+//      }
+//}
+
+<IS_PYTHON_INLINE> {
+
+    {WS}+ / [^\r\n\t ]              {
+            yybegin(IN_PYTHON_INLINE);
+            return WHITE_SPACE;
+          }
+     // consume any whitespace folloinw the keyword, or blank line before the block
+    {WHITE_SPACE}+               { return WHITE_SPACE; }
+     {CRLF}                    { return CRLF;  }
+
+    [^]                    {
+            yypushback(1);
+            yybegin(IN_PYTHON_BLOCK);
       }
+}
+
+<IN_PYTHON_INLINE> {
+    {CRLF}                    { yypopState(); return CRLF;  }
+
+    // Consume everything else as ARG until we hit CRLF or END
+    (.*|{LINE_CONTINUATION})*     { return PYTHON_INLINE; }
+
 }
 
 <IN_PYTHON_BLOCK> {
   ^{WHITE_SPACE}*end{WHITE_SPACE}*{CRLF}?   { yypopState(); return END; }
 
   /* Any other full line */
-  [^\r\n]*{CRLF}          { return PYTHON_BLOCK_LINE; }
+  [^\r\n]*{CRLF}          { return PYTHON_BLOCK; }
 
-  /* Last partial line before EOF */
-  [^\r\n]+                { return PYTHON_BLOCK_LINE; }
+  /* Last partial line before EOF - @TODO this wouldn't be valid, should return error block */
+  [^\r\n]+                { return PYTHON_BLOCK; }
 }
 
 <IN_TEXT_BLOCK> {
@@ -340,14 +365,14 @@ ENDLINE_BODY=\s*end\s*
 
     // Commands - only recognize at command boundaries
     {COMMAND_EXECUTION} / [^a-zA-Z0-9_]  { yypushState(IN_ARGS); return COMMAND_EXECUTION; }
-    {COMMAND_STACK} / [^a-zA-Z0-9_]     { return COMMAND_STACK; }
+    {COMMAND_STACK} / [^a-zA-Z0-9_]     { yypushState(IN_ARGS); return COMMAND_STACK; }
     {COMMAND_DATA} / [^a-zA-Z0-9_]      {  yypushState(IN_ARGS); return COMMAND_DATA; }
     {COMMAND_CONFIG} / [^a-zA-Z0-9_]    { yypushState(IN_ARGS); return COMMAND_CONFIG; }
 
 
     // print, set and with have complicated lexing due various
     // argument configurations available.
-    {COMMAND_PRINT}            { yypushState(IN_ARGS); return COMMAND_PRINT; }
+    {COMMAND_PRINT} / [^a-zA-Z0-9_]           { yypushState(IN_ARGS); return COMMAND_PRINT; }
     {COMMAND_SET}               { yypushState(IN_ARGS); return COMMAND_SET; }
 
     // command has an optional argument, and no block
@@ -372,10 +397,9 @@ ENDLINE_BODY=\s*end\s*
 
     // Language block transitions
     {PYTHON_KW}                  {
-          yypushState(IN_PYTHON_BLOCK);
-          yypushState(IN_ARGS);
-          return PYTHON_KW;
-         }
+              yypushState(IS_PYTHON_INLINE);
+              return PYTHON_KW;
+             }
 
     // catch all for unknown commands. If a block command matches this it
     // will run to end before failing

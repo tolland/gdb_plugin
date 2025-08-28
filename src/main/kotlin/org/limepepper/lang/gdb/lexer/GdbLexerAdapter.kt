@@ -11,7 +11,7 @@ import org.limepepper.lang.gdb.psi.GdbTypes
 class GdbLexerAdapter : MergingLexerAdapter(
     FlexAdapter(GdbLexer(null)),
     TokenSet.create(
-        GdbTypes.DOC_BLOCK_LINE,
-        GdbTypes.PYTHON_BLOCK_LINE
+        GdbTypes.DOC_BLOCK,
+        GdbTypes.PYTHON_BLOCK
     )
 )

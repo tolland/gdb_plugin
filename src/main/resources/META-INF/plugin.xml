@@ -69,10 +69,10 @@
     <languageInjectionContributor
       implementationClass="org.limepepper.lang.gdb.injection.GdbPyInjectionContributor"
       language="GDBScript"/>
-    <lang.elementManipulator forClass="org.limepepper.lang.gdb.injection.GdbPyBlockPsi" 
+    <lang.elementManipulator forClass="org.limepepper.lang.gdb.injection.GdbPyBlockPsi"
                             implementationClass="org.limepepper.lang.gdb.injection.GdbPyBlockElementManipulator"/>
-    <projectService serviceImplementation="org.limepepper.lang.gdb.injection.GdbPythonPathService"/>
-    <projectActivity implementation="org.limepepper.lang.gdb.injection.GdbPythonPathStartupActivity"/>
+<!--    <projectService serviceImplementation="org.limepepper.lang.gdb.injection.GdbPythonPathService"/>-->
+    <postStartupActivity implementation="org.limepepper.lang.gdb.injection.GdbPythonPathStartupActivity"/>
   </extensions>
 
   <!-- Actions -->

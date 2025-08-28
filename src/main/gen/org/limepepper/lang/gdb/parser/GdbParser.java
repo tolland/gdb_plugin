@@ -36,7 +36,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // code_block_start command_argument* PYTHON_BLOCK_LINE* END
+  // code_block_start command_argument* (CRLF python_code_block END)
   public static boolean code_block(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "code_block")) return false;
     if (!nextTokenIs(builder_, "<code block>", GUILE_KW, PYTHON_KW)) return false;
@@ -45,7 +45,6 @@ public class GdbParser implements PsiParser, LightPsiParser {
     result_ = code_block_start(builder_, level_ + 1);
     result_ = result_ && code_block_1(builder_, level_ + 1);
     result_ = result_ && code_block_2(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, END);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }
@@ -61,15 +60,16 @@ public class GdbParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // PYTHON_BLOCK_LINE*
+  // CRLF python_code_block END
   private static boolean code_block_2(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "code_block_2")) return false;
-    while (true) {
-      int pos_ = current_position_(builder_);
-      if (!consumeToken(builder_, PYTHON_BLOCK_LINE)) break;
-      if (!empty_element_parsed_guard_(builder_, "code_block_2", pos_)) break;
-    }
-    return true;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, CRLF);
+    result_ = result_ && python_code_block(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, END);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
   }
 
   /* ********************************************************** */
@@ -229,7 +229,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // text_block_start command_argument* {CRLF}? doc_block_body END
+  // text_block_start command_argument* CRLF? doc_block_body END
   public static boolean doc_block(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "doc_block")) return false;
     if (!nextTokenIs(builder_, COMMAND_DOCUMENT)) return false;
@@ -255,7 +255,7 @@ public class GdbParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // {CRLF}?
+  // CRLF?
   private static boolean doc_block_2(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "doc_block_2")) return false;
     consumeToken(builder_, CRLF);
@@ -295,6 +295,34 @@ public class GdbParser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(builder_, "gdbFile", pos_)) break;
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // PYTHON_BLOCK_LINE+ | PYTHON_BLOCK
+  public static boolean python_code_block(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "python_code_block")) return false;
+    if (!nextTokenIs(builder_, "<python code block>", PYTHON_BLOCK, PYTHON_BLOCK_LINE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, PYTHON_CODE_BLOCK, "<python code block>");
+    result_ = python_code_block_0(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, PYTHON_BLOCK);
+    exit_section_(builder_, level_, marker_, result_, false, null);
+    return result_;
+  }
+
+  // PYTHON_BLOCK_LINE+
+  private static boolean python_code_block_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "python_code_block_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, PYTHON_BLOCK_LINE);
+    while (result_) {
+      int pos_ = current_position_(builder_);
+      if (!consumeToken(builder_, PYTHON_BLOCK_LINE)) break;
+      if (!empty_element_parsed_guard_(builder_, "python_code_block_0", pos_)) break;
+    }
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
   }
 
   /* ********************************************************** */

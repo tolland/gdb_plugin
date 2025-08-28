@@ -13,4 +13,10 @@ public interface GdbCodeBlock extends PsiElement {
   @NotNull
   List<GdbCommandArgument> getCommandArgumentList();
 
+  @NotNull
+  GdbPythonCodeBlock getPythonCodeBlock();
+
+  @NotNull
+  PsiElement getCrlf();
+
 }

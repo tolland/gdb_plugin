@@ -15,6 +15,4 @@ internal class GdbPsiDocProvider : BaseGdbDocProvider(), PsiDocumentationTargetP
     ): DocumentationTarget? {
         return computeDocumentationTarget(element)
     }
-
-
 }

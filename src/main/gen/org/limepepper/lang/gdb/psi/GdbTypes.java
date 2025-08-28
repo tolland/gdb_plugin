@@ -17,6 +17,7 @@ public interface GdbTypes {
   IElementType COMMAND_STATEMENT = new GdbElementType("COMMAND_STATEMENT");
   IElementType DOC_BLOCK = new GdbElementType("DOC_BLOCK");
   IElementType DOC_BLOCK_BODY = new GdbElementType("DOC_BLOCK_BODY");
+  IElementType PYTHON_CODE_BLOCK = new GdbElementType("PYTHON_CODE_BLOCK");
   IElementType TEXT_BLOCK_START = new GdbElementType("TEXT_BLOCK_START");
 
   IElementType ARG = new GdbTokenType("ARG");
@@ -112,6 +113,9 @@ public interface GdbTypes {
       }
       else if (type == DOC_BLOCK_BODY) {
         return new GdbDocBlockBodyImpl(node);
+      }
+      else if (type == PYTHON_CODE_BLOCK) {
+        return new GdbPythonCodeBlockImpl(node);
       }
       else if (type == TEXT_BLOCK_START) {
         return new GdbTextBlockStartImpl(node);

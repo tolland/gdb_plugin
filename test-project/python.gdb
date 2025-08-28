@@ -15,7 +15,7 @@ def switch_inferior_and_continue(x):
     gdb.execute("continue")
 
 
-def exit_handler(event):
+def exit_handler(_event):
     print("in the exit handler")
     has_threads = [ inferior.num for inferior in gdb.inferiors() if inferior.threads() ]
     if has_threads:

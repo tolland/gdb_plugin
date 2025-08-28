@@ -10,7 +10,6 @@ print   variable_name
 print "Inside command"
 info registers
 backtrace
-end
 
 # Complex expressions (should format operators)
 break function if argc>1&&argv!=NULL

@@ -17,9 +17,10 @@
 
     PYTHON_KW = 'python'
     GUILE_KW = 'guile'
-    PYTHON_BLOCK_LINE = 'PYTHON_BLOCK_LINE'
     DOC_BLOCK_LINE = 'regexp:"([^"\\]|\\.)*"'
+    // parser concept to wrap the various permutations of lexings of python
     PYTHON_BLOCK = 'regexp:python\n.*?(end\b)'
+    PYTHON_BLOCK_LINE = 'PYTHON_BLOCK_LINE'
     PYTHON_INLINE = 'PYTHON_INLINE'
     GUILE_BLOCK = 'regexp:guile\n.*?(end\b)'
     ARGS_BLOCK = 'regexp:args\n.*?(end\b)'
@@ -167,10 +168,12 @@ commands_block ::= commands_block_start command_argument* statement* END
 text_block_start ::= COMMAND_DOCUMENT
 private doc_block_lines ::= DOC_BLOCK_LINE*
 doc_block_body ::= doc_block_lines
-doc_block ::= text_block_start command_argument* {CRLF}? doc_block_body END
+doc_block ::= text_block_start command_argument* CRLF? doc_block_body END
 
 // code blocks such as guile and python
-code_block ::= code_block_start command_argument* PYTHON_BLOCK_LINE* END
+// either lexed multiline as single token, or list of line tokens
+python_code_block ::= (PYTHON_BLOCK_LINE+ | PYTHON_BLOCK)
+code_block ::= code_block_start command_argument* (CRLF python_code_block END)
 code_block_start ::= PYTHON_KW
                     | GUILE_KW
 
