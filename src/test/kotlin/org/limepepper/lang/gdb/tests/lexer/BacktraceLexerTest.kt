@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 class BacktraceLexerTest {
     @Test
-    fun pythonBlockIsSingleTokenUntilEnd() {
+    fun backTraceargVariations() {
         val content = """
             # Stack navigation commands
             backtrace "123"
@@ -19,9 +19,9 @@ class BacktraceLexerTest {
         val tokens = LexerTestUtils.tokenizeWithAdapter(content, GdbLexerAdapter()).filter { it.type != TokenType.WHITE_SPACE }
         // LexerTestUtils.printTokens(tokens)
         assertTrue(tokens.none { it.type == TokenType.BAD_CHARACTER })
-        assertEquals(GdbTypes.PYTHON_KW, tokens[0].type)
-        assertEquals(GdbTypes.PYTHON_BLOCK, tokens[2].type)
-        assertEquals(1, tokens.count { it.type == GdbTypes.PYTHON_BLOCK })
-        assertEquals(GdbTypes.END, tokens.get(tokens.size - 1).type)
+        assertEquals(GdbTypes.COMMAND_STACK, tokens[2].type)
+        assertEquals(GdbTypes.DOUBLE_QUOTED_STRING, tokens[3].type)
+        assertEquals(1, tokens.count { it.type == GdbTypes.COMMAND_STACK })
+        assertEquals(1, tokens.count { it.type == GdbTypes.DOUBLE_QUOTED_STRING })
     }
 }

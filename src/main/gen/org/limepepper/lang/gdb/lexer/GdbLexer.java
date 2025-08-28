@@ -492,10 +492,6 @@ public class GdbLexer implements FlexLexer {
     private int commentStart = -1;
 
     public void yypushState(int newState) {
-      yypushState(newState, -1, -1);
-    }
-
-    public void yypushState(int newState, int start, int next) {
       int currentState = yystate();
       assert currentState != YYINITIAL || stack.empty() : "Can't push initial state into the not empty stack";
       stack.push(currentState);
@@ -910,7 +906,7 @@ public class GdbLexer implements FlexLexer {
           // fall through
           case 53: break;
           case 16:
-            { stringStart = zzStartRead; yypushState(STATE_D_STRING, zzStartRead, -1);
+            { stringStart = zzStartRead; yypushState(STATE_D_STRING);
             }
           // fall through
           case 54: break;

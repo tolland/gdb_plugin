@@ -172,10 +172,6 @@ ENDLINE_BODY=\s*end\s*
     private int commentStart = -1;
 
     public void yypushState(int newState) {
-      yypushState(newState, -1, -1);
-    }
-
-    public void yypushState(int newState, int start, int next) {
       int currentState = yystate();
       assert currentState != YYINITIAL || stack.empty() : "Can't push initial state into the not empty stack";
       stack.push(currentState);
@@ -296,7 +292,7 @@ ENDLINE_BODY=\s*end\s*
 <IN_ARGS> {
 
     // String start transitions
-    \"                        { stringStart = zzStartRead; yypushState(STATE_D_STRING, zzStartRead, -1); }
+    \"                        { stringStart = zzStartRead; yypushState(STATE_D_STRING); }
 
     // Check for end keyword to pop back
 //    {END}                     { yypopState(); return END; }
