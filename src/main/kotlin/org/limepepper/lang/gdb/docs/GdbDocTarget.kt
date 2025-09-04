@@ -1,6 +1,7 @@
 package org.limepepper.lang.gdb.docs
 
 import com.intellij.model.Pointer
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.platform.backend.documentation.DocumentationResult
 import com.intellij.platform.backend.documentation.DocumentationTarget
 import com.intellij.platform.backend.presentation.TargetPresentation
@@ -14,6 +15,8 @@ import org.limepepper.lang.gdb.psi.GdbTypes
  */
 @Suppress("UnstableApiUsage")
 class GdbDocTarget(private val element: PsiElement) : DocumentationTarget {
+
+    private val logger = thisLogger()
 
     override fun createPointer(): Pointer<out DocumentationTarget> {
         // A Pointer allows the IDE to restore this target later if needed.
@@ -31,6 +34,7 @@ class GdbDocTarget(private val element: PsiElement) : DocumentationTarget {
             GdbTypes.COMMAND_DATA,
             GdbTypes.COMMAND_CONFIG,
             GdbTypes.COMMAND_USER -> {
+                //logger.info("returning command presentation for $elementText")
                 val doc = GdbCommandDoc.getDocumentation(elementText)
                 TargetPresentation.builder("GDB Command: $elementText")
                     .presentation()

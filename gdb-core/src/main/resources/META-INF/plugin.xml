@@ -1,0 +1,39 @@
+<idea-plugin require-restart="true">
+    <id>org.limepepper.lang.gdb.core</id>
+    <name>GDB Core Language Support</name>
+    <vendor url="https://github.com/limepepper">limepepper</vendor>
+    <description><![CDATA[
+        Core language support for GDB debugger scripts.
+        Provides lexer, parser, and basic language infrastructure.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <fileType
+                name="GDBScript"
+                implementationClass="org.limepepper.lang.gdb.GdbFileType"
+                fieldName="INSTANCE"
+                language="GDBScript"
+                extensions="gdb"
+         />
+
+        <!-- Parser definition -->
+        <lang.parserDefinition
+            language="GDBScript"
+            implementationClass="org.limepepper.lang.gdb.parser.GdbParserDefinition"
+        />
+
+        <lang.syntaxHighlighterFactory
+            language="GDBScript"
+            implementationClass="org.limepepper.lang.gdb.highlighting.GdbSyntaxHighlighterFactory"
+        />
+
+        <lang.ast.factory
+            implementationClass="org.limepepper.lang.gdb.injection.GdbAstFactory"
+            language="GDBScript"
+        />
+    </extensions>
+</idea-plugin>

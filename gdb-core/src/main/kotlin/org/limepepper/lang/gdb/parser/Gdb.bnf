@@ -1,0 +1,185 @@
+{
+
+  elementTypeClass="org.limepepper.lang.gdb.psi.GdbElementType"
+  elementTypeHolderClass="org.limepepper.lang.gdb.psi.GdbTypes"
+  extends='org.limepepper.lang.gdb.psi.GdbPsiElement'
+//  implements = 'org.limepepper.lang.gdb.psi.GdbPsiElement'
+  parserClass="org.limepepper.lang.gdb.parser.GdbParser"
+  parserUtilClass = "org.limepepper.lang.gdb.parser.GdbParserUtil"
+  psiClassPrefix="Gdb"
+  psiImplClassSuffix="Impl"
+  psiImplPackage="org.limepepper.lang.gdb.psi.impl"
+  psiImplUtilClass="org.limepepper.lang.gdb.psi.impl.GdbPsiImplUtil"
+  psiPackage="org.limepepper.lang.gdb.psi"
+  tokenTypeClass="org.limepepper.lang.gdb.psi.GdbTokenType"
+
+  tokens=[
+
+    PYTHON_KW = 'python'
+    GUILE_KW = 'guile'
+    DOC_BLOCK_LINE = 'regexp:"([^"\\]|\\.)*"'
+    // parser concept to wrap the various permutations of lexings of python
+    PYTHON_BLOCK = 'regexp:python\n.*?(end\b)'
+    PYTHON_BLOCK_LINE = 'PYTHON_BLOCK_LINE'
+    PYTHON_INLINE = 'PYTHON_INLINE'
+    GUILE_BLOCK = 'regexp:guile\n.*?(end\b)'
+    ARGS_BLOCK = 'regexp:args\n.*?(end\b)'
+
+    // Special-case command keywords ---
+    END              = 'end'
+
+
+    // Basic commands (without x, print, p, break, b)
+    COMMAND_BREAKPOINT='regexp:(condition|disable|enable|delete|tbreak|thbreak|hbreak|rbreak|tbre|tbr|tb|break|brea|bre|br|b|watch|rwatch|awatch|catch)'
+    COMMAND_CONFIG='regexp:(unset|source|exec-file|symbol-file|core-file|target|attach|load)'
+    COMMAND_CONTROL='regexp:(if|while)'
+    COMMAND_DATA='regexp:(display|output|printf|call|return|examine|info|i|show|list|l|disassemble|disas)'
+    COMMAND_EXECUTION='regexp:(run|r|start|continue|c|step|s|next|n|finish|until|u|kill|quit|q|detach)'
+    COMMAND_PRINT='regexp:(print|p)'
+    COMMAND_SET='regexp:(set)'
+    COMMAND_SILENT='regexp:(silent)'
+    COMMAND_STACK='regexp:(backtrace|bt|frame|f|up|down|select-frame)'
+    COMMAND_USER='regexp:(define)'
+    /**
+    (gdb) help commands
+    Set commands to be executed when the given breakpoints are hit.
+    Give a space-separated breakpoint list as argument after "commands".
+    A list element can be a breakpoint number (e.g. `5') or a range of numbers
+    (e.g. `5-7').
+    With no argument, the targeted breakpoint is the last one set.
+    The commands themselves follow starting on the next line.
+    Type a line containing "end" to indicate the end of them.
+    Give "silent" as the first line to make the breakpoint silent;
+    then no output is printed when it is hit, except what the commands print
+     */
+    COMMAND_COMMANDS='regexp:(commands)'
+    /**
+     token for any other command in command context, including user defined
+     commands. It has to be pretty bvroad to allow for user defined commands
+      define commandname
+    Define a command named commandname. If there is already a command by that name, you are asked to confirm that you want to redefine it. The argument commandname may be a bare command name consisting of letters, numbers, dashes, dots, and underscores.
+    and also supporting user defined prefixes:
+    (gdb) define-prefix abc def
+    (gdb) define abc def
+    Type commands for definition of "abc def".
+    End with a line saying just "end".
+    >echo command initial def\n
+    >end
+    (gdb) define abc def ghi
+     */
+    COMMAND_GENERIC='regexp:[a-zA-Z_][0-9a-zA-Z_]*'
+
+    ARG='regexp:[a-zA-Z_][a-z0-9A-Z_]*'
+
+    // strings
+    DOUBLE_QUOTED_STRING="regexp:\"([^\\\"\r\n]|\\[^\r\n])*\"?"
+
+    // Structural tokens
+    WHITE_SPACE       = 'regexp:[ \t]'
+    COMMENT          = 'regexp:#[^\r\n]*'
+    LINE_CONTINUATION = 'regexp:\\\\(\r\n|\n|\r)'
+    CRLF             = 'regexp:(\r\n|\n|\r)'
+
+    // Literals
+    HEX_NUMBER='regexp:0x[0-9a-fA-F]+'
+//    VARIABLE = 'regexp:\$[a-zA-Z_][a-zA-Z0-9_]*'
+    REGISTER='regexp:\$[a-zA-Z_][a-zA-Z0-9_]*|\$\d+'
+    NUMBER='regexp:\d+'
+    IDENTIFIER='regexp:[A-Za-z_][a-zA-Z0-9_]*'
+    STRING='regexp:"([^"\\]|\\.)*"'
+
+    // Punctuation
+    ARROW='->'
+    COLON=':'
+    COMMA=','
+    DOT='.'
+    OP_EQUAL='=='
+    OP_ASSIGN='='
+    LBRACE='{'
+    LBRACKET='['
+    LPAREN='('
+    OP_DIV='/'
+    OP_ELLIPSIS='...'
+    OP_GREATER_OR_EQUAL='>='
+    OP_GREATER='>'
+    OP_LESS_OR_EQUAL='<='
+    OP_LESS='<'
+    RBRACE='}'
+    RBRACKET=']'
+    RPAREN=')'
+    SEMICOLON=';'
+    OP_AND_AND='&&'
+    OP_OR_OR='||'
+    OP_PIPE='|'
+
+    // Operators
+    OP_PLUS='+'
+    OP_MINUS='-'
+    OP_MUL='*'
+    OP_DIV='/'
+    OP_MOD='%'
+
+    OPERATOR='OPERATOR'
+    ASSIGNMENT='ASSIGNMENT'
+
+    SINGLE_QUOTE="'"
+    SCOPE_RESOLUTION='::'
+    WORD             = 'regexp:[^#\s\\]+'
+  ]
+}
+
+
+gdbFile ::= statement*
+
+private statement ::= (CRLF
+            | comment
+            | commands_block
+            | doc_block
+            | code_block
+            | command_statement
+            )
+/**
+A GDB command is a single line of input. There is no limit on how long it can be. It starts with a command name, which is followed by arguments whose meaning depends on the command name.
+ */
+command_statement ::= command_name command_argument* (CRLF | <<eof>>) {
+
+}
+
+// The set of words that gdb accepts as a "command name" with possible args
+command_name ::= COMMAND_EXECUTION
+               | COMMAND_BREAKPOINT
+               | COMMAND_STACK
+               | COMMAND_DATA
+               | COMMAND_PRINT
+               | COMMAND_SET
+               | COMMAND_SILENT
+               | COMMAND_CONFIG
+               | COMMAND_GENERIC
+
+// commands blocks have a start token and an end token.
+// The start token is the command name, and the end token is "end".
+commands_block_start ::= COMMAND_COMMANDS
+                      | COMMAND_USER
+                      | COMMAND_CONTROL
+
+commands_block ::= commands_block_start command_argument* statement* END
+
+// free text that occurs in document block body
+text_block_start ::= COMMAND_DOCUMENT
+private doc_block_lines ::= DOC_BLOCK_LINE*
+doc_block_body ::= doc_block_lines
+doc_block ::= text_block_start command_argument* CRLF? doc_block_body END
+
+// code blocks such as guile and python
+// either lexed multiline as single token, or list of line tokens
+python_code_block ::= (PYTHON_BLOCK_LINE+ | PYTHON_BLOCK)
+code_block ::= code_block_start command_argument* (CRLF python_code_block END)
+code_block_start ::= PYTHON_KW
+                    | GUILE_KW
+
+command_argument ::= HEX_NUMBER
+                     | REGISTER
+                     | NUMBER
+                     | DOUBLE_QUOTED_STRING
+                     | STRING
+                     | ARG

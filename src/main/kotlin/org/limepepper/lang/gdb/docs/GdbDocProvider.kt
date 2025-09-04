@@ -18,7 +18,7 @@ class GdbDocProvider : DocumentationTargetProvider {
         logger.info("GdbDocumentationTargetProvider.documentationTargets called for file: ${file.name}, offset: $offset")
 
         // Check if this is a GDB file
-        val isGdbFile = file.name.endsWith(".gdb") || file.fileType.name == "GDB Script"
+        val isGdbFile = file.name.endsWith(".gdb") || file.fileType.name == "GDBScript"
         if (!isGdbFile) {
             logger.info("File ${file.name} is not a GDB file, skipping")
             return emptyList()
